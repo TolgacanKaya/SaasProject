@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Müşteriler | T-Randevu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-dark px-4 shadow-sm">
+        <a class="navbar-brand fw-bold" href="#">T-Randevu SaaS</a>
+        <div class="d-flex text-white align-items-center">
+            <span class="me-3">Hoş Geldiniz, <strong>{{ request.user.username }}</strong></span>
+            <a href="{% url 'cikis' %}" class="btn btn-sm btn-outline-light">Çıkış Yap</a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 bg-white min-vh-100 shadow-sm pt-4">
+                <div class="text-center mb-4">
+                    {% if isletme.logo %}
+                        <img src="{{ isletme.logo.url }}" class="rounded-circle object-fit-cover shadow-sm mb-2" width="70" height="70" alt="Logo">
+                    {% else %}
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold fs-3 mb-2" style="width: 70px; height: 70px;">
+                            {{ isletme.name|make_list|first }}
+                        </div>
+                    {% endif %}
+                    <h6 class="fw-bold text-dark">{{ isletme.name }}</h6>
+                    <span class="badge bg-success">Aktif Plan</span>
+                </div>
+                <hr>
+                <div class="list-group list-group-flush border-0">
+                    {% if not isletme.is_premium %}
+                        <a href="{% url 'isletme_abonelik' %}" class="list-group-item list-group-item-action fw-bold border-0 rounded mt-2 bg-warning text-dark">⭐ Pro Plan'a Yükselt</a>
+                    {% else %}
+                        <a href="{% url 'isletme_abonelik' %}" class="list-group-item list-group-item-action border-0 text-success fw-bold mt-2">👑 Abonelik Yönetimi</a>
+                    {% endif %}
+                    <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action border-0">📊 Genel Bakış</a>
+                    <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action border-0">🗓️ Randevular</a>
+                    <a href="{% url 'isletme_musteriler' %}" class="list-group-item list-group-item-action active fw-bold border-0 rounded">👥 Müşteriler</a>
+                    <a href="{% url 'isletme_hizmetler' %}" class="list-group-item list-group-item-action border-0">✂️ Hizmetlerim</a>
+                    <a href="{% url 'isletme_ayarlar' %}" class="list-group-item list-group-item-action border-0">⚙️ İşletme Ayarları</a>
+                    <a href="/{{ isletme.slug }}/" target="_blank" class="list-group-item list-group-item-action border-0 text-primary mt-3">
+                        🔗 Vitrinimi Gör
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-10 p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold m-0">👥 Müşteri Veritabanı (CRM)</h3>
+                    <button class="btn btn-primary fw-bold shadow-sm">📥 Listeyi İndir (Excel)</button>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-0">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="px-4 py-3">Müşteri Adı Soyadı</th>
+                                    <th class="py-3">Telefon Numarası</th>
+                                    <th class="py-3 text-end px-4">Toplam Randevu Sayısı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for musteri in musteriler %}
+                                <tr>
+                                    <td class="px-4 py-3 fw-bold text-dark">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 40px; height: 40px;">
+                                                {{ musteri.first_name|make_list|first }}
+                                            </div>
+                                            {{ musteri.first_name }} {{ musteri.last_name }}
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <a href="tel:{{ musteri.phone }}" class="text-decoration-none text-dark">📞 {{ musteri.phone }}</a>
+                                    </td>
+                                    <td class="py-3 text-end px-4">
+                                        <span class="badge bg-primary rounded-pill fs-6">{{ musteri.appointments.count }}</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted">
+                                        Henüz sisteminize kayıtlı bir müşteri bulunmuyor.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

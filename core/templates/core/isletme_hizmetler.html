@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Hizmetlerim | T-Randevu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-dark px-4 shadow-sm">
+        <a class="navbar-brand fw-bold" href="#">T-Randevu SaaS</a>
+        <div class="d-flex text-white align-items-center">
+            <span class="me-3">Hoş Geldiniz, <strong>{{ request.user.username }}</strong></span>
+            <a href="{% url 'cikis' %}" class="btn btn-sm btn-outline-light">Çıkış Yap</a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 bg-white min-vh-100 shadow-sm pt-4">
+                <div class="text-center mb-4">
+                    {% if isletme.logo %}
+                        <img src="{{ isletme.logo.url }}" class="rounded-circle object-fit-cover shadow-sm mb-2" width="70" height="70" alt="Logo">
+                    {% else %}
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold fs-3 mb-2" style="width: 70px; height: 70px;">
+                            {{ isletme.name|make_list|first }}
+                        </div>
+                    {% endif %}
+                    <h6 class="fw-bold text-dark">{{ isletme.name }}</h6>
+
+                    {% if isletme.is_premium %}
+                        <span class="badge bg-warning text-dark fw-bold shadow-sm px-3">⭐ PRO İŞLETME</span>
+                    {% else %}
+                        <span class="badge bg-secondary opacity-75 fw-normal">Ücretsiz Plan</span>
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="list-group list-group-flush border-0">
+                    {% if not isletme.is_premium %}
+                        <a href="{% url 'isletme_abonelik' %}" class="list-group-item list-group-item-action fw-bold border-0 rounded mt-2 bg-warning text-dark">⭐ Pro Plan'a Yükselt</a>
+                    {% else %}
+                        <a href="{% url 'isletme_abonelik' %}" class="list-group-item list-group-item-action border-0 text-success fw-bold mt-2">👑 Abonelik Yönetimi</a>
+                    {% endif %}
+
+                    <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action border-0">📊 Genel Bakış</a>
+                    <a href="{% url 'isletme_hizmetler' %}" class="list-group-item list-group-item-action active fw-bold border-0 rounded">✂️ Hizmetlerim</a>
+                    <a href="{% url 'isletme_randevular' %}" class="list-group-item list-group-item-action border-0">🗓️ Randevular</a>
+                    <a href="{% url 'isletme_musteriler' %}" class="list-group-item list-group-item-action border-0">👥 Müşteriler</a>
+                    <a href="{% url 'isletme_ayarlar' %}" class="list-group-item list-group-item-action border-0">⚙️ Vitrin Ayarları</a>
+                    <a href="/{{ isletme.slug }}/" target="_blank" class="list-group-item list-group-item-action border-0 text-primary mt-3">🔗 Vitrinimi Gör</a>
+                </div>
+            </div>
+
+            <div class="col-md-10 p-4 p-md-5">
+                <h3 class="fw-bold mb-4">✂️ Hizmet ve Fiyat Listesi</h3>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 fw-bold" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold border-bottom pb-2 mb-3">Yeni Hizmet Ekle</h5>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Hizmet Adı</label>
+                                        <input type="text" name="name" class="form-control" placeholder="Örn: Saç Kesimi" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Fiyat (₺)</label>
+                                        <input type="number" name="price" class="form-control" placeholder="Örn: 250" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Hizmet Konumu</label>
+                                        <select name="location_type" class="form-select" required>
+                                            <option value="in_store">📍 İşletmede (Benim Mekanımda)</option>
+                                            <option value="at_home">🏠 Müşteri Adresinde (Evde/İşyerinde)</option>
+                                            <option value="online">💻 Online (Görüntülü/Telefonda)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">Tahmini Süre (İsteğe Bağlı)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="duration_value" class="form-control" placeholder="Örn: 2" min="1">
+                                            <select name="duration_unit" class="form-select" style="max-width: 120px;" required>
+                                                <option value="minutes">Dakika</option>
+                                                <option value="hours">Saat</option>
+                                                <option value="days">Gün</option>
+                                                <option value="weeks">Hafta</option>
+                                                <option value="months">Ay</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold">➕ Vitrine Ekle</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="px-4 py-3">Hizmet Adı</th>
+                                        <th class="py-3">Süre</th>
+                                        <th class="py-3">Fiyat</th>
+                                        <th class="py-3 text-end px-4">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for hizmet in hizmetler %}
+                                    <tr>
+                                        <td class="px-4 fw-bold text-dark">
+                                            {{ hizmet.name }} <br>
+                                            {% if hizmet.location_type == 'in_store' %}
+                                                <span class="badge bg-secondary border small mt-1">📍 İşletmede</span>
+                                            {% elif hizmet.location_type == 'at_home' %}
+                                                <span class="badge bg-info text-dark border small mt-1">🏠 Müşteri Adresinde</span>
+                                            {% elif hizmet.location_type == 'online' %}
+                                                <span class="badge bg-primary border small mt-1">💻 Online</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><span class="text-muted">⏱️ {{ hizmet.formatted_duration }}</span></td>
+                                        <td><span class="badge bg-success fs-6">{{ hizmet.price }} ₺</span></td>
+                                        <td class="text-end px-4">
+                                            <a href="{% url 'hizmet_sil' hizmet.id %}" class="btn btn-sm btn-outline-danger fw-bold" onclick="return confirm('Bu hizmeti vitrinden kaldırmak istediğinize emin misiniz?');">Sil</a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            Vitrininizde henüz bir hizmet yok. Sol taraftaki formu kullanarak eklemeye başlayın!
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
