@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tüm Randevular | T-Randevu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-dark px-4 shadow-sm">
+        <a class="navbar-brand fw-bold" href="#">T-Randevu SaaS</a>
+        <div class="d-flex text-white align-items-center">
+            <span class="me-3">Hoş Geldiniz, <strong>{{ request.user.username }}</strong></span>
+            <a href="{% url 'cikis' %}" class="btn btn-sm btn-outline-light">Çıkış Yap</a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 bg-white min-vh-100 shadow-sm pt-4">
+                <div class="text-center mb-4">
+                    {% if isletme.logo %}
+                        <img src="{{ isletme.logo.url }}" class="rounded-circle object-fit-cover shadow-sm mb-2" width="70" height="70" alt="Logo">
+                    {% else %}
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold fs-3 mb-2" style="width: 70px; height: 70px;">
+                            {{ isletme.name|make_list|first }}
+                        </div>
+                    {% endif %}
+                    <h6 class="fw-bold text-dark">{{ isletme.name }}</h6>
+
+                    {% if isletme.is_premium %}
+                        <span class="badge bg-warning text-dark fw-bold shadow-sm px-3">⭐ PRO İŞLETME</span>
+                    {% else %}
+                        <span class="badge bg-secondary opacity-75 fw-normal">Ücretsiz Plan</span>
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="list-group list-group-flush border-0">
+                    {% if not isletme.is_premium %}
+                        <a href="{% url 'isletme_abonelik' %}" class="list-group-item list-group-item-action fw-bold border-0 rounded mt-2 bg-warning text-dark">⭐ Pro Plan'a Yükselt</a>
+                    {% else %}
+                        <a href="{% url 'isletme_abonelik' %}" class="list-group-item list-group-item-action border-0 text-success fw-bold mt-2">👑 Abonelik Yönetimi</a>
+                    {% endif %}
+                    <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action border-0">📊 Genel Bakış</a>
+                    <a href="{% url 'isletme_randevular' %}" class="list-group-item list-group-item-action active fw-bold border-0 rounded">🗓️ Tüm Randevular</a>
+                    <a href="{% url 'isletme_musteriler' %}" class="list-group-item list-group-item-action border-0">👥 Müşteriler</a>
+                    <a href="{% url 'isletme_hizmetler' %}" class="list-group-item list-group-item-action border-0">✂️ Hizmetlerim</a>
+                    <a href="{% url 'isletme_ayarlar' %}" class="list-group-item list-group-item-action border-0">⚙️ İşletme Ayarları</a>
+                    <a href="/{{ isletme.slug }}/" target="_blank" class="list-group-item list-group-item-action border-0 text-primary mt-3">🔗 Vitrinimi Gör</a>
+                </div>
+            </div>
+
+            <div class="col-md-10 p-4 p-md-5">
+                <h3 class="fw-bold mb-4">🗓️ Tüm Randevu Arşivi</h3>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 fw-bold" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-0">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="px-4 py-3">Müşteri</th>
+                                    <th class="py-3">Hizmet</th>
+                                    <th class="py-3">Tarih & Saat</th>
+                                    <th class="py-3">Durum</th>
+                                    <th class="py-3 text-end px-4">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for randevu in randevular %}
+                                <tr>
+                                    <td class="px-4 fw-bold text-dark">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</td>
+                                    <td><span class="badge bg-secondary">{{ randevu.service.name }}</span></td>
+                                    <td>
+                                        <span class="text-muted">📅 {{ randevu.date_time|date:"d M Y" }}</span><br>
+                                        <span class="fw-bold text-dark">⏰ {{ randevu.date_time|time:"H:i" }}</span>
+                                    </td>
+                                    <td>
+                                        {% if randevu.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark mt-1">⏳ Bekliyor</span>
+                                        {% elif randevu.status == 'approved' %}
+                                            <span class="badge bg-success mt-1">✅ Onaylandı</span>
+                                        {% elif randevu.status == 'cancelled' %}
+                                            <span class="badge bg-danger mt-1">❌ İptal Edildi</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end px-4">
+                                        <button type="button" class="btn btn-sm btn-info text-white fw-bold me-1" data-bs-toggle="modal" data-bs-target="#randevuModal{{ randevu.id }}">
+                                            🔍 Detay
+                                        </button>
+
+                                        {% if randevu.status == 'pending' %}
+                                            <a href="{% url 'randevu_onayla' randevu.id %}" class="btn btn-sm btn-success fw-bold">Onayla</a>
+                                            <a href="{% url 'randevu_iptal' randevu.id %}" class="btn btn-sm btn-outline-danger">İptal</a>
+                                        {% elif randevu.status == 'approved' %}
+                                            <a href="{% url 'randevu_iptal' randevu.id %}" class="btn btn-sm btn-outline-danger">İptal Et</a>
+                                        {% else %}
+                                            <span class="text-muted small">İşlem Kapalı</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+
+                                <div class="modal fade text-start" id="randevuModal{{ randevu.id }}" tabindex="-1" aria-hidden="true">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4">
+                                      <div class="modal-header bg-light border-bottom-0 pb-0">
+                                        <h5 class="modal-title fw-bold">📋 Randevu Detayı</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                      </div>
+                                      <div class="modal-body p-4">
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block">Müşteri</small>
+                                            <span class="fw-bold fs-5">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block">İletişim Numarası</small>
+                                            <a href="tel:{{ randevu.customer.phone }}" class="fw-bold text-primary text-decoration-none">📞 {{ randevu.customer.phone }}</a>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block">Alınan Hizmet</small>
+                                            <span class="badge bg-secondary">{{ randevu.service.name }}</span>
+                                        </div>
+                                        <div class="mb-4">
+                                            <small class="text-muted d-block">Tarih & Saat</small>
+                                            <span class="fw-bold text-dark">📅 {{ randevu.date_time|date:"d M Y" }} - ⏰ {{ randevu.date_time|time:"H:i" }}</span>
+                                        </div>
+
+                                        {% if randevu.service.location_type == 'at_home' %}
+                                            <div class="alert alert-info border-info border-start border-4 border-end-0 border-top-0 border-bottom-0 bg-light">
+                                                <h6 class="fw-bold text-info mb-2">🏠 Gidilecek Adres</h6>
+                                                <p class="mb-0">{{ randevu.customer_address|default:"Adres belirtilmemiş." }}</p>
+                                            </div>
+                                        {% elif randevu.service.location_type == 'online' %}
+                                            <div class="alert alert-primary border-primary border-start border-4 border-end-0 border-top-0 border-bottom-0 bg-light">
+                                                <h6 class="fw-bold text-primary mb-2">💻 Online Görüşme Bilgileri</h6>
+                                                <p class="mb-1"><strong>Uygulama:</strong> {{ randevu.online_app|default:"Belirtilmemiş" }}</p>
+                                                <p class="mb-0"><strong>Kullanıcı Adı/Link:</strong> {{ randevu.online_link|default:"Belirtilmemiş" }}</p>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-secondary border-secondary border-start border-4 border-end-0 border-top-0 border-bottom-0 bg-light">
+                                                <h6 class="fw-bold text-secondary mb-0">📍 İşletmenizde Gerçekleşecek</h6>
+                                            </div>
+                                        {% endif %}
+
+                                      </div>
+                                      <div class="modal-footer border-top-0 pt-0">
+                                        <button type="button" class="btn btn-secondary w-100 fw-bold" data-bs-dismiss="modal">Kapat</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">Henüz randevunuz bulunmuyor.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
