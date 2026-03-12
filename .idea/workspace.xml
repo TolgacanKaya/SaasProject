@@ -4,7 +4,44 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b8d7e1a1-0524-493f-a306-4793c7ea7bd6" name="Changes" comment="Proje iskeleti ve core app oluşturuldu" />
+    <list default="true" id="b8d7e1a1-0524-493f-a306-4793c7ea7bd6" name="Changes" comment="Proje iskeleti ve core app oluşturuldu">
+      <change afterPath="$PROJECT_DIR$/accounts/templates/accounts/giris.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/accounts/templates/accounts/kayit.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/appointments/templates/appointments/isletme_randevular.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/businesses/templates/businesses/dashboard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_abonelik.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_ayarlar.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_detay.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_hizmetler.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_musteriler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/SaasProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SaasProject.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0002_business_logo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0003_business_cover_image.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0004_service_duration_type_alter_service_duration.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0005_business_is_premium_business_theme_color.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0006_service_location_type.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0007_appointment_customer_address_appointment_online_app_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/ana_sayfa.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/ana_sayfa.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/dashboard.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/giris.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/isletme_abonelik.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/isletme_ayarlar.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/isletme_detay.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/isletme_hizmetler.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/isletme_musteriler.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/isletme_randevular.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/kayit.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/kesfet.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/kesfet.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,6 +70,10 @@
     &quot;accountId&quot;: &quot;728cfc8b-69dc-4a6d-bc08-476fdee2cbbe&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -46,20 +87,43 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Tolgacan Kaya/OneDrive/Masaüstü/SaasProject&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\businesses\templates\businesses" />
+      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\appointments\templates\appointments" />
+      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\accounts\templates\accounts" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-ce6832f46686-7b97d883f26b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.25557.178" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.31033.139" />
+        <option value="bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139" />
       </set>
     </attachedChunks>
   </component>
@@ -70,6 +134,11 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1772714613004</updated>
+      <workItem from="1772856071603" duration="401000" />
+      <workItem from="1772856510455" duration="583000" />
+      <workItem from="1772891994955" duration="31000" />
+      <workItem from="1772892051199" duration="24805000" />
+      <workItem from="1773199288272" duration="20000" />
     </task>
     <task id="LOCAL-00001" summary="Proje iskeleti ve core app oluşturuldu">
       <option name="closed" value="true" />
@@ -81,6 +150,9 @@
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Proje iskeleti ve core app oluşturuldu" />

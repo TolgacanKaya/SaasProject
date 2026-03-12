@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}İşletme Paneli | T-Randevu{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Premium Temalar Buraya Gelecek */
+        .tema-kuafor .bg-dark { background-color: #1a1a1a !important; }
+        .tema-kuafor .active { background-color: #d4af37 !important; color: #000 !important; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-light {% if isletme.is_premium %}tema-{{ isletme.category.name|slugify }}{% endif %}">
+
+    <nav class="navbar navbar-dark bg-dark px-4 shadow-sm">
+        <a class="navbar-brand fw-bold" href="#">T-Randevu SaaS</a>
+        <div class="d-flex text-white align-items-center">
+            <span class="me-3">Hoş Geldiniz, <strong>{{ request.user.username }}</strong></span>
+            <a href="{% url 'cikis' %}" class="btn btn-sm btn-outline-light">Çıkış Yap</a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 bg-white min-vh-100 shadow-sm pt-4">
+                <div class="text-center mb-4">
+                    {% if isletme.logo %}
+                        <img src="{{ isletme.logo.url }}" class="rounded-circle object-fit-cover shadow-sm mb-2" width="70" height="70">
+                    {% else %}
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold fs-3 mb-2" style="width: 70px; height: 70px;">
+                            {{ isletme.name|make_list|first }}
+                        </div>
+                    {% endif %}
+                    <h6 class="fw-bold text-dark">{{ isletme.name }}</h6>
+                    {% if isletme.is_premium %}
+                        <span class="badge bg-warning text-dark fw-bold shadow-sm px-3">⭐ PRO İŞLETME</span>
+                    {% else %}
+                        <span class="badge bg-secondary opacity-75 fw-normal">Ücretsiz Plan</span>
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="list-group list-group-flush border-0">
+
+                    {% if not isletme.is_premium %}
+                        <a href="{% url 'isletme_abonelik' %}" class="list-group-item list-group-item-action fw-bold border-0 rounded mb-2 bg-warning text-dark shadow-sm">⭐ Pro Plan'a Yükselt</a>
+                    {% else %}
+                        <a href="{% url 'isletme_abonelik' %}" class="list-group-item list-group-item-action border-0 text-success fw-bold mb-2">👑 Abonelik Yönetimi</a>
+                    {% endif %}
+                    <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action border-0">📊 Genel Bakış</a>
+                    <a href="{% url 'isletme_randevular' %}" class="list-group-item list-group-item-action border-0">🗓️ Randevular</a>
+                    <a href="{% url 'isletme_musteriler' %}" class="list-group-item list-group-item-action border-0">👥 Müşteriler</a>
+                    <a href="{% url 'isletme_hizmetler' %}" class="list-group-item list-group-item-action border-0">✂️ Hizmetlerim</a>
+                    <a href="{% url 'isletme_ayarlar' %}" class="list-group-item list-group-item-action border-0">⚙️ İşletme Ayarları</a>
+                    <a href="/{{ isletme.slug }}/" target="_blank" class="list-group-item list-group-item-action border-0 text-primary mt-3">🔗 Vitrinimi Gör</a>
+                </div>
+            </div>
+
+            <div class="col-md-10 p-4 p-md-5">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 fw-bold" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

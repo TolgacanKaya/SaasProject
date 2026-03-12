@@ -1,0 +1,52 @@
+{% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
+
+{% block title %}Müşteriler | T-Randevu{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold m-0">👥 Müşteri Veritabanı (CRM)</h3>
+    <button class="btn btn-primary fw-bold shadow-sm">📥 Listeyi İndir (Excel)</button>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="px-4 py-3 border-0">Müşteri Adı Soyadı</th>
+                    <th class="py-3 border-0">Telefon Numarası</th>
+                    <th class="py-3 text-end px-4 border-0">Toplam Randevu Sayısı</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for musteri in musteriler %}
+                <tr>
+                    <td class="px-4 py-3 fw-bold text-dark border-light">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3 shadow-sm" style="width: 40px; height: 40px;">
+                                {{ musteri.first_name|make_list|first }}
+                            </div>
+                            {{ musteri.first_name }} {{ musteri.last_name }}
+                        </div>
+                    </td>
+                    <td class="py-3 border-light">
+                        <a href="tel:{{ musteri.phone }}" class="text-decoration-none text-dark fw-bold">📞 {{ musteri.phone }}</a>
+                    </td>
+                    <td class="py-3 text-end px-4 border-light">
+                        <span class="badge bg-primary rounded-pill fs-6 shadow-sm">{{ musteri.appointments.count }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-5 text-muted border-0">
+                        <div class="display-1 text-light mb-3">👥</div>
+                        <h5>Henüz sisteminize kayıtlı bir müşteri bulunmuyor.</h5>
+                        <p class="mb-0">Müşterileriniz randevu aldıkça bu liste otomatik olarak dolacaktır.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
