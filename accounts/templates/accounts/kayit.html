@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}İşletme Kayıt | T-Randevu{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center py-5" style="min-height: 80vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-4 p-4">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-primary">T-Randevu'ya Katıl</h2>
+                        <p class="text-muted">Saniyeler içinde işletmeni dijitale taşı</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger fw-bold text-center">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">İşletme Adı (Vitrin İsminiz)</label>
+                            <input type="text" name="business_name" class="form-control form-control-lg" placeholder="Örn: Tolga Kuaför" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">İşletme Kategoriniz</label>
+                            <select name="category" class="form-select form-select-lg" required>
+                                <option value="">--- Sektörünüzü Seçin ---</option>
+                                {% for kategori in kategoriler %}
+                                    {% if kategori.name != "Diğer" %}
+                                        <option value="{{ kategori.id }}">{{ kategori.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                                <option value="diger" class="fw-bold text-primary">➕ Diğer (Listede Yok)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Kullanıcı Adı (Giriş İçin)</label>
+                            <input type="text" name="username" class="form-control form-control-lg" placeholder="Örn: tolgakuafor" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">E-posta Adresiniz</label>
+                            <input type="email" name="email" class="form-control form-control-lg" placeholder="iletisim@sirket.com" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Şifre</label>
+                                <input type="password" name="password" class="form-control form-control-lg" placeholder="••••••••" required>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Şifre (Tekrar)</label>
+                                <input type="password" name="password_confirm" class="form-control form-control-lg" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow">Ücretsiz Hesap Oluştur</button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3">
+                        <p class="text-muted mb-0">Zaten bir hesabın var mı?</p>
+                        <a href="{% url 'giris' %}" class="text-decoration-none fw-bold text-primary">Hemen Giriş Yap</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,133 +1,114 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İşletmeleri Keşfet | T-Randevu</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %}
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold fs-4" href="/">T-Randevu</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link active fw-bold text-white" href="/kesfet/">🔍 İşletmeleri Keşfet</a></li>
-                    <li class="nav-item ms-3"><a class="btn btn-outline-light" href="{% url 'giris' %}">İşletme Girişi</a></li>
-                    <li class="nav-item ms-2"><a class="btn btn-primary" href="{% url 'kayit' %}">Hemen Başla</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+{% block title %}İşletmeleri Keşfet | T-Randevu{% endblock %}
 
-    <div class="container mt-4">
-        <form method="GET" action="{% url 'kesfet' %}" class="bg-white p-4 rounded-4 shadow-sm mb-5">
-            <div class="row g-3">
-
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Ne Arıyorsunuz?</label>
-                    <input type="text" name="arama" class="form-control form-control-lg" list="kategori-onerileri" placeholder="Kuaför, Marangoz..." value="{{ request.GET.arama }}" autocomplete="off">
-
-                    <datalist id="kategori-onerileri">
-                        {% for kategori in kategoriler %}
-                            <option value="{{ kategori.name }}">
-                        {% endfor %}
-                    </datalist>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Şehir</label>
-                    <input type="text" name="sehir" class="form-control form-control-lg" list="sehir-onerileri" placeholder="Şehir seçin..." value="{{ request.GET.sehir }}" autocomplete="off">
-
-                    <datalist id="sehir-onerileri">
-                        <option value="Adana"><option value="Adıyaman"><option value="Afyonkarahisar"><option value="Ağrı"><option value="Amasya"><option value="Ankara"><option value="Antalya"><option value="Artvin"><option value="Aydın"><option value="Balıkesir"><option value="Bilecik"><option value="Bingöl"><option value="Bitlis"><option value="Bolu"><option value="Burdur"><option value="Bursa"><option value="Çanakkale"><option value="Çankırı"><option value="Çorum"><option value="Denizli"><option value="Diyarbakır"><option value="Edirne"><option value="Elazığ"><option value="Erzincan"><option value="Erzurum"><option value="Eskişehir"><option value="Gaziantep"><option value="Giresun"><option value="Gümüşhane"><option value="Hakkari"><option value="Hatay"><option value="Isparta"><option value="Mersin"><option value="İstanbul"><option value="İzmir"><option value="Kars"><option value="Kastamonu"><option value="Kayseri"><option value="Kırklareli"><option value="Kırşehir"><option value="Kocaeli"><option value="Konya"><option value="Kütahya"><option value="Malatya"><option value="Manisa"><option value="Kahramanmaraş"><option value="Mardin"><option value="Muğla"><option value="Muş"><option value="Nevşehir"><option value="Niğde"><option value="Ordu"><option value="Rize"><option value="Sakarya"><option value="Samsun"><option value="Siirt"><option value="Sinop"><option value="Sivas"><option value="Tekirdağ"><option value="Tokat"><option value="Trabzon"><option value="Tunceli"><option value="Şanlıurfa"><option value="Uşak"><option value="Van"><option value="Yozgat"><option value="Zonguldak"><option value="Aksaray"><option value="Bayburt"><option value="Karaman"><option value="Kırıkkale"><option value="Batman"><option value="Şırnak"><option value="Bartın"><option value="Ardahan"><option value="Iğdır"><option value="Yalova"><option value="Karabük"><option value="Kilis"><option value="Osmaniye"><option value="Düzce">
-                    </datalist>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">Kategori Seçin</label>
-                    <select class="form-select form-select-lg" name="kategori">
-                        <option value="">Tümü</option>
-                        {% for kategori in kategoriler %}
-                            <option value="{{ kategori.id }}" {% if request.GET.kategori == kategori.id|stringformat:"s" %}selected{% endif %}>
-                                {{ kategori.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="col-md-1 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold px-0">Bul</button>
-                </div>
-
-            </div>
-        </form>
-    </div>
-    <div class="container pb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold text-dark">Yakınınızdaki İşletmeler</h3>
-            <span class="text-muted">{{ isletmeler|length }} işletme bulundu</span>
-        </div>
-
-        <div class="row g-4">
-            {% for isletme in isletmeler %}
+{% block content %}
+<div class="container mt-5">
+    <form method="GET" action="{% url 'kesfet' %}" class="bg-white p-4 rounded-4 shadow-sm mb-5">
+        <div class="row g-3">
             <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                <label class="form-label fw-bold">Ne Arıyorsunuz?</label>
+                <input type="text" name="arama" class="form-control form-control-lg" list="kategori-onerileri" placeholder="Kuaför, Marangoz..." value="{{ request.GET.arama }}" autocomplete="off">
 
-                    <div class="position-relative">
-                        {% if isletme.is_premium %}
-                            <span class="position-absolute top-0 end-0 badge bg-warning text-dark m-3 z-1 shadow-sm">
-                                ★ Premium
-                            </span>
-                        {% endif %}
-
-                        {% if isletme.logo %}
-                            <img src="{{ isletme.logo.url }}" class="card-img-top" alt="{{ isletme.name }}" style="height: 200px; object-fit: cover;">
-                        {% else %}
-                            <div class="card-img-top bg-secondary bg-gradient d-flex align-items-center justify-content-center text-white" style="height: 200px;">
-                                <span class="display-1 opacity-50">🏪</span>
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="card-body mt-2">
-                        {% if isletme.category %}
-                        <span class="badge bg-dark mb-2">{{ isletme.category.name }}</span>
-                        {% endif %}
-
-                        <h5 class="card-title fw-bold text-dark fs-4 mb-1">{{ isletme.name }}</h5>
-                        <p class="card-text text-muted small mb-3">
-                            📍 {{ isletme.city|default:"Konum Belirtilmemiş" }} - {{ isletme.district|default:"" }}
-                        </p>
-                        <p class="card-text text-dark" style="font-size: 0.95rem;">
-                            {{ isletme.description|truncatewords:12|default:"Bu işletme için henüz bir açıklama girilmemiş." }}
-                        </p>
-                    </div>
-
-                    <div class="card-footer bg-white border-top-0 pb-4 pt-0">
-                        <a href="/{{ isletme.slug }}/" class="btn btn-outline-primary w-100 fw-bold">Profili İncele ve Randevu Al</a>
-                    </div>
-                </div>
+                <datalist id="kategori-onerileri">
+                    {% for kategori in kategoriler %}
+                        <option value="{{ kategori.name }}">
+                    {% endfor %}
+                </datalist>
             </div>
 
-            {% empty %}
-            <div class="col-12 text-center py-5">
-                <div class="alert alert-light border shadow-sm p-5" role="alert">
-                    <span class="display-1 d-block mb-3">🏪</span>
-                    <h4 class="text-muted">Buralar henüz çok sessiz...</h4>
-                    <p>Sistemde aradığınız kriterlere uygun işletme bulunamadı.</p>
-                </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Şehir</label>
+                <input type="text" name="sehir" class="form-control form-control-lg" list="sehir-onerileri" placeholder="Şehir seçin..." value="{{ request.GET.sehir }}" autocomplete="off">
+
+                <datalist id="sehir-onerileri">
+                    <option value="Adana"><option value="Adıyaman"><option value="Afyonkarahisar"><option value="Ağrı"><option value="Amasya"><option value="Ankara"><option value="Antalya"><option value="Artvin"><option value="Aydın"><option value="Balıkesir"><option value="Bilecik"><option value="Bingöl"><option value="Bitlis"><option value="Bolu"><option value="Burdur"><option value="Bursa"><option value="Çanakkale"><option value="Çankırı"><option value="Çorum"><option value="Denizli"><option value="Diyarbakır"><option value="Edirne"><option value="Elazığ"><option value="Erzincan"><option value="Erzurum"><option value="Eskişehir"><option value="Gaziantep"><option value="Giresun"><option value="Gümüşhane"><option value="Hakkari"><option value="Hatay"><option value="Isparta"><option value="Mersin"><option value="İstanbul"><option value="İzmir"><option value="Kars"><option value="Kastamonu"><option value="Kayseri"><option value="Kırklareli"><option value="Kırşehir"><option value="Kocaeli"><option value="Konya"><option value="Kütahya"><option value="Malatya"><option value="Manisa"><option value="Kahramanmaraş"><option value="Mardin"><option value="Muğla"><option value="Muş"><option value="Nevşehir"><option value="Niğde"><option value="Ordu"><option value="Rize"><option value="Sakarya"><option value="Samsun"><option value="Siirt"><option value="Sinop"><option value="Sivas"><option value="Tekirdağ"><option value="Tokat"><option value="Trabzon"><option value="Tunceli"><option value="Şanlıurfa"><option value="Uşak"><option value="Van"><option value="Yozgat"><option value="Zonguldak"><option value="Aksaray"><option value="Bayburt"><option value="Karaman"><option value="Kırıkkale"><option value="Batman"><option value="Şırnak"><option value="Bartın"><option value="Ardahan"><option value="Iğdır"><option value="Yalova"><option value="Karabük"><option value="Kilis"><option value="Osmaniye"><option value="Düzce">
+                </datalist>
             </div>
-            {% endfor %}
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Kategori Seçin</label>
+                <select class="form-select form-select-lg" name="kategori">
+                    <option value="">Tümü</option>
+                    {% for kategori in kategoriler %}
+                        <option value="{{ kategori.id }}" {% if request.GET.kategori == kategori.id|stringformat:"s" %}selected{% endif %}>
+                            {{ kategori.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold px-0 shadow-sm">Bul</button>
+            </div>
         </div>
-    </div> <footer class="bg-dark text-white text-center py-4 mt-auto">
-        <p class="mb-0">© 2026 T-Randevu SaaS Projesi. Tüm hakları saklıdır.</p>
-    </footer>
+    </form>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark">Yakınınızdaki İşletmeler</h3>
+        <span class="text-muted fw-bold">{{ isletmeler|length }} işletme bulundu</span>
+    </div>
+
+    <div class="row g-4">
+        {% for isletme in isletmeler %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                <div class="position-relative">
+                    {% if isletme.is_premium %}
+                        <span class="position-absolute top-0 end-0 badge bg-warning text-dark m-3 z-1 shadow-sm fs-6">
+                            ⭐ Premium
+                        </span>
+                    {% endif %}
+
+                    {% if isletme.logo %}
+                        <img src="{{ isletme.logo.url }}" class="card-img-top" alt="{{ isletme.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-secondary bg-gradient d-flex align-items-center justify-content-center text-white" style="height: 200px;">
+                            <span class="display-1 opacity-50">🏪</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body mt-2">
+                    {% if isletme.category %}
+                    <span class="badge bg-dark mb-2">{{ isletme.category.name }}</span>
+                    {% endif %}
+
+                    <h5 class="card-title fw-bold text-dark fs-4 mb-1">{{ isletme.name }}</h5>
+
+                    <p class="card-text text-muted small mb-2">
+                        📍 {{ isletme.city|default:"Konum Belirtilmemiş" }} - {{ isletme.district|default:"" }}<br>
+                        <span class="d-inline-block mt-1 badge bg-light text-dark border border-secondary-subtle">
+                            ⏰ {{ isletme.opening_time|time:"H:i" }} - {{ isletme.closing_time|time:"H:i" }}
+                        </span>
+                    </p>
+
+                    <p class="card-text text-dark" style="font-size: 0.95rem;">
+                        {{ isletme.description|truncatewords:12|default:"Bu işletme için henüz bir açıklama girilmemiş." }}
+                    </p>
+                </div>
+
+                <div class="card-footer bg-white border-top-0 pb-4 pt-0">
+                    <a href="/{{ isletme.slug }}/" class="btn btn-outline-primary w-100 fw-bold shadow-sm">Profili İncele ve Randevu Al</a>
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="alert alert-light border shadow-sm p-5 rounded-4" role="alert">
+                <span class="display-1 d-block mb-3">🏪</span>
+                <h4 class="text-muted fw-bold">Buralar henüz çok sessiz...</h4>
+                <p class="mb-0">Sistemde aradığınız kriterlere uygun işletme bulunamadı.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<footer class="bg-dark text-white text-center py-4 mt-auto">
+    <p class="mb-0">© 2026 T-Randevu SaaS Projesi. Tüm hakları saklıdır.</p>
+</footer>
+{% endblock %}

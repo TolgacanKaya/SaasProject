@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}İşletme Girişi | T-Randevu{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center py-5" style="min-height: 80vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-sm border-0 rounded-4 p-4">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-primary">T-Randevu</h2>
+                        <p class="text-muted">İşletme Yönetim Paneli</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger fw-bold text-center">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Kullanıcı Adı</label>
+                            <input type="text" name="username" class="form-control form-control-lg" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Şifre</label>
+                            <input type="password" name="password" class="form-control form-control-lg" required>
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                            <label class="form-check-label text-muted" for="rememberMe">Beni Hatırla</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold">Giriş Yap</button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">İşletme hesabınız yok mu?</p>
+                        <a href="{% url 'kayit' %}" class="text-decoration-none text-primary fw-bold">Hemen Ücretsiz Kayıt Ol</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
