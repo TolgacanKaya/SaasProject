@@ -66,8 +66,11 @@ class Service(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='services')
     name = models.CharField(max_length=100, verbose_name="Hizmet Adı")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Fiyat (TL)")
-    location_type = models.CharField(max_length=20, choices=LOCATION_CHOICES, default='in_store',
-                                     verbose_name="Hizmet Konumu")
+
+    # YENİ ÇOKLU LOKASYON YAPISI
+    is_in_store = models.BooleanField(default=True, verbose_name="İşletmede Verilir")
+    is_at_home = models.BooleanField(default=False, verbose_name="Müşteri Adresinde Verilir")
+    is_online = models.BooleanField(default=False, verbose_name="Online Verilir")
 
     duration = models.IntegerField(verbose_name="Süre", blank=True, null=True)
     duration_type = models.CharField(max_length=10, choices=DURATION_CHOICES, default='minutes',

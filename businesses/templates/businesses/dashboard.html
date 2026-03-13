@@ -1,163 +1,281 @@
 {% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
 
+{% block title %}Genel Bakış{% endblock %}
 {% block page_title %}Genel Bakış{% endblock %}
 
 {% block content %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-        <div class="premium-card p-6 relative overflow-hidden group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="p-2.5 bg-accent/10 rounded-xl text-accent group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    {% if isletme.is_premium %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="premium-card p-6 relative overflow-hidden group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-2.5 bg-accent/10 rounded-xl text-accent group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </div>
                 </div>
-                <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">+12%</span>
+                <h3 class="text-3xl font-bold text-white mb-1">{{ toplam_randevu }}</h3>
+                <p class="text-sm text-muted font-medium">Toplam Randevu</p>
             </div>
-            <h3 class="text-3xl font-bold text-white mb-1">{{ toplam_randevu }}</h3>
-            <p class="text-sm text-muted font-medium">Toplam Randevu</p>
-        </div>
 
-        <div class="premium-card p-6 relative overflow-hidden group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="p-2.5 bg-accent/10 rounded-xl text-accent group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div class="premium-card p-6 relative overflow-hidden group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-2.5 bg-accent/10 rounded-xl text-accent group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
                 </div>
-                <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">+8%</span>
+                <h3 class="text-3xl font-bold text-white mb-1">{{ toplam_musteri }}</h3>
+                <p class="text-sm text-muted font-medium">Aktif Müşteri</p>
             </div>
-            <h3 class="text-3xl font-bold text-white mb-1">{{ toplam_musteri }}</h3>
-            <p class="text-sm text-muted font-medium">Aktif Müşteri</p>
-        </div>
 
-        <div class="premium-card p-6 relative overflow-hidden group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="p-2.5 bg-accent/10 rounded-xl text-accent group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" /></svg>
+            <div class="premium-card p-6 relative overflow-hidden group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-2.5 bg-accent/10 rounded-xl text-accent group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" /></svg>
+                    </div>
                 </div>
-                <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">+3</span>
+                <h3 class="text-3xl font-bold text-white mb-1">{{ toplam_hizmet }}</h3>
+                <p class="text-sm text-muted font-medium">Hizmetler</p>
             </div>
-            <h3 class="text-3xl font-bold text-white mb-1">{{ toplam_hizmet }}</h3>
-            <p class="text-sm text-muted font-medium">Hizmetler</p>
-        </div>
 
-        <div class="premium-card p-6 relative overflow-hidden group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="p-2.5 bg-accent/10 rounded-xl text-accent group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+            <div class="premium-card p-6 relative overflow-hidden group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-2.5 bg-accent/10 rounded-xl text-accent group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold">Aktif</span>
                 </div>
-                <span class="px-2.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold">%100</span>
+                <h3 class="text-3xl font-bold text-white mb-1">%100</h3>
+                <p class="text-sm text-muted font-medium">Sistem Durumu</p>
             </div>
-            <h3 class="text-3xl font-bold text-white mb-1">Aktif</h3>
-            <p class="text-sm text-muted font-medium">Sistem Durumu</p>
-        </div>
-    </div>
-
-    <div class="premium-card overflow-hidden">
-        <div class="flex justify-between items-center p-6 border-b border-border">
-            <h2 class="text-lg font-bold text-white">Yaklaşan Randevular</h2>
-            <a href="{% url 'isletme_randevular' %}" class="text-sm font-semibold text-accent hover:text-accent-hover flex items-center gap-1 transition-colors">
-                Tümünü Gör <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
-            </a>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-card text-muted text-xs uppercase tracking-wider font-semibold border-b border-border">
-                    <tr>
-                        <th class="px-6 py-4">Müşteri</th>
-                        <th class="px-6 py-4">Hizmet</th>
-                        <th class="px-6 py-4">Tarih</th>
-                        <th class="px-6 py-4">Saat</th>
-                        <th class="px-6 py-4">Durum</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-border">
-                    {% for randevu in randevular %}
-                    <tr class="hover:bg-white/[0.02] transition-colors duration-200 group">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-gray-200">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</div>
-                            <div class="text-xs text-muted mt-0.5">{{ randevu.customer.phone }}</div>
-                        </td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-300">
-                            {{ randevu.service.name }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-300">
-                            {{ randevu.date_time|date:"d M Y" }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-300">
-                            {{ randevu.date_time|time:"H:i" }}
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-4">
-                                {% if randevu.status == 'pending' %}
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 border border-amber-500/20 text-amber-500">Bekliyor</span>
-                                {% elif randevu.status == 'approved' %}
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">Onaylandı</span>
-                                {% elif randevu.status == 'cancelled' %}
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 border border-red-500/20 text-red-400">İptal Edildi</span>
-                                {% endif %}
+        <div class="premium-card overflow-hidden">
+            <div class="flex justify-between items-center p-6 border-b border-border">
+                <h2 class="text-lg font-bold text-white">Yaklaşan Randevular</h2>
+                <a href="{% url 'isletme_randevular' %}" class="text-sm font-semibold text-accent hover:text-accent-hover flex items-center gap-1 transition-colors">
+                    Tümünü Gör <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </a>
+            </div>
 
-                                <button type="button" onclick="openPremiumModal('vipModal{{ randevu.id }}')" class="ml-auto px-4 py-1.5 rounded-full border border-accent/30 text-accent text-xs font-bold hover:bg-accent hover:text-black transition-colors">
-                                    Detay
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-card text-muted text-xs uppercase tracking-wider font-semibold border-b border-border">
+                        <tr>
+                            <th class="px-6 py-4">Müşteri</th>
+                            <th class="px-6 py-4">Hizmet</th>
+                            <th class="px-6 py-4">Tarih</th>
+                            <th class="px-6 py-4">Saat</th>
+                            <th class="px-6 py-4">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border">
+                        {% for randevu in randevular %}
+                        <tr class="hover:bg-white/[0.02] transition-colors duration-200 group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-200">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</div>
+                                <div class="text-xs text-muted mt-0.5">{{ randevu.customer.phone }}</div>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-300">{{ randevu.service.name }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-300">{{ randevu.date_time|date:"d M Y" }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-300">{{ randevu.date_time|time:"H:i" }}</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    {% if randevu.status == 'pending' %}
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 border border-amber-500/20 text-amber-500">Bekliyor</span>
+                                    {% elif randevu.status == 'approved' %}
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">Onaylandı</span>
+                                    {% elif randevu.status == 'cancelled' %}
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 border border-red-500/20 text-red-400">İptal Edildi</span>
+                                    {% endif %}
 
-                    <div class="fixed inset-0 z-[9999] modal-overlay flex items-center justify-center p-4 bg-black/60" id="vipModal{{ randevu.id }}">
-                        <div class="modal-content bg-card border border-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-                            <div class="flex justify-between items-center p-5 border-b border-border">
-                                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                    <span class="text-accent">📋</span> Randevu Detayı
-                                </h3>
-                                <button onclick="closePremiumModal('vipModal{{ randevu.id }}')" class="text-muted hover:text-white transition-colors">
-                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                                </button>
-                            </div>
-
-                            <div class="p-6 space-y-5">
-                                <div>
-                                    <p class="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Müşteri</p>
-                                    <p class="text-xl font-bold text-white">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</p>
-                                    <a href="tel:{{ randevu.customer.phone }}" class="text-accent hover:underline font-medium mt-1 inline-block">📞 {{ randevu.customer.phone }}</a>
+                                    <button type="button" onclick="openPremiumModal('vipModal{{ randevu.id }}')" class="ml-auto px-4 py-1.5 rounded-full border border-accent/30 text-accent text-xs font-bold hover:bg-accent hover:text-black transition-colors">
+                                        Detay
+                                    </button>
                                 </div>
+                            </td>
+                        </tr>
 
-                                <div>
-                                    <p class="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Alınan Hizmet</p>
-                                    <span class="inline-block px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm font-medium text-gray-200">
-                                        {{ randevu.service.name }}
-                                    </span>
+                        <div class="fixed inset-0 z-[9999] modal-overlay flex items-center justify-center p-4 bg-black/60" id="vipModal{{ randevu.id }}">
+                            <div class="modal-content bg-card border border-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+                                <div class="flex justify-between items-center p-5 border-b border-border">
+                                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><span class="text-accent">📋</span> Randevu Detayı</h3>
+                                    <button onclick="closePremiumModal('vipModal{{ randevu.id }}')" class="text-muted hover:text-white transition-colors">
+                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
                                 </div>
+                                <div class="p-6 space-y-5">
+                                    <div>
+                                        <p class="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Müşteri</p>
+                                        <p class="text-xl font-bold text-white">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</p>
+                                        <a href="tel:{{ randevu.customer.phone }}" class="text-accent hover:underline font-medium mt-1 inline-block">📞 {{ randevu.customer.phone }}</a>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Alınan Hizmet</p>
+                                        <span class="inline-block px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm font-medium text-gray-200">{{ randevu.service.name }}</span>
+                                    </div>
 
-                                <div class="p-4 bg-background rounded-xl border border-border">
-                                    <p class="text-sm font-bold text-white mb-1 flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-accent"></span> İşletmenizde Gerçekleşecek
-                                    </p>
-                                    <p class="text-sm text-gray-400 pl-4">
-                                        📅 {{ randevu.date_time|date:"d M Y" }} - ⏰ {{ randevu.date_time|time:"H:i" }}
-                                    </p>
-                                </div>
+                                    {% if randevu.customer_note %}
+                                    <div>
+                                        <p class="text-xs text-muted uppercase tracking-wider font-semibold mb-1">Müşteri Notu</p>
+                                        <div class="p-3 bg-accent/10 border border-accent/20 rounded-lg text-sm font-medium text-gray-200 italic">
+                                            "{{ randevu.customer_note }}"
+                                        </div>
+                                    </div>
+                                    {% endif %}
 
-                                {% if randevu.status == 'pending' %}
-                                <div class="flex gap-3 pt-2">
-                                    <a href="{% url 'randevu_onayla' randevu.id %}" class="flex-1 text-center py-2.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-colors">Onayla</a>
-                                    <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-colors">İptal Et</a>
+                                    <div class="p-4 bg-background rounded-xl border border-border">
+                                        <p class="text-sm font-bold text-white mb-1 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-accent"></span>
+                                            {% if randevu.chosen_location == 'at_home' %} Müşteri Adresinde
+                                            {% elif randevu.chosen_location == 'online' %} Online Görüşme
+                                            {% else %} İşletmenizde Gerçekleşecek {% endif %}
+                                        </p>
+                                        <p class="text-sm text-gray-400 pl-4">📅 {{ randevu.date_time|date:"d M Y" }} - ⏰ {{ randevu.date_time|time:"H:i" }}</p>
+                                    </div>
+
+                                    {% if randevu.status == 'pending' %}
+                                    <div class="flex gap-3 pt-2">
+                                        <a href="{% url 'randevu_onayla' randevu.id %}" class="flex-1 text-center py-2.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-colors">Onayla</a>
+                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-colors">İptal Et</a>
+                                    </div>
+                                    {% endif %}
                                 </div>
-                                {% endif %}
                             </div>
                         </div>
-                    </div>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="py-16 text-center">
-                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 text-muted mb-4">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 2v4M8 2v4M3 10h18"/></svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-2">Henüz randevunuz bulunmuyor</h3>
-                            <p class="text-muted text-sm max-w-sm mx-auto">Müşterilerinize vitrin linkinizi göndererek randevu almaya başlayabilirsiniz.</p>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-16 text-center">
+                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 text-muted mb-4">
+                                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                </div>
+                                <h3 class="text-lg font-bold text-white mb-2">Henüz randevunuz bulunmuyor</h3>
+                                <p class="text-muted text-sm max-w-sm mx-auto">Müşterilerinize vitrin linkinizi göndererek randevu almaya başlayabilirsiniz.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+
+
+    {% else %}
+        <h3 class="fw-bold mb-4">Genel Bakış</h3>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 bg-white p-3 border-start border-primary border-5">
+                    <div class="card-body">
+                        <h6 class="text-muted fw-bold">Toplam Randevu</h6>
+                        <h2 class="display-5 fw-bold text-dark mb-0">{{ toplam_randevu }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 bg-white p-3 border-start border-success border-5">
+                    <div class="card-body">
+                        <h6 class="text-muted fw-bold">Toplam Müşteri</h6>
+                        <h2 class="display-5 fw-bold text-dark mb-0">{{ toplam_musteri }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 bg-white p-3 border-start border-info border-5">
+                    <div class="card-body">
+                        <h6 class="text-muted fw-bold">Aktif Hizmetler</h6>
+                        <h2 class="display-5 fw-bold text-dark mb-0">{{ toplam_hizmet }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Yaklaşan Randevular</h5>
+                <a href="{% url 'isletme_randevular' %}" class="btn btn-sm btn-primary fw-bold">Tümünü Gör</a>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-3">Müşteri</th>
+                            <th class="py-3">Hizmet</th>
+                            <th class="py-3">Tarih / Saat</th>
+                            <th class="py-3">Telefon</th>
+                            <th class="py-3 text-end px-4">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for randevu in randevular %}
+                        <tr>
+                            <td class="px-4 fw-bold text-dark">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</td>
+                            <td><span class="badge bg-secondary">{{ randevu.service.name }}</span></td>
+                            <td>
+                                <span class="text-muted">📅 {{ randevu.date_time|date:"d M Y" }}</span><br>
+                                <span class="fw-bold text-dark">⏰ {{ randevu.date_time|time:"H:i" }}</span>
+                            </td>
+                            <td>
+                                {{ randevu.customer.phone }}<br>
+                                {% if randevu.status == 'pending' %}<span class="badge bg-warning text-dark mt-1">⏳ Bekliyor</span>
+                                {% elif randevu.status == 'approved' %}<span class="badge bg-success mt-1">✅ Onaylandı</span>
+                                {% elif randevu.status == 'cancelled' %}<span class="badge bg-danger mt-1">❌ İptal Edildi</span>{% endif %}
+                            </td>
+                            <td class="text-end px-4">
+                                <button type="button" class="btn btn-sm btn-info text-white fw-bold me-1" data-bs-toggle="modal" data-bs-target="#randevuModal{{ randevu.id }}">🔍 Detay</button>
+                                {% if randevu.status == 'pending' %}
+                                    <a href="{% url 'randevu_onayla' randevu.id %}" class="btn btn-sm btn-success fw-bold">Onayla</a>
+                                    <a href="{% url 'randevu_iptal' randevu.id %}" class="btn btn-sm btn-outline-danger">İptal</a>
+                                {% elif randevu.status == 'approved' %}
+                                    <a href="{% url 'randevu_iptal' randevu.id %}" class="btn btn-sm btn-outline-danger">İptal Et</a>
+                                {% else %}
+                                    <span class="text-muted small">İşlem Kapalı</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">Henüz bekleyen randevunuz bulunmuyor.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% for randevu in randevular %}
+        <div class="modal fade" id="randevuModal{{ randevu.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header bg-light border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold" style="font-family: 'Inter', sans-serif;">📋 Randevu Detayı</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-start" style="font-family: 'Inter', sans-serif;">
+                        <div class="mb-3"><small class="text-muted d-block">Müşteri</small><span class="fw-bold fs-5">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</span></div>
+                        <div class="mb-3"><small class="text-muted d-block">İletişim Numarası</small><span class="fw-bold text-primary">📞 {{ randevu.customer.phone }}</span></div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Alınan Hizmet</small>
+                            <span class="badge bg-secondary">{{ randevu.service.name }}</span>
+                        </div>
+
+                        {% if randevu.customer_note %}
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">📝 Müşteri Notu</small>
+                            <div class="p-2 bg-warning bg-opacity-10 border border-warning border-opacity-50 rounded text-dark">
+                                <em>"{{ randevu.customer_note }}"</em>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-4"><small class="text-muted d-block">Tarih & Saat</small><span class="fw-bold text-dark">📅 {{ randevu.date_time|date:"d M Y" }} - ⏰ {{ randevu.date_time|time:"H:i" }}</span></div>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-secondary w-100 fw-bold" data-bs-dismiss="modal">Kapat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
 {% endblock %}

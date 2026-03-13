@@ -5,9 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-
+from businesses.models import Category
 from django.core.paginator import Paginator
-
 from appointments.models import Appointment
 from .models import Business, Customer, Service
 
@@ -20,7 +19,7 @@ def isletme_detay(request, slug):
         # ÜCRETSİZ PLAN KONTROLÜ
         if not isletme.is_premium:
             mevcut_randevu_sayisi = isletme.appointments.count()
-            if mevcut_randevu_sayisi >= 2:
+            if mevcut_randevu_sayisi >= 20:
                 messages.error(
                     request,
                     "❌ Üzgünüz, bu işletme aylık ücretsiz randevu kotasını doldurmuştur.",
@@ -38,6 +37,7 @@ def isletme_detay(request, slug):
         gelen_uygulama = request.POST.get("online_app")
         gelen_link = request.POST.get("online_link")
         gelen_not = request.POST.get("customer_note")
+        secilen_konum = request.POST.get("chosen_location", "in_store")
 
         secilen_hizmet = get_object_or_404(Service, id=service_id)
 
@@ -152,7 +152,8 @@ def isletme_detay(request, slug):
             customer_address=gelen_adres,
             online_app=gelen_uygulama,
             online_link=gelen_link,
-            customer_note=gelen_not
+            customer_note=gelen_not,
+            chosen_location = secilen_konum
         )
 
         messages.success(request, "🎉 Randevu talebiniz başarıyla alındı!")
@@ -199,13 +200,15 @@ def dashboard(request):
 
 
 @login_required(login_url="/hesap/giris/")
-@login_required(login_url="/hesap/giris/")
 def isletme_ayarlar(request):
     isletme = Business.objects.filter(owner=request.user).first()
     if not isletme:
         return redirect("kayit")
 
-    # 15 DAKİKALIK ZAMAN DİLİMLERİNİ ÜRET (00:00, 00:15... 23:45)
+    # KATEGORİLERİ VERİTABANINDAN ÇEK (Yeni eklendi)
+    kategoriler = Category.objects.all()
+
+    # 15 DAKİKALIK ZAMAN DİLİMLERİNİ ÜRET
     time_choices = []
     for h in range(24):
         for m in (0, 15, 30, 45):
@@ -219,7 +222,11 @@ def isletme_ayarlar(request):
         isletme.city = request.POST.get("city", "")
         isletme.district = request.POST.get("district", "")
 
-        # YENİ EKLENEN SAATLERİ KAYDETME
+        # KATEGORİ GÜNCELLEMESİ (Yeni eklendi)
+        kategori_id = request.POST.get("category")
+        if kategori_id:
+            isletme.category_id = kategori_id
+
         acilis = request.POST.get("opening_time")
         kapanis = request.POST.get("closing_time")
         if acilis:
@@ -229,7 +236,6 @@ def isletme_ayarlar(request):
 
         if request.FILES.get("logo"):
             isletme.logo = request.FILES.get("logo")
-
         if request.FILES.get("cover_image"):
             isletme.cover_image = request.FILES.get("cover_image")
 
@@ -242,7 +248,8 @@ def isletme_ayarlar(request):
         "businesses/isletme_ayarlar.html",
         {
             "isletme": isletme,
-            "time_choices": time_choices, # Saatleri HTML'e yolluyoruz
+            "time_choices": time_choices,
+            "kategoriler": kategoriler, # KATEGORİLERİ HTML'E GÖNDERİYORUZ
         },
     )
 
@@ -275,7 +282,10 @@ def isletme_hizmetler(request):
         fiyat = request.POST.get("price")
         sure_deger = request.POST.get("duration_value")
         sure_birim = request.POST.get("duration_unit", "minutes")
-        konum_tipi = request.POST.get("location_type", "in_store")
+
+        in_store_check = request.POST.get("is_in_store") == "on"
+        at_home_check = request.POST.get("is_at_home") == "on"
+        online_check = request.POST.get("is_online") == "on"
 
         if hizmet_adi and fiyat:
             duration_int = int(sure_deger) if sure_deger else None
@@ -286,7 +296,9 @@ def isletme_hizmetler(request):
                 price=fiyat,
                 duration=duration_int,
                 duration_type=sure_birim,
-                location_type=konum_tipi,
+                is_in_store=in_store_check,  # YENİ
+                is_at_home=at_home_check,  # YENİ
+                is_online=online_check
             )
 
             messages.success(request, "✅ Yeni hizmetiniz vitrine eklendi!")

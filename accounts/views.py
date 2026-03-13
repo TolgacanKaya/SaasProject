@@ -4,7 +4,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from businesses.models import Business, Category
+from django.views.decorators.cache import never_cache
 
+@never_cache
 def isletme_giris(request):
     if request.user.is_authenticated:
         return redirect('dashboard')

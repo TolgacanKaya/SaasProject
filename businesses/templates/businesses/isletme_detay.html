@@ -14,62 +14,77 @@
         justify-content: center;
         color: white;
         text-align: center;
-    {
-    % if isletme . cover_image %
-    } background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ isletme.cover_image.url }}');
-    {
-    % else %
-    } background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), #2c3e50;
-    {
-    % endif %
-    } background-size: cover;
+        {% if isletme.cover_image %}
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ isletme.cover_image.url }}');
+        {% else %}
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        {% endif %}
+        background-size: cover;
         background-position: center;
     }
 
     .profile-logo {
-        width: 140px;
-        height: 140px;
+        width: 150px;
+        height: 150px;
         object-fit: cover;
-        border: 5px solid white;
+        border: 6px solid white;
         border-radius: 50%;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        margin-bottom: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        margin-bottom: 20px;
         background-color: white;
+        transition: transform 0.3s ease;
+    }
+
+    .profile-logo:hover {
+        transform: scale(1.05);
     }
 
     .appointment-card {
-        margin-top: -50px;
+        margin-top: -60px;
         z-index: 10;
         position: relative;
     }
 
     .brand-border {
-        border-top: 5px solid {
-    % if isletme . is_premium %
-    } {
-    {
-        isletme.theme_color
-    }
-    } {
-    % else %
+        border-top: 5px solid {% if isletme.is_premium %}#eab308{% else %}#0d6efd{% endif %} !important;
     }
 
-        #0d6efd {
-        % endif %
-        }
+    /* Kart Hover Efektleri */
+    .info-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
 
-    !important;
+    .service-item {
+        transition: background-color 0.2s;
+    }
+    .service-item:hover {
+        background-color: #f8f9fa !important;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="cover-container shadow-sm" style="{% if isletme.cover_image %}background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ isletme.cover_image.url }}');{% else %}background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), #2c3e50;{% endif %} background-size: cover; background-position: center;">    <div class="container">
+<div class="cover-container shadow-sm">
+    <div class="container pb-3">
         {% if isletme.logo %}
         <img src="{{ isletme.logo.url }}" alt="{{ isletme.name }}" class="profile-logo">
+        {% else %}
+        <div class="profile-logo d-inline-flex align-items-center justify-content-center bg-light text-dark display-1 fw-bold">
+            {{ isletme.name|make_list|first|upper }}
+        </div>
         {% endif %}
-        <h1 class="display-3 fw-bold mb-1">{{ isletme.name }}</h1>
-        <p class="lead mb-0">📍 {{ isletme.city|default:"Konum Belirtilmemiş" }} / {{ isletme.district|default:"" }}</p>
+
+        <h1 class="display-4 fw-bold mb-2">
+            {{ isletme.name }}
+            {% if isletme.is_premium %}
+            <span class="badge bg-warning text-dark fs-6 align-middle ms-2 px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.4em !important;"><i class="bi bi-star-fill me-1"></i>Premium</span>
+            {% endif %}
+        </h1>
+        <p class="lead mb-0 opacity-75 fw-medium">📍 {{ isletme.city|default:"Konum Belirtilmemiş" }} {% if isletme.district %}/ {{ isletme.district }}{% endif %}</p>
     </div>
 </div>
 
@@ -77,139 +92,168 @@
     <div class="row g-4">
 
         <div class="col-lg-5">
-            <div class="bg-white p-4 rounded-4 shadow-sm mb-4">
-                <h4 class="fw-bold border-bottom pb-2 mb-3">Hakkımızda</h4>
-                <p class="text-muted">{{ isletme.description|default:"Bu işletme henüz bir açıklama eklememiş." }}</p>
-                <hr>
-                <p class="mb-2"><strong>📞 Telefon:</strong> {{ isletme.phone|default:"Belirtilmemiş" }}</p>
-                <p class="mb-2"><strong>⏰ Çalışma Saatleri:</strong> {{ isletme.opening_time|time:"H:i" }} - {{ isletme.closing_time|time:"H:i" }}</p>
-                <p class="mb-0"><strong>🏠 Adres:</strong> {{ isletme.address|default:"Belirtilmemiş" }}</p>
+            <div class="bg-white p-4 rounded-4 shadow-sm mb-4 info-card border-0">
+                <h4 class="fw-bold border-bottom pb-3 mb-3 text-dark">İşletme Bilgileri</h4>
+                <p class="text-secondary lh-lg">{{ isletme.description|default:"Bu işletme henüz bir açıklama eklememiş." }}</p>
+
+                <div class="bg-light p-3 rounded-3 mt-4">
+                    <p class="mb-2 text-dark"><span class="fw-bold text-primary me-2">📞 Telefon:</span> <a href="tel:{{ isletme.phone }}" class="text-decoration-none text-dark">{{ isletme.phone|default:"Belirtilmemiş" }}</a></p>
+                    <p class="mb-2 text-dark"><span class="fw-bold text-primary me-2">⏰ Mesai:</span> {{ isletme.opening_time|time:"H:i" }} - {{ isletme.closing_time|time:"H:i" }}</p>
+                    <p class="mb-0 text-dark"><span class="fw-bold text-primary me-2">🏠 Adres:</span> {{ isletme.address|default:"Belirtilmemiş" }}</p>
+                </div>
+
+                {% if isletme.phone %}
+                <button onclick="openWhatsApp()" class="btn btn-success w-100 fw-bold mt-4 py-3 shadow-sm d-flex align-items-center justify-content-center gap-2 rounded-3" style="background-color: #25D366; border-color: #25D366;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+                    </svg>
+                    WhatsApp'tan Bize Ulaşın
+                </button>
+                {% endif %}
             </div>
 
-            <div class="bg-white p-4 rounded-4 shadow-sm">
-                <h4 class="fw-bold border-bottom pb-2 mb-3">Hizmetlerimiz</h4>
-                <div class="list-group list-group-flush">
+            <div class="bg-white p-4 rounded-4 shadow-sm info-card border-0">
+                <h4 class="fw-bold border-bottom pb-3 mb-3 text-dark">Sunulan Hizmetler</h4>
+                <div class="list-group list-group-flush mt-2">
                     {% for hizmet in hizmetler %}
-                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-2 py-3 bg-transparent service-item border-bottom">
                         <div>
-                            <h6 class="mb-0 fw-bold">{{ hizmet.name }}</h6>
-                            <small class="text-muted">⏱️ {{ hizmet.formatted_duration }}</small>
-
-                            {% if hizmet.location_type == 'at_home' %}
-                            <span class="badge bg-info text-dark ms-2">🏠 Müşteri Adresinde</span>
-                            {% elif hizmet.location_type == 'online' %}
-                            <span class="badge bg-primary ms-2">💻 Online</span>
-                            {% else %}
-                            <span class="badge bg-secondary ms-2">📍 İşletmede</span>
-                            {% endif %}
-
+                            <h6 class="mb-1 fw-bold text-dark">{{ hizmet.name }}</h6>
+                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                {% if hizmet.duration %}
+                                <span class="badge bg-light text-secondary border fw-normal">⏱️ {{ hizmet.duration }} {% if hizmet.duration_type == 'minutes' %}Dk{% elif hizmet.duration_type == 'hours' %}Saat{% elif hizmet.duration_type == 'days' %}Gün{% elif hizmet.duration_type == 'weeks' %}Hafta{% elif hizmet.duration_type == 'months' %}Ay{% endif %}</span>
+                                {% endif %}
+                                {% if hizmet.is_at_home %}<span class="badge bg-info bg-opacity-10 text-info border border-info fw-normal">🏠 Evde</span>{% endif %}
+                                {% if hizmet.is_online %}<span class="badge bg-primary bg-opacity-10 text-primary border border-primary fw-normal">💻 Online</span>{% endif %}
+                                {% if hizmet.is_in_store %}<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary fw-normal">📍 İşletmede</span>{% endif %}
+                            </div>
                         </div>
-                        <span class="badge bg-dark rounded-pill fs-6">{{ hizmet.price }} ₺</span>
+                        <span class="badge bg-dark rounded-pill fs-6 py-2 px-3 shadow-sm">{{ hizmet.price }} ₺</span>
                     </div>
                     {% empty %}
-                    <p class="text-muted small">Henüz hizmet eklenmemiş.</p>
+                    <div class="text-center py-4">
+                        <span class="d-block display-6 text-muted mb-2">📋</span>
+                        <p class="text-muted small mb-0">İşletme henüz vitrinine hizmet eklememiş.</p>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
         <div class="col-lg-7">
-            <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm brand-border">
-                <h3 class="fw-bold mb-4">Hemen Randevu Al</h3>
+            <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm brand-border h-100">
+                <h3 class="fw-bold mb-4 text-dark">Hemen Randevu Oluştur</h3>
+                <p class="text-muted mb-4 pb-2 border-bottom">İstediğiniz hizmeti ve saati seçin, randevunuzu anında onaylayalım.</p>
 
                 <form method="POST">
                     {% csrf_token %}
 
                     {% if messages %}
                     {% for message in messages %}
-                    <div class="alert alert-danger fw-bold text-center border-0 shadow-sm mb-4">
+                    <div class="alert alert-danger fw-bold text-center border-0 shadow-sm mb-4 rounded-3">
                         {{ message }}
                     </div>
                     {% endfor %}
                     {% endif %}
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Almak İstediğiniz Hizmet</label>
-                        <select name="service_id" id="service-select" class="form-select form-select-lg" required>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">1. Almak İstediğiniz Hizmet</label>
+                        <select name="service_id" id="serviceSelect" class="form-select form-select-lg bg-light border-0" required>
                             <option value="">-- Lütfen Hizmet Seçin --</option>
                             {% for hizmet in hizmetler %}
-                            <option value="{{ hizmet.id }}" data-location="{{ hizmet.location_type }}">
+                            <option value="{{ hizmet.id }}"
+                                    data-store="{{ hizmet.is_in_store|yesno:'true,false' }}"
+                                    data-home="{{ hizmet.is_at_home|yesno:'true,false' }}"
+                                    data-online="{{ hizmet.is_online|yesno:'true,false' }}">
                                 {{ hizmet.name }} ({{ hizmet.price }} ₺)
                             </option>
                             {% endfor %}
                         </select>
                     </div>
 
-                    <div id="address-box" class="mb-3 d-none bg-light p-3 rounded border border-info">
-                        <label class="form-label fw-bold text-info">🏡 Açık Adresiniz <span class="text-danger">*</span></label>
-                        <textarea name="customer_address" id="customer_address" class="form-control" rows="2"
-                                  placeholder="Hizmetin verileceği tam adresi giriniz..."></textarea>
-                        <small class="text-muted">Bu hizmet adresinize gelineceği için zorunludur.</small>
+                    <div id="dynamicLocationArea" class="mb-4" style="display: none;">
+                        <label class="form-label fw-bold text-secondary small text-uppercase mb-3">📍 Hizmetin Konumu</label>
+                        <div class="d-grid gap-2">
+                            <label class="btn btn-outline-primary text-start p-3 rounded-3 fw-medium" id="lbl_store">
+                                <input type="radio" name="chosen_location" value="in_store" id="rad_store" class="me-2" required>
+                                İşletmede Gerçekleşecek
+                            </label>
+
+                            <label class="btn btn-outline-info text-start p-3 rounded-3 fw-medium" id="lbl_home">
+                                <input type="radio" name="chosen_location" value="at_home" id="rad_home" class="me-2">
+                                Müşteri Adresinde (Benim Adresimde)
+                            </label>
+
+                            <label class="btn btn-outline-success text-start p-3 rounded-3 fw-medium" id="lbl_online">
+                                <input type="radio" name="chosen_location" value="online" id="rad_online" class="me-2">
+                                Online (Görüntülü/Link İle)
+                            </label>
+                        </div>
                     </div>
 
-                    <div id="online-box" class="mb-3 d-none bg-light p-3 rounded border border-primary">
-                        <label class="form-label fw-bold text-primary">💻 Görüşme Uygulaması <span
-                                class="text-danger">*</span></label>
-                        <input type="text" name="online_app" id="online_app" class="form-control mb-2"
+                    <div id="address-box" class="mb-4 d-none bg-info bg-opacity-10 p-4 rounded-3 border border-info border-opacity-50">
+                        <label class="form-label fw-bold text-info">🏡 Açık Adresiniz <span class="text-danger">*</span></label>
+                        <textarea name="customer_address" id="customer_address" class="form-control border-info" rows="2"
+                                  placeholder="Hizmetin verileceği tam adresi giriniz..."></textarea>
+                        <small class="text-muted mt-2 d-block">Bu hizmet adresinize gelineceği için zorunludur.</small>
+                    </div>
+
+                    <div id="online-box" class="mb-4 d-none bg-primary bg-opacity-10 p-4 rounded-3 border border-primary border-opacity-50">
+                        <label class="form-label fw-bold text-primary">💻 Görüşme Uygulaması <span class="text-danger">*</span></label>
+                        <input type="text" name="online_app" id="online_app" class="form-control border-primary mb-3"
                                placeholder="Örn: Zoom, Skype, Google Meet, WhatsApp">
 
-                        <label class="form-label fw-bold text-primary">Kullanıcı Adı / Telefon Numarası <span
-                                class="text-danger">*</span></label>
-                        <input type="text" name="online_link" id="online_link" class="form-control"
+                        <label class="form-label fw-bold text-primary">Kullanıcı Adı / Telefon Numarası <span class="text-danger">*</span></label>
+                        <input type="text" name="online_link" id="online_link" class="form-control border-primary"
                                placeholder="Size ulaşabileceğimiz kullanıcı adınız veya numaranız">
                     </div>
 
-                    <div class="row mt-3">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Tarih</label>
-                            <input type="date" class="form-control form-control-lg" name="date" required>
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">2. Tarih</label>
+                            <input type="date" class="form-control form-control-lg bg-light border-0" name="date" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Saat</label>
-                            <input type="time" class="form-control form-control-lg" name="time" required>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">3. Saat</label>
+                            <input type="time" class="form-control form-control-lg bg-light border-0" name="time" required>
                         </div>
                     </div>
 
-                    <hr class="my-4">
+                    <hr class="my-4 border-light">
 
+                    <label class="form-label fw-bold text-secondary small text-uppercase mb-3">4. Kişisel Bilgileriniz</label>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Adınız</label>
-                            <input type="text" class="form-control form-control-lg" name="first_name"
-                                   placeholder="Örn: Ahmet" required>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" name="first_name"
+                                   placeholder="Adınız" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Soyadınız</label>
-                            <input type="text" class="form-control form-control-lg" name="last_name"
-                                   placeholder="Örn: Yılmaz" required>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" name="last_name"
+                                   placeholder="Soyadınız" required>
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Telefon Numaranız</label>
-                        <input type="tel" class="form-control form-control-lg" name="phone" placeholder="05XX XXX XX XX"
-                               required>
+                    <div class="mb-3">
+                        <input type="tel" id="phone" class="form-control form-control-lg bg-light border-0" name="phone" placeholder="Telefon Numaranız (05XX XXX XX XX)" required>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Eklemek İstediğiniz Not <span class="text-muted fw-normal">(İsteğe Bağlı)</span></label>
-                        <textarea name="customer_note" class="form-control bg-light" rows="2" placeholder="Örn: Ahmet abi saç kesiminde şu jöleden de istiyorum..."></textarea>
+                        <textarea name="customer_note" class="form-control bg-light border-0" rows="3" placeholder="Eklemek İstediğiniz Not (İsteğe Bağlı)"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold py-3 shadow">
-                        Randevu Talebi Gönder
+                    <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold py-3 shadow mt-2">
+                        Randevu Talebini Gönder
                     </button>
 
-                    <p class="text-center text-muted small mt-3">
-                        Talebiniz işletmeye iletilecek ve size geri dönüş yapılacaktır.
+                    <p class="text-center text-muted small mt-3 mb-0">
+                        Talebiniz işletmeye iletilecek ve SMS/Arama ile geri dönüş yapılacaktır.
                     </p>
                 </form>
             </div>
 
             {% if not isletme.is_premium %}
             <div class="text-center mt-4">
-                <p class="small text-muted mb-0">Gücünü <a href="/" class="fw-bold text-dark text-decoration-none">T-Randevu</a>'dan
-                    alır.</p>
+                <p class="small text-muted mb-0">Bu işletme altyapısı <a href="/" class="fw-bold text-dark text-decoration-none border-bottom border-dark">T-Randevu</a> tarafından sağlanmaktadır.</p>
             </div>
             {% endif %}
         </div>
@@ -220,52 +264,111 @@
 
 {% block extra_js %}
 <script>
-    // JS Kodunu en alta, HTML'in çalışmasını yavaşlatmayacak yere taşıdık
-    document.getElementById('service-select').addEventListener('change', function () {
-        var selectedOption = this.options[this.selectedIndex];
-        var locationType = selectedOption.getAttribute('data-location');
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. DİNAMİK LOKASYON SİSTEMİ
+        const serviceSelect = document.getElementById('serviceSelect');
+        const locationArea = document.getElementById('dynamicLocationArea');
 
-        var addressBox = document.getElementById('address-box');
-        var addressInput = document.getElementById('customer_address');
+        const addressBox = document.getElementById('address-box');
+        const addressInput = document.getElementById('customer_address');
+        const onlineBox = document.getElementById('online-box');
+        const onlineAppInput = document.getElementById('online_app');
+        const onlineLinkInput = document.getElementById('online_link');
 
-        var onlineBox = document.getElementById('online-box');
-        var onlineAppInput = document.getElementById('online_app');
-        var onlineLinkInput = document.getElementById('online_link');
+        function resetExtraBoxes() {
+            addressBox.classList.add('d-none');
+            addressInput.removeAttribute('required');
+            onlineBox.classList.add('d-none');
+            onlineAppInput.removeAttribute('required');
+            onlineLinkInput.removeAttribute('required');
+        }
 
-        // Önce her şeyi gizle ve zorunluluğu (required) kaldır ki müşteri hata almasın
-        addressBox.classList.add('d-none');
-        addressInput.removeAttribute('required');
+        serviceSelect.addEventListener('change', function() {
+            resetExtraBoxes();
 
-        onlineBox.classList.add('d-none');
-        onlineAppInput.removeAttribute('required');
-        onlineLinkInput.removeAttribute('required');
+            if(!this.value) {
+                locationArea.style.display = 'none';
+                return;
+            }
+            locationArea.style.display = 'block';
+            const selectedOpt = this.options[this.selectedIndex];
 
-        // Seçime göre ilgili kutuyu aç ve içindeki inputları zorunlu yap!
-        if (locationType === 'at_home') {
-            addressBox.classList.remove('d-none');
-            addressInput.setAttribute('required', 'required');
-        } else if (locationType === 'online') {
-            onlineBox.classList.remove('d-none');
-            onlineAppInput.setAttribute('required', 'required');
-            onlineLinkInput.setAttribute('required', 'required');
+            const canStore = selectedOpt.getAttribute('data-store') === 'true';
+            const canHome = selectedOpt.getAttribute('data-home') === 'true';
+            const canOnline = selectedOpt.getAttribute('data-online') === 'true';
+
+            const lblStore = document.getElementById('lbl_store');
+            lblStore.className = canStore ? "btn btn-outline-primary text-start p-3 rounded-3 fw-medium" : "btn btn-outline-secondary text-start p-3 rounded-3 disabled opacity-50";
+            lblStore.innerHTML = canStore ? `<input type="radio" name="chosen_location" value="in_store" id="rad_store" class="me-2" required> 📍 İşletmede Gerçekleşecek` : `🚫 Sadece İşletme: Mevcut Değil`;
+
+            const lblHome = document.getElementById('lbl_home');
+            lblHome.className = canHome ? "btn btn-outline-info text-start p-3 rounded-3 fw-medium" : "btn btn-outline-secondary text-start p-3 rounded-3 disabled opacity-50";
+            lblHome.innerHTML = canHome ? `<input type="radio" name="chosen_location" value="at_home" id="rad_home" class="me-2" required> 🏠 Müşteri Adresinde (Benim Adresimde)` : `🚫 Müşteri Adresinde: Mevcut Değil`;
+
+            const lblOnline = document.getElementById('lbl_online');
+            lblOnline.className = canOnline ? "btn btn-outline-success text-start p-3 rounded-3 fw-medium" : "btn btn-outline-secondary text-start p-3 rounded-3 disabled opacity-50";
+            lblOnline.innerHTML = canOnline ? `<input type="radio" name="chosen_location" value="online" id="rad_online" class="me-2" required> 💻 Online (Görüntülü/Link İle)` : `🚫 Online Hizmet: Mevcut Değil`;
+        });
+
+        document.body.addEventListener('change', function(e) {
+            if (e.target.name === 'chosen_location') {
+                resetExtraBoxes();
+
+                if (e.target.value === 'at_home') {
+                    addressBox.classList.remove('d-none');
+                    addressInput.setAttribute('required', 'required');
+                } else if (e.target.value === 'online') {
+                    onlineBox.classList.remove('d-none');
+                    onlineAppInput.setAttribute('required', 'required');
+                    onlineLinkInput.setAttribute('required', 'required');
+                }
+            }
+        });
+
+        // 2. TELEFON NUMARASI MASKESİ (05XX XXX XX XX)
+        const phoneInput = document.getElementById('phone');
+        if(phoneInput) {
+            phoneInput.addEventListener('input', function (e) {
+                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,4})(\d{0,3})(\d{0,2})(\d{0,2})/);
+                e.target.value = !x[2] ? x[1] : x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '');
+            });
         }
     });
 
     // GEÇMİŞ VE ÇOK UZAK GELECEK TARİHİNİ ENGELLEME KODU
     var today = new Date();
-
-    // Saat farklarından (Timezone) etkilenmemek için tarihi yerel saate göre alıyoruz
     var offset = today.getTimezoneOffset() * 60000;
     var localToday = new Date(today.getTime() - offset);
     var minDate = localToday.toISOString().split('T')[0];
 
-    // Bugüne tam 180 gün (yaklaşık 6 ay) ekliyoruz
     var maxDateObj = new Date(localToday);
     maxDateObj.setDate(maxDateObj.getDate() + 180);
     var maxDate = maxDateObj.toISOString().split('T')[0];
 
     var dateInput = document.getElementsByName("date")[0];
-    dateInput.setAttribute('min', minDate); // Dünü kapat
-    dateInput.setAttribute('max', maxDate); // 6 ay sonrasını kapat
+    dateInput.setAttribute('min', minDate);
+    dateInput.setAttribute('max', maxDate);
+
+    // WHATSAPP YÖNLENDİRİCİSİ
+    function openWhatsApp() {
+        let phone = "{{ isletme.phone|default:'' }}";
+        if (!phone) {
+            alert("İşletme telefon numarası bulunmuyor.");
+            return;
+        }
+
+        phone = phone.replace(/\D/g, ''); // Harf/Boşluk sil
+
+        if (phone.startsWith('0')) {
+            phone = '90' + phone.substring(1);
+        } else if (!phone.startsWith('90')) {
+            phone = '90' + phone;
+        }
+
+        let mesaj = encodeURIComponent("Merhaba, T-Randevu vitrininizi inceledim. Randevu ve hizmetleriniz hakkında bilgi almak istiyorum.");
+        let url = `https://wa.me/${phone}?text=${mesaj}`;
+
+        window.open(url, '_blank');
+    }
 </script>
 {% endblock %}

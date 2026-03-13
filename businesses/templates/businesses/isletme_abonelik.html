@@ -1,59 +1,88 @@
 {% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
 
-{% block title %}Abonelik ve Planlar | T-Randevu{% endblock %}
+{% block page_title %}Abonelik Yönetimi{% endblock %}
 
 {% block content %}
-<div class="text-center mb-5">
-    <h2 class="fw-bold">İşletmenizi Bir Üst Seviyeye Taşıyın 🚀</h2>
-    <p class="text-muted fs-5">Limitlere takılmadan büyümek isteyen işletmeler için tasarlandı.</p>
-</div>
-
-<div class="row justify-content-center g-4">
-    <div class="col-md-5">
-        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 {% if not isletme.is_premium %}border-top border-primary border-5{% endif %}">
-            <div class="card-body">
-                <h4 class="fw-bold text-dark mb-1">Başlangıç Planı</h4>
-                <h2 class="display-5 fw-bold text-primary mb-4">Ücretsiz</h2>
-                <ul class="list-unstyled mb-4 fs-6 text-muted">
-                    <li class="mb-3">✅ Aylık 50 Randevu Limiti</li>
-                    <li class="mb-3">✅ Standart Mavi Tema</li>
-                    <li class="mb-3">✅ Randevu Yönetim Paneli</li>
-                    <li class="mb-3 text-danger">❌ Alt Kısımda "T-Randevu" Logosu</li>
-                </ul>
-                {% if not isletme.is_premium %}
-                    <button class="btn btn-secondary btn-lg w-100 fw-bold disabled">Şu Anki Planınız</button>
-                {% endif %}
-            </div>
+    {% if isletme.is_premium %}
+        <div class="text-center mb-10 mt-4">
+            <h2 class="text-3xl font-bold text-white mb-3">İşletmenizi Bir Üst Seviyeye Taşıyın 🚀</h2>
+            <p class="text-muted text-lg">Limitlere takılmadan büyümek isteyen elit işletmeler için tasarlandı.</p>
         </div>
-    </div>
 
-    <div class="col-md-5">
-        <div class="card h-100 border-0 shadow-lg rounded-4 p-4 bg-dark text-white position-relative overflow-hidden {% if isletme.is_premium %}border-top border-warning border-5{% endif %}">
-
-            <div class="position-absolute top-0 end-0 bg-warning text-dark px-4 py-1 fw-bold" style="border-bottom-left-radius: 10px;">
-                En Popüler
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div class="premium-card p-8 border-t-4 border-t-gray-700 opacity-60">
+                <h4 class="font-bold text-gray-400 mb-1">Başlangıç Planı</h4>
+                <h2 class="text-4xl font-bold text-white mb-6">Ücretsiz</h2>
+                <ul class="space-y-4 mb-8 text-gray-400 text-sm font-medium">
+                    <li class="flex items-center gap-3"><span>✅</span> Aylık 50 Randevu Limiti</li>
+                    <li class="flex items-center gap-3"><span>✅</span> Standart Mavi Tema</li>
+                    <li class="flex items-center gap-3"><span>✅</span> Randevu Yönetim Paneli</li>
+                    <li class="flex items-center gap-3 text-red-400"><span>❌</span> Alt Kısımda "T-Randevu" Logosu</li>
+                </ul>
             </div>
 
-            <div class="card-body">
-                <h4 class="fw-bold text-warning mb-1">Pro İşletme Planı</h4>
-                <div class="d-flex align-items-baseline mb-4">
-                    <h2 class="display-5 fw-bold text-white mb-0">299 ₺</h2>
-                    <span class="text-white-50 ms-2">/ ay</span>
+            <div class="premium-card p-8 border-t-4 border-t-accent relative overflow-hidden shadow-[0_0_30px_rgba(234,179,8,0.08)] transform scale-105">
+                <div class="absolute top-4 right-4 bg-accent/20 text-accent px-3 py-1 rounded-full text-xs font-bold border border-accent/30">
+                    Aktif Plan
                 </div>
-                <ul class="list-unstyled mb-4 fs-6 text-light">
-                    <li class="mb-3">⭐ <strong>Sınırsız</strong> Randevu Alımı</li>
-                    <li class="mb-3">🎨 <strong>Özel Vitrin Rengi</strong> (Kırmızı, Pembe, Siyah vb.)</li>
-                    <li class="mb-3">🚀 <strong>Reklamsız Vitrin</strong> (Sadece sizin markanız)</li>
-                    <li class="mb-3">🎧 Öncelikli WhatsApp Desteği</li>
+                <h4 class="font-bold text-accent mb-1">Pro İşletme Planı</h4>
+                <div class="flex items-baseline mb-6">
+                    <h2 class="text-5xl font-bold text-white">299 ₺</h2>
+                    <span class="text-muted ml-2 font-medium">/ ay</span>
+                </div>
+                <ul class="space-y-4 mb-8 text-gray-200 text-sm font-medium">
+                    <li class="flex items-center gap-3">⭐ <strong class="text-white">Sınırsız</strong> Randevu Alımı</li>
+                    <li class="flex items-center gap-3">🎨 <strong class="text-white">Özel Vitrin Rengi</strong> (Tam Özelleştirme)</li>
+                    <li class="flex items-center gap-3">🚀 <strong class="text-white">Reklamsız Vitrin</strong> (Sadece sizin markanız)</li>
+                    <li class="flex items-center gap-3">🎧 Öncelikli WhatsApp Desteği</li>
                 </ul>
-                {% if isletme.is_premium %}
-                    <button class="btn btn-warning btn-lg w-100 fw-bold disabled text-dark">Aktif Planınız</button>
-                {% else %}
-                    <a href="{% url 'pro_yap' %}" class="btn btn-warning btn-lg w-100 fw-bold text-dark shadow-sm">Hemen Yükselt</a>
-                    <p class="text-center text-white-50 small mt-3 mb-0">İstediğiniz zaman iptal edebilirsiniz.</p>
-                {% endif %}
+                <button class="w-full py-3.5 bg-white/5 border border-white/10 text-white font-bold rounded-xl cursor-default">
+                    Şu Anki Planınız
+                </button>
             </div>
         </div>
-    </div>
-</div>
+
+    {% else %}
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">İşletmenizi Bir Üst Seviyeye Taşıyın 🚀</h2>
+            <p class="text-muted fs-5">Limitlere takılmadan büyümek isteyen işletmeler için tasarlandı.</p>
+        </div>
+        <div class="row justify-content-center g-4">
+            <div class="col-md-5">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 border-top border-primary border-5">
+                    <div class="card-body">
+                        <h4 class="fw-bold text-dark mb-1">Başlangıç Planı</h4>
+                        <h2 class="display-5 fw-bold text-primary mb-4">Ücretsiz</h2>
+                        <ul class="list-unstyled mb-4 fs-6 text-muted">
+                            <li class="mb-3">✅ Aylık 50 Randevu Limiti</li>
+                            <li class="mb-3">✅ Standart Mavi Tema</li>
+                            <li class="mb-3">✅ Randevu Yönetim Paneli</li>
+                            <li class="mb-3 text-danger">❌ Alt Kısımda "T-Randevu" Logosu</li>
+                        </ul>
+                        <button class="btn btn-secondary btn-lg w-100 fw-bold disabled">Şu Anki Planınız</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card h-100 border-0 shadow-lg rounded-4 p-4 bg-dark text-white position-relative overflow-hidden">
+                    <div class="position-absolute top-0 end-0 bg-warning text-dark px-4 py-1 fw-bold" style="border-bottom-left-radius: 10px;">En Popüler</div>
+                    <div class="card-body">
+                        <h4 class="fw-bold text-warning mb-1">Pro İşletme Planı</h4>
+                        <div class="d-flex align-items-baseline mb-4">
+                            <h2 class="display-5 fw-bold text-white mb-0">299 ₺</h2>
+                            <span class="text-white-50 ms-2">/ ay</span>
+                        </div>
+                        <ul class="list-unstyled mb-4 fs-6 text-light">
+                            <li class="mb-3">⭐ <strong>Sınırsız</strong> Randevu Alımı</li>
+                            <li class="mb-3">🎨 <strong>Özel Vitrin Rengi</strong></li>
+                            <li class="mb-3">🚀 <strong>Reklamsız Vitrin</strong></li>
+                            <li class="mb-3">🎧 Öncelikli WhatsApp Desteği</li>
+                        </ul>
+                        <a href="{% url 'pro_yap' %}" class="btn btn-warning btn-lg w-100 fw-bold text-dark shadow-sm">Hemen Yükselt</a>
+                        <p class="text-center text-white-50 small mt-3 mb-0">İstediğiniz zaman iptal edebilirsiniz.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

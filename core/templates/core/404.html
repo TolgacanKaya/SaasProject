@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Sayfa Bulunamadı | T-Randevu{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="text-center">
+        <div class="display-1 mb-4" style="font-size: 8rem; opacity: 0.8;">✂️🤔</div>
+        
+        <h1 class="display-4 fw-bold text-dark mb-3">Oops! Yanlış Dükkana Girdiniz.</h1>
+        <p class="lead text-muted mb-5 mx-auto" style="max-width: 600px;">
+            Aradığınız işletmeyi, sayfayı veya hizmeti bulamadık. Belki isim değişmiştir, belki de randevu defteri tamamen dolup kayıplara karışmıştır. 
+        </p>
+        
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="/" class="btn btn-dark btn-lg fw-bold px-4 py-3 rounded-pill shadow-sm">
+                🏠 Ana Sayfaya Dön
+            </a>
+            <a href="{% url 'kesfet' %}" class="btn btn-outline-primary btn-lg fw-bold px-4 py-3 rounded-pill shadow-sm">
+                🔍 İşletmeleri Keşfet
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
