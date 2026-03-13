@@ -1,128 +1,231 @@
 {% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
 
-{% block title %}Vitrin Ayarları | T-Randevu{% endblock %}
+{% block page_title %}İşletme Ayarları{% endblock %}
 
 {% block content %}
-<h3 class="fw-bold mb-4">⚙️ Vitrin ve İşletme Ayarları</h3>
+    {% if isletme.is_premium %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="row g-4">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="premium-card p-6">
+                        <h2 class="text-lg font-bold text-white mb-6 border-b border-border pb-4">Temel Bilgiler</h2>
+                        <div class="space-y-5">
 
-        <div class="col-lg-7">
-            <div class="bg-white p-4 rounded-4 shadow-sm h-100">
-                <h5 class="fw-bold border-bottom pb-2 mb-4">Temel Bilgiler</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-1.5">İşletme Adı</label>
+                                    <input type="text" name="name" value="{{ isletme.name }}" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" required>
+                                </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">İşletme Adı</label>
-                    <input type="text" name="name" class="form-control" value="{{ isletme.name }}" required>
-                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-1.5">İşletme Kategorisi</label>
+                                    <select name="category" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all cursor-pointer">
+                                        {% for kat in kategoriler %}
+                                            <option value="{{ kat.id }}" {% if isletme.category and isletme.category.id == kat.id %}selected{% endif %}>
+                                                {{ kat.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Hakkımızda (Açıklama)</label>
-                    <textarea name="description" class="form-control" rows="4"
-                              placeholder="İşletmenizi müşterilerinize tanıtın...">{{ isletme.description|default:"" }}</textarea>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Şehir</label>
-                        <input type="text" name="city" class="form-control" value="{{ isletme.city|default:'' }}"
-                               placeholder="Örn: İstanbul">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-1.5">Hakkımızda (Açıklama)</label>
+                                <textarea name="description" rows="4" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" placeholder="İşletmenizi müşterilerinize tanıtın...">{{ isletme.description|default:"" }}</textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-1.5">Şehir</label>
+                                    <input type="text" name="city" value="{{ isletme.city|default:'' }}" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" placeholder="Örn: İstanbul">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-1.5">İlçe</label>
+                                    <input type="text" name="district" value="{{ isletme.district|default:'' }}" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" placeholder="Örn: Kadıköy">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-1.5">Açık Adres</label>
+                                <input type="text" name="address" value="{{ isletme.address|default:'' }}" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" placeholder="Mahalle, Sokak, No...">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-1.5">İletişim Numarası</label>
+                                <input type="tel" name="phone" value="{{ isletme.phone|default:'' }}" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" placeholder="05XX XXX XX XX">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">İlçe</label>
-                        <input type="text" name="district" class="form-control"
-                               value="{{ isletme.district|default:'' }}" placeholder="Örn: Kadıköy">
+
+                    <div class="premium-card p-6">
+                        <h2 class="text-lg font-bold text-white mb-6 border-b border-border pb-4 flex items-center gap-2">
+                            <span class="text-accent">⏰</span> Çalışma Saatleri
+                        </h2>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-1.5">Açılış Saati</label>
+                                <select name="opening_time" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all cursor-pointer">
+                                    {% for t in time_choices %}
+                                    <option value="{{ t }}" {% if isletme.opening_time|time:"H:i" == t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-1.5">Kapanış Saati</label>
+                                <select name="closing_time" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all cursor-pointer">
+                                    {% for t in time_choices %}
+                                    <option value="{{ t }}" {% if isletme.closing_time|time:"H:i" == t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Açık Adres</label>
-                    <input type="text" name="address" class="form-control" value="{{ isletme.address|default:'' }}"
-                           placeholder="Mahalle, Sokak, No...">
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="premium-card p-6">
+                        <h2 class="text-lg font-bold text-white mb-6 border-b border-border pb-4">Görsel Vitrin</h2>
+
+                        <div class="mb-8 text-center">
+                            <label class="block text-sm font-semibold text-gray-300 mb-3 text-left">İşletme Logosu</label>
+                            <div class="w-32 h-32 mx-auto rounded-full border-2 border-accent border-dashed overflow-hidden flex items-center justify-center bg-background mb-4 relative group cursor-pointer" onclick="document.getElementById('logo_input').click()">
+                                {% if isletme.logo %}
+                                <img src="{{ isletme.logo.url }}" class="w-full h-full object-cover">
+                                {% else %}
+                                <span class="text-muted text-sm">Logo Yok</span>
+                                {% endif %}
+                                <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span class="text-white text-xs font-bold">Değiştir</span>
+                                </div>
+                            </div>
+                            <input type="file" name="logo" id="logo_input" accept="image/*" class="hidden">
+                            <p class="text-xs text-muted">Kare formatında yüklemeniz önerilir.</p>
+                        </div>
+
+                        <div class="mb-6 text-center">
+                            <label class="block text-sm font-semibold text-gray-300 mb-3 text-left">Kapak Fotoğrafı</label>
+                            <div class="w-full h-32 rounded-xl border-2 border-accent border-dashed overflow-hidden flex items-center justify-center bg-background mb-4 relative group cursor-pointer" onclick="document.getElementById('cover_input').click()">
+                                {% if isletme.cover_image %}
+                                <img src="{{ isletme.cover_image.url }}" class="w-full h-full object-cover">
+                                {% else %}
+                                <span class="text-muted text-sm">Kapak Yok</span>
+                                {% endif %}
+                                <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span class="text-white text-xs font-bold">Değiştir</span>
+                                </div>
+                            </div>
+                            <input type="file" name="cover_image" id="cover_input" accept="image/*" class="hidden">
+                            <p class="text-xs text-muted">Geniş formatlı (1920x1080) önerilir.</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-accent text-black font-bold rounded-xl hover:bg-accent-hover hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300">
+                        💾 Değişiklikleri Kaydet
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    {% else %}
+        <h3 class="fw-bold mb-4">⚙️ Vitrin ve İşletme Ayarları</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="bg-white p-4 rounded-4 shadow-sm h-100">
+                        <h5 class="fw-bold border-bottom pb-2 mb-4">Temel Bilgiler</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">İşletme Adı</label>
+                                <input type="text" name="name" class="form-control" value="{{ isletme.name }}" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">İşletme Kategorisi</label>
+                                <select name="category" class="form-select">
+                                    {% for kat in kategoriler %}
+                                        <option value="{{ kat.id }}" {% if isletme.category and isletme.category.id == kat.id %}selected{% endif %}>
+                                            {{ kat.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Hakkımızda (Açıklama)</label>
+                            <textarea name="description" class="form-control" rows="4">{{ isletme.description|default:"" }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Şehir</label>
+                                <input type="text" name="city" class="form-control" value="{{ isletme.city|default:'' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">İlçe</label>
+                                <input type="text" name="district" class="form-control" value="{{ isletme.district|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Açık Adres</label>
+                            <input type="text" name="address" class="form-control" value="{{ isletme.address|default:'' }}">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">İletişim Numarası</label>
+                            <input type="tel" name="phone" class="form-control" value="{{ isletme.phone|default:'' }}">
+                        </div>
+
+                        <hr class="my-4 border-light">
+                        <h5 class="fw-bold mb-3 text-primary">⏰ Çalışma Saatleri</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Açılış Saati</label>
+                                <select name="opening_time" class="form-select">
+                                    {% for t in time_choices %}
+                                    <option value="{{ t }}" {% if isletme.opening_time|time:"H:i" == t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Kapanış Saati</label>
+                                <select name="closing_time" class="form-select">
+                                    {% for t in time_choices %}
+                                    <option value="{{ t }}" {% if isletme.closing_time|time:"H:i" == t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">İletişim Numarası</label>
-                    <input type="tel" name="phone" class="form-control" value="{{ isletme.phone|default:'' }}"
-                           placeholder="05XX XXX XX XX">
-                </div>
-
-                <hr class="my-4 border-light">
-                <h5 class="fw-bold mb-3 text-primary">⏰ Çalışma Saatleri</h5>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Açılış Saati</label>
-                        <select name="opening_time" class="form-select form-select-lg border-primary">
-                            {% for t in time_choices %}
-                            {% if isletme.opening_time|time:"H:i" == t %}
-                            <option value="{{ t }}" selected>{{ t }}</option>
+                <div class="col-lg-5">
+                    <div class="bg-white p-4 rounded-4 shadow-sm h-100">
+                        <h5 class="fw-bold border-bottom pb-2 mb-4">Görsel Vitrin</h5>
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-bold d-block text-start">İşletme Logosu</label>
+                            {% if isletme.logo %}
+                            <img src="{{ isletme.logo.url }}" class="rounded-circle border shadow-sm mb-3 object-fit-cover" width="120" height="120">
                             {% else %}
-                            <option value="{{ t }}">{{ t }}</option>
+                            <div class="bg-light rounded-circle border d-inline-flex align-items-center justify-content-center mb-3 text-muted" style="width: 120px; height: 120px;">Logo Yok</div>
                             {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Kapanış Saati</label>
-                        <select name="closing_time" class="form-select form-select-lg border-primary">
-                            {% for t in time_choices %}
-                            {% if isletme.closing_time|time:"H:i" == t %}
-                            <option value="{{ t }}" selected>{{ t }}</option>
+                            <input class="form-control" type="file" name="logo" accept="image/*">
+                        </div>
+                        <hr class="my-4">
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-bold d-block text-start">Kapak Fotoğrafı</label>
+                            {% if isletme.cover_image %}
+                            <img src="{{ isletme.cover_image.url }}" class="rounded border shadow-sm mb-3 object-fit-cover w-100" height="120">
                             {% else %}
-                            <option value="{{ t }}">{{ t }}</option>
+                            <div class="bg-light rounded border d-flex align-items-center justify-content-center mb-3 text-muted w-100" style="height: 120px;">Kapak Yok</div>
                             {% endif %}
-                            {% endfor %}
-                        </select>
+                            <input class="form-control" type="file" name="cover_image" accept="image/*">
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-5">
-            <div class="bg-white p-4 rounded-4 shadow-sm h-100">
-                <h5 class="fw-bold border-bottom pb-2 mb-4">Görsel Vitrin</h5>
-
-                <div class="mb-4 text-center">
-                    <label class="form-label fw-bold d-block text-start">İşletme Logosu</label>
-                    {% if isletme.logo %}
-                    <img src="{{ isletme.logo.url }}" class="rounded-circle border shadow-sm mb-3 object-fit-cover"
-                         width="120" height="120" alt="Mevcut Logo">
-                    {% else %}
-                    <div class="bg-light rounded-circle border d-inline-flex align-items-center justify-content-center mb-3 text-muted"
-                         style="width: 120px; height: 120px;">Logo Yok
-                    </div>
-                    {% endif %}
-                    <input class="form-control" type="file" name="logo" accept="image/*">
-                    <small class="text-muted d-block mt-1">Kare formatında (Örn: 500x500px) yüklemeniz önerilir.</small>
-                </div>
-
-                <hr class="my-4">
-
-                <div class="mb-4 text-center">
-                    <label class="form-label fw-bold d-block text-start">Kapak Fotoğrafı</label>
-                    {% if isletme.cover_image %}
-                    <img src="{{ isletme.cover_image.url }}"
-                         class="rounded border shadow-sm mb-3 object-fit-cover w-100" height="120" alt="Mevcut Kapak">
-                    {% else %}
-                    <div class="bg-light rounded border d-flex align-items-center justify-content-center mb-3 text-muted w-100"
-                         style="height: 120px;">Kapak Yok
-                    </div>
-                    {% endif %}
-                    <input class="form-control" type="file" name="cover_image" accept="image/*">
-                    <small class="text-muted d-block mt-1">Geniş formatlı (Örn: 1920x1080px) yüklemeniz
-                        önerilir.</small>
-                </div>
+            <div class="mt-4 text-end">
+                <button type="submit" class="btn btn-primary btn-lg fw-bold px-5 shadow">💾 Değişiklikleri Kaydet</button>
             </div>
-        </div>
-
-    </div>
-
-    <div class="mt-4 text-end">
-        <button type="submit" class="btn btn-primary btn-lg fw-bold px-5 shadow">💾 Değişiklikleri Kaydet</button>
-    </div>
-</form>
+        </form>
+    {% endif %}
 {% endblock %}

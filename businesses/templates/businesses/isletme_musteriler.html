@@ -1,52 +1,103 @@
 {% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
 
-{% block title %}Müşteriler | T-Randevu{% endblock %}
+{% block page_title %}Müşteri Veritabanı{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold m-0">👥 Müşteri Veritabanı (CRM)</h3>
-    <button class="btn btn-primary fw-bold shadow-sm">📥 Listeyi İndir (Excel)</button>
-</div>
+    {% if isletme.is_premium %}
+        <div class="premium-card overflow-hidden">
+            <div class="flex justify-between items-center p-6 border-b border-border">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-accent/10 rounded-xl text-accent">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h2 class="text-lg font-bold text-white">Müşteri Listesi</h2>
+                </div>
+                <button class="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold rounded-xl hover:bg-emerald-500 hover:text-white transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Listeyi İndir
+                </button>
+            </div>
 
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-    <div class="card-body p-0">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th class="px-4 py-3 border-0">Müşteri Adı Soyadı</th>
-                    <th class="py-3 border-0">Telefon Numarası</th>
-                    <th class="py-3 text-end px-4 border-0">Toplam Randevu Sayısı</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for musteri in musteriler %}
-                <tr>
-                    <td class="px-4 py-3 fw-bold text-dark border-light">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3 shadow-sm" style="width: 40px; height: 40px;">
-                                {{ musteri.first_name|make_list|first }}
-                            </div>
-                            {{ musteri.first_name }} {{ musteri.last_name }}
-                        </div>
-                    </td>
-                    <td class="py-3 border-light">
-                        <a href="tel:{{ musteri.phone }}" class="text-decoration-none text-dark fw-bold">📞 {{ musteri.phone }}</a>
-                    </td>
-                    <td class="py-3 text-end px-4 border-light">
-                        <span class="badge bg-primary rounded-pill fs-6 shadow-sm">{{ musteri.appointments.count }}</span>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3" class="text-center py-5 text-muted border-0">
-                        <div class="display-1 text-light mb-3">👥</div>
-                        <h5>Henüz sisteminize kayıtlı bir müşteri bulunmuyor.</h5>
-                        <p class="mb-0">Müşterileriniz randevu aldıkça bu liste otomatik olarak dolacaktır.</p>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-card text-muted text-xs uppercase tracking-wider font-semibold border-b border-border">
+                        <tr>
+                            <th class="px-6 py-4">Müşteri Bilgileri</th>
+                            <th class="px-6 py-4">Telefon Numarası</th>
+                            <th class="px-6 py-4 text-center">Toplam Randevu</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border">
+                        {% for musteri in musteriler %}
+                        <tr class="hover:bg-white/[0.02] transition-colors duration-200">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center">
+                                        {{ musteri.first_name|make_list|first|upper }}
+                                    </div>
+                                    <div class="font-bold text-gray-200 text-base">{{ musteri.first_name }} {{ musteri.last_name }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-gray-300 font-medium flex items-center gap-2">
+                                <span class="text-accent">📞</span> {{ musteri.phone }}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white font-bold">{{ musteri.appointments.count }}</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="py-16 text-center">
+                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 text-muted mb-4">
+                                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                </div>
+                                <h3 class="text-lg font-bold text-white mb-2">Müşteri bulunmuyor</h3>
+                                <p class="text-muted text-sm">Sisteminizde henüz kayıtlı bir müşteri yok.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">👥 Müşteri Veritabanı (CRM)</h3>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Tüm Müşteriler</h5>
+                <button class="btn btn-sm btn-success fw-bold">📥 Listeyi İndir (Excel)</button>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-3">Müşteri Adı Soyadı</th>
+                            <th class="py-3">Telefon Numarası</th>
+                            <th class="py-3 text-center px-4">Toplam Randevu Sayısı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for musteri in musteriler %}
+                        <tr>
+                            <td class="px-4 fw-bold text-dark">{{ musteri.first_name }} {{ musteri.last_name }}</td>
+                            <td><span class="text-primary fw-bold">📞 {{ musteri.phone }}</span></td>
+                            <td class="text-center px-4"><span class="badge bg-secondary rounded-pill">{{ musteri.appointments.count }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-5 text-muted">
+                                <h5 class="fw-bold">Müşteri bulunmuyor</h5>
+                                <p>Sisteminizde henüz kayıtlı bir müşteri yok.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

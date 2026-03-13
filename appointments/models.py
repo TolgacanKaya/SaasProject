@@ -10,6 +10,15 @@ class Appointment(models.Model):
         ('cancelled', 'İptal Edildi'),
     )
 
+    LOCATION_CHOICES = (
+        ('in_store', 'İşletmede'),
+        ('at_home', 'Müşteri Adresinde'),
+        ('online', 'Online Görüşme'),
+    )
+    # ... diğer alanların arasına ekle:
+    chosen_location = models.CharField(max_length=20, choices=LOCATION_CHOICES, default='in_store',
+                                       verbose_name="Seçilen Konum")
+
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='appointments')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='appointments')
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, verbose_name="Hizmet")

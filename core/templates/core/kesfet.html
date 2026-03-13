@@ -1,45 +1,53 @@
 {% extends 'base.html' %}
-
-{% block title %}İşletmeleri Keşfet | T-Randevu{% endblock %}
+{% load static %} {% block title %}İşletmeleri Keşfet | T-Randevu{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <form method="GET" action="{% url 'kesfet' %}" class="bg-white p-4 rounded-4 shadow-sm mb-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Size En Uygun Hizmeti Bulun</h2>
+        <p class="text-muted">Binlerce seçkin işletme arasından arama yapın ve hemen randevu alın.</p>
+    </div>
+
+    <form method="GET" action="{% url 'kesfet' %}" class="bg-white p-4 rounded-4 shadow mb-5 border border-light">
         <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Ne Arıyorsunuz?</label>
-                <input type="text" name="arama" class="form-control form-control-lg" list="kategori-onerileri" placeholder="Kuaför, Marangoz..." value="{{ request.GET.arama }}" autocomplete="off">
-
-                <datalist id="kategori-onerileri">
-                    {% for kategori in kategoriler %}
-                        <option value="{{ kategori.name }}">
-                    {% endfor %}
-                </datalist>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Şehir</label>
-                <input type="text" name="sehir" class="form-control form-control-lg" list="sehir-onerileri" placeholder="Şehir seçin..." value="{{ request.GET.sehir }}" autocomplete="off">
-
-                <datalist id="sehir-onerileri">
-                    <option value="Adana"><option value="Adıyaman"><option value="Afyonkarahisar"><option value="Ağrı"><option value="Amasya"><option value="Ankara"><option value="Antalya"><option value="Artvin"><option value="Aydın"><option value="Balıkesir"><option value="Bilecik"><option value="Bingöl"><option value="Bitlis"><option value="Bolu"><option value="Burdur"><option value="Bursa"><option value="Çanakkale"><option value="Çankırı"><option value="Çorum"><option value="Denizli"><option value="Diyarbakır"><option value="Edirne"><option value="Elazığ"><option value="Erzincan"><option value="Erzurum"><option value="Eskişehir"><option value="Gaziantep"><option value="Giresun"><option value="Gümüşhane"><option value="Hakkari"><option value="Hatay"><option value="Isparta"><option value="Mersin"><option value="İstanbul"><option value="İzmir"><option value="Kars"><option value="Kastamonu"><option value="Kayseri"><option value="Kırklareli"><option value="Kırşehir"><option value="Kocaeli"><option value="Konya"><option value="Kütahya"><option value="Malatya"><option value="Manisa"><option value="Kahramanmaraş"><option value="Mardin"><option value="Muğla"><option value="Muş"><option value="Nevşehir"><option value="Niğde"><option value="Ordu"><option value="Rize"><option value="Sakarya"><option value="Samsun"><option value="Siirt"><option value="Sinop"><option value="Sivas"><option value="Tekirdağ"><option value="Tokat"><option value="Trabzon"><option value="Tunceli"><option value="Şanlıurfa"><option value="Uşak"><option value="Van"><option value="Yozgat"><option value="Zonguldak"><option value="Aksaray"><option value="Bayburt"><option value="Karaman"><option value="Kırıkkale"><option value="Batman"><option value="Şırnak"><option value="Bartın"><option value="Ardahan"><option value="Iğdır"><option value="Yalova"><option value="Karabük"><option value="Kilis"><option value="Osmaniye"><option value="Düzce">
-                </datalist>
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-muted small text-uppercase">Ne Arıyorsunuz?</label>
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-white border-end-0">🔍</span>
+                    <input type="text" name="arama" class="form-control border-start-0 ps-0" placeholder="Örn: Kuaför, Masaj..." value="{{ request.GET.arama }}" autocomplete="off">
+                </div>
             </div>
 
             <div class="col-md-3">
-                <label class="form-label fw-bold">Kategori Seçin</label>
+                <label class="form-label fw-bold text-muted small text-uppercase">Şehir</label>
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-white border-end-0">📍</span>
+                    <input type="text" name="sehir" id="sehirInput" class="form-control border-start-0 ps-0" list="sehir-onerileri" placeholder="Şehir seçin..." value="{{ request.GET.sehir }}" autocomplete="off">
+                </div>
+                <datalist id="sehir-onerileri"></datalist>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-muted small text-uppercase">İlçe</label>
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-white border-end-0">🏢</span>
+                    <input type="text" name="ilce" id="ilceInput" class="form-control border-start-0 ps-0" list="ilce-onerileri" placeholder="Önce şehir seçin..." value="{{ request.GET.ilce }}" autocomplete="off" disabled>
+                </div>
+                <datalist id="ilce-onerileri"></datalist>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-bold text-muted small text-uppercase">Kategori</label>
                 <select class="form-select form-select-lg" name="kategori">
                     <option value="">Tümü</option>
                     {% for kategori in kategoriler %}
-                        <option value="{{ kategori.id }}" {% if request.GET.kategori == kategori.id|stringformat:"s" %}selected{% endif %}>
-                            {{ kategori.name }}
-                        </option>
+                        <option value="{{ kategori.id }}" {% if request.GET.kategori == kategori.id|stringformat:"s" %}selected{% endif %}>{{ kategori.name }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="col-md-1 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold px-0 shadow-sm">Bul</button>
+                <button type="submit" class="btn btn-dark w-100 btn-lg fw-bold px-0 shadow-sm">Bul</button>
             </div>
         </div>
     </form>
@@ -47,23 +55,21 @@
 
 <div class="container pb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold text-dark">Yakınınızdaki İşletmeler</h3>
-        <span class="text-muted fw-bold">{{ isletmeler|length }} işletme bulundu</span>
+        <h4 class="fw-bold text-dark mb-0">Arama Sonuçları</h4>
+        <span class="badge bg-light text-dark border px-3 py-2 fs-6">{{ isletmeler|length }} işletme bulundu</span>
     </div>
 
     <div class="row g-4">
         {% for isletme in isletmeler %}
         <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 overflow-hidden">
+            <div class="card h-100 border-0 overflow-hidden {% if isletme.is_premium %}shadow-lg border-warning border border-2{% else %}shadow-sm{% endif %}">
                 <div class="position-relative">
                     {% if isletme.is_premium %}
-                        <span class="position-absolute top-0 end-0 badge bg-warning text-dark m-3 z-1 shadow-sm fs-6">
-                            ⭐ Premium
-                        </span>
+                        <span class="position-absolute top-0 end-0 badge bg-warning text-dark m-3 z-1 shadow fs-6 fw-bold px-3 py-2 rounded-pill">⭐ Öne Çıkan</span>
                     {% endif %}
 
-                    {% if isletme.logo %}
-                        <img src="{{ isletme.logo.url }}" class="card-img-top" alt="{{ isletme.name }}" style="height: 200px; object-fit: cover;">
+                    {% if isletme.cover_image %}
+                        <img src="{{ isletme.cover_image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
                     {% else %}
                         <div class="card-img-top bg-secondary bg-gradient d-flex align-items-center justify-content-center text-white" style="height: 200px;">
                             <span class="display-1 opacity-50">🏪</span>
@@ -71,37 +77,41 @@
                     {% endif %}
                 </div>
 
-                <div class="card-body mt-2">
+                <div class="card-body mt-2 position-relative">
+                    {% if isletme.logo %}
+                        <img src="{{ isletme.logo.url }}" class="rounded-circle border border-4 border-white shadow-sm position-absolute bg-white" style="width: 70px; height: 70px; object-fit: cover; top: -35px; right: 20px;">
+                    {% endif %}
+
                     {% if isletme.category %}
-                    <span class="badge bg-dark mb-2">{{ isletme.category.name }}</span>
+                    <span class="badge bg-dark mb-2 px-2 py-1">{{ isletme.category.name }}</span>
                     {% endif %}
 
                     <h5 class="card-title fw-bold text-dark fs-4 mb-1">{{ isletme.name }}</h5>
 
-                    <p class="card-text text-muted small mb-2">
-                        📍 {{ isletme.city|default:"Konum Belirtilmemiş" }} - {{ isletme.district|default:"" }}<br>
-                        <span class="d-inline-block mt-1 badge bg-light text-dark border border-secondary-subtle">
-                            ⏰ {{ isletme.opening_time|time:"H:i" }} - {{ isletme.closing_time|time:"H:i" }}
-                        </span>
+                    <p class="card-text text-muted small mb-3">
+                        <span class="text-primary fw-bold">📍 {{ isletme.city|default:"Konum Yok" }}</span> {% if isletme.district %}- {{ isletme.district }}{% endif %}<br>
+                        <span class="d-inline-block mt-2 badge bg-light text-dark border border-secondary-subtle py-1">⏰ Mesai: {{ isletme.opening_time|time:"H:i" }} - {{ isletme.closing_time|time:"H:i" }}</span>
                     </p>
 
                     <p class="card-text text-dark" style="font-size: 0.95rem;">
-                        {{ isletme.description|truncatewords:12|default:"Bu işletme için henüz bir açıklama girilmemiş." }}
+                        {{ isletme.description|truncatewords:12|default:"Bu işletme için açıklama girilmemiş." }}
                     </p>
                 </div>
 
                 <div class="card-footer bg-white border-top-0 pb-4 pt-0">
-                    <a href="/{{ isletme.slug }}/" class="btn btn-outline-primary w-100 fw-bold shadow-sm">Profili İncele ve Randevu Al</a>
+                    <a href="/{{ isletme.slug }}/" class="btn {% if isletme.is_premium %}btn-warning text-dark{% else %}btn-outline-primary{% endif %} w-100 fw-bold shadow-sm py-2">
+                        Profili İncele ve Randevu Al
+                    </a>
                 </div>
             </div>
         </div>
 
         {% empty %}
         <div class="col-12 text-center py-5">
-            <div class="alert alert-light border shadow-sm p-5 rounded-4" role="alert">
-                <span class="display-1 d-block mb-3">🏪</span>
+            <div class="alert alert-light border shadow-sm p-5 rounded-4 d-inline-block" role="alert">
+                <span class="display-1 d-block mb-3">🔍</span>
                 <h4 class="text-muted fw-bold">Buralar henüz çok sessiz...</h4>
-                <p class="mb-0">Sistemde aradığınız kriterlere uygun işletme bulunamadı.</p>
+                <p class="mb-0 text-muted">Sistemde aradığınız kriterlere uygun işletme bulunamadı.</p>
             </div>
         </div>
         {% endfor %}
@@ -111,4 +121,52 @@
 <footer class="bg-dark text-white text-center py-4 mt-auto">
     <p class="mb-0">© 2026 T-Randevu SaaS Projesi. Tüm hakları saklıdır.</p>
 </footer>
+
+<script src="{% static 'core/il_ilce.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const sehirInput = document.getElementById("sehirInput");
+        const ilceInput = document.getElementById("ilceInput");
+        const sehirDatalist = document.getElementById("sehir-onerileri");
+        const ilceDatalist = document.getElementById("ilce-onerileri");
+
+        // 1. Şehir Listesini Doldur
+        for (let sehir in trData) {
+            let option = document.createElement("option");
+            option.value = sehir;
+            sehirDatalist.appendChild(option);
+        }
+
+        // 2. İlçe Doldurma Fonksiyonu
+        function ilceleriDoldur(secilenSehirAdi) {
+            ilceDatalist.innerHTML = "";
+            let ilceler = trData[secilenSehirAdi];
+
+            if (ilceler) {
+                ilceInput.disabled = false;
+                ilceInput.placeholder = "İlçe seçin...";
+                ilceler.forEach(ilce => {
+                    let option = document.createElement("option");
+                    option.value = ilce;
+                    ilceDatalist.appendChild(option);
+                });
+            } else {
+                ilceInput.disabled = true;
+                ilceInput.value = "";
+                ilceInput.placeholder = "Önce şehir seçin...";
+            }
+        }
+
+        // 3. Sayfa yüklendiğinde url'de şehir varsa otomatik aç
+        if (sehirInput.value.trim() !== "") {
+            ilceleriDoldur(sehirInput.value.trim());
+        }
+
+        // 4. Müşteri şehir yazdıkça ilçeyi güncelle
+        sehirInput.addEventListener("input", function() {
+            ilceInput.value = ""; // Şehir değişince eski ilçeyi sil
+            ilceleriDoldur(this.value.trim());
+        });
+    });
+</script>
 {% endblock %}

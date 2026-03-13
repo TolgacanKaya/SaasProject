@@ -2,109 +2,110 @@
 
 {% block title %}T-Randevu | İşletmenizi Dijitale Taşıyın{% endblock %}
 
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-section::before {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 50%);
+        animation: pulse 10s infinite;
+    }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    .feature-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 1rem; border: 1px solid #f1f5f9; }
+    .feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border-color: #e2e8f0; }
+    .icon-box { width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center; border-radius: 1rem; margin-bottom: 1.5rem; font-size: 1.75rem;}
+</style>
+{% endblock %}
+
 {% block content %}
-    <div class="container-fluid bg-primary text-white text-center py-5 shadow-sm">
-        <div class="container py-5">
-            <h1 class="display-4 fw-bold mb-3">İşletmenizi Tek Bir Ekrandan Yönetin</h1>
-            <p class="lead mb-4">Randevu takipleri, müşteri yönetimi ve dijital görünürlük. Eski usul defterleri çöpe atın, T-Randevu ile markanızı büyütün.</p>
-            <a href="{% url 'kayit' %}" class="btn btn-dark btn-lg fw-bold px-5 py-3">14 Gün Ücretsiz Dene</a>
-            <p class="mt-3 small opacity-75">Kredi kartı gerektirmez. İstediğiniz zaman iptal edebilirsiniz.</p>
+    <div class="hero-section text-white text-center py-5 shadow-lg">
+        <div class="container py-5 position-relative z-1">
+            <span class="badge bg-white text-dark mb-3 px-3 py-2 rounded-pill fw-bold shadow-sm">🚀 T-Randevu v2.0 Yayında</span>
+            <h1 class="display-4 fw-bold mb-4 text-white">İşletmenizi Tek Bir Ekrandan <span style="color: #cbd5e1;">Yönetin</span></h1>
+            <p class="lead mb-5 mx-auto text-light" style="max-width: 700px;">Randevu takipleri, müşteri yönetimi ve dijital görünürlük. Eski usul defterleri çöpe atın, T-Randevu ile markanızı çağ atlatın.</p>
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{% url 'kayit' %}" class="btn btn-light btn-lg fw-bold px-5 py-3 rounded-pill shadow-sm">Ücretsiz Başla</a>
+                <a href="{% url 'kesfet' %}" class="btn btn-outline-light btn-lg fw-bold px-5 py-3 rounded-pill">İşletmeleri Keşfet</a>
+            </div>
+            <p class="mt-4 small opacity-75">Kredi kartı gerektirmez. İstediğiniz zaman iptal edebilirsiniz.</p>
         </div>
     </div>
 
-    <div class="container py-5 mt-4">
-        <div class="row align-items-center mb-5 pb-5 border-bottom">
-            <div class="col-md-6">
-                <h2 class="fw-bold text-dark mb-4">Müşterileriniz 7/24 Randevu Alsın</h2>
-                <p class="text-muted fs-5">Size özel oluşturulan linki (örn: t-randevu.com/sizin-isletmeniz) Instagram veya WhatsApp üzerinden paylaşın. Müşterileriniz size mesaj atmadan, gece yarısı bile boş saatlerinizi görüp saniyeler içinde randevu oluştursun.</p>
-                <ul class="list-unstyled mt-4 fs-5 text-muted">
-                    <li class="mb-2">✅ Otomatik Randevu Onayı</li>
-                    <li class="mb-2">✅ Çakışan Saatleri Engelleme</li>
-                    <li class="mb-2">✅ Sınırsız Hizmet Ekleme</li>
-                </ul>
-            </div>
-            <div class="col-md-6 text-center">
-                <div class="p-5 bg-white border rounded-4 shadow-sm text-primary display-1">
-                    💻 📱
-                </div>
-            </div>
+    <div class="container py-5 my-5">
+        <div class="text-center mb-5 pb-3">
+            <h2 class="fw-bold text-dark">Sıradan Bir Randevu Sisteminden Çok Daha Fazlası</h2>
+            <p class="text-muted fs-5">İşletmenizi büyütmek için ihtiyacınız olan her şey T-Randevu'da.</p>
         </div>
 
-        <h2 class="text-center fw-bold mb-5 text-dark">Neden T-Randevu?</h2>
-        <div class="row text-center g-4">
+        <div class="row g-4 text-center">
             <div class="col-md-4">
-                <div class="p-4 border rounded-3 bg-white shadow-sm h-100">
-                    <div class="text-primary mb-3"><span class="fs-1">🚀</span></div>
-                    <h4 class="fw-bold">Markanızı Büyütün</h4>
-                    <p class="text-muted">Pazaryerimizde listelenerek bölgenizdeki yeni müşterilerin sizi keşfetmesini sağlayın.</p>
+                <div class="feature-card p-5 bg-white h-100">
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary">📱</div>
+                    <h4 class="fw-bold mb-3">7/24 Online Vitrin</h4>
+                    <p class="text-muted mb-0">Size özel oluşturulan linki sosyal medyada paylaşın. Müşterileriniz size mesaj atmadan saniyeler içinde randevu oluştursun.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="p-4 border rounded-3 bg-white shadow-sm h-100">
-                    <div class="text-primary mb-3"><span class="fs-1">📊</span></div>
-                    <h4 class="fw-bold">Veri Analizi</h4>
-                    <p class="text-muted">Hangi hizmetiniz daha çok satıyor? En sadık müşteriniz kim? Hepsini tek tıkla görün.</p>
+                <div class="feature-card p-5 bg-white h-100">
+                    <div class="icon-box bg-success bg-opacity-10 text-success">📍</div>
+                    <h4 class="fw-bold mb-3">Çoklu Lokasyon Zekası</h4>
+                    <p class="text-muted mb-0">İşletmede, müşterinin evinde veya online... Hizmetlerinizi nerede vereceğinizi siz belirleyin, sistem yönlendirsin.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="p-4 border rounded-3 bg-white shadow-sm h-100">
-                    <div class="text-primary mb-3"><span class="fs-1">🛡️</span></div>
-                    <h4 class="fw-bold">Müşteri Güvenliği</h4>
-                    <p class="text-muted">Müşteri verileriniz size özel şifreli alanda tutulur, KVKK standartlarına tam uyum sağlanır.</p>
+                <div class="feature-card p-5 bg-white h-100">
+                    <div class="icon-box bg-warning bg-opacity-10 text-warning">🤖</div>
+                    <h4 class="fw-bold mb-3">Akıllı Çakışma Önleyici</h4>
+                    <p class="text-muted mb-0">Aynı saate iki kişinin randevu alması imkansız! Gelişmiş zaman algoritması ile mesai saatleriniz tam koruma altında.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid bg-white py-5">
+    {% if vip_isletmeler %}
+    <div class="container-fluid bg-light py-5 border-top">
         <div class="container py-4">
-            <h2 class="text-center fw-bold mb-5 text-dark">Sıkça Sorulan Sorular</h2>
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="accordion shadow-sm" id="faqAccordion">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    Sistemi kullanmak için teknik bilgiye ihtiyacım var mı?
-                                </button>
-                            </h2>
-                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    Hayır, T-Randevu herkesin kullanabileceği kadar basit tasarlanmıştır. Sosyal medya hesabı açabiliyorsanız, işletme panelinizi de rahatlıkla yönetebilirsiniz.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    Müşterilerim randevu alırken üye olmak zorunda mı?
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    Kesinlikle hayır. Müşterileriniz zaman kaybetmeden, sadece ad-soyad ve telefon girerek "Misafir" olarak saniyeler içinde randevu alabilir.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Sistemden dilediğim zaman çıkabilir miyim?
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    Evet. Herhangi bir taahhüt bulunmamaktadır. Memnun kalmadığınız takdirde aboneliğinizi anında iptal edebilirsiniz.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="d-flex justify-content-between align-items-end mb-5">
+                <div>
+                    <h2 class="fw-bold text-dark mb-2">Platformun Yıldızları 🌟</h2>
+                    <p class="text-muted mb-0">T-Randevu kullanan elit işletmeleri keşfedin.</p>
                 </div>
+                <a href="{% url 'kesfet' %}" class="btn btn-outline-dark fw-bold rounded-pill px-4">Tümünü Gör</a>
+            </div>
+
+            <div class="row g-4">
+                {% for vip in vip_isletmeler %}
+                <div class="col-md-4 col-lg-3">
+                    <a href="/{{ vip.slug }}/" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden feature-card">
+                            {% if vip.cover_image %}
+                                <img src="{{ vip.cover_image.url }}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-dark" style="height: 120px;"></div>
+                            {% endif %}
+                            <div class="card-body text-center position-relative mt-n4">
+                                {% if vip.logo %}
+                                    <img src="{{ vip.logo.url }}" class="rounded-circle border border-4 border-white shadow-sm mb-2 bg-white" style="width: 60px; height: 60px; object-fit: cover; position: relative; z-index: 2; margin-top: -40px;">
+                                {% else %}
+                                    <div class="rounded-circle border border-4 border-white shadow-sm mb-2 bg-warning text-dark d-inline-flex align-items-center justify-content-center fw-bold fs-4" style="width: 60px; height: 60px; position: relative; z-index: 2; margin-top: -40px;">{{ vip.name|make_list|first|upper }}</div>
+                                {% endif %}
+                                <h6 class="fw-bold text-dark mb-1 text-truncate">{{ vip.name }}</h6>
+                                <p class="small text-muted mb-0">📍 {{ vip.city|default:"Konum Yok" }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
+    {% endif %}
 
-    <footer class="bg-dark text-white text-center py-4 mt-5">
+    <footer class="bg-dark text-white text-center py-4">
         <p class="mb-0">© 2026 T-Randevu SaaS Projesi. Tüm hakları saklıdır.</p>
     </footer>
 {% endblock %}

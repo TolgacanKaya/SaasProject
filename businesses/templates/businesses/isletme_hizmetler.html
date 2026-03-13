@@ -1,98 +1,248 @@
 {% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
 
-{% block title %}Hizmetlerim | T-Randevu{% endblock %}
+{% block page_title %}Hizmet ve Fiyat Listesi{% endblock %}
 
 {% block content %}
-<h3 class="fw-bold mb-4">✂️ Hizmet ve Fiyat Listesi</h3>
+    {% if isletme.is_premium %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-body p-4">
-                <h5 class="fw-bold border-bottom pb-2 mb-3">Yeni Hizmet Ekle</h5>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Hizmet Adı</label>
-                        <input type="text" name="name" class="form-control" placeholder="Örn: Saç Kesimi" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Fiyat (₺)</label>
-                        <input type="number" name="price" class="form-control" placeholder="Örn: 250" required>
-                    </div>
+            <div class="lg:col-span-1">
+                <div class="premium-card p-6">
+                    <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                        <span class="text-accent">➕</span> Yeni Hizmet Ekle
+                    </h2>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Hizmet Konumu</label>
-                        <select name="location_type" class="form-select" required>
-                            <option value="in_store">📍 İşletmede (Benim Mekanımda)</option>
-                            <option value="at_home">🏠 Müşteri Adresinde (Evde/İşyerinde)</option>
-                            <option value="online">💻 Online (Görüntülü/Telefonda)</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Tahmini Süre (İsteğe Bağlı)</label>
-                        <div class="input-group">
-                            <input type="number" name="duration_value" class="form-control" placeholder="Örn: 2" min="1">
-                            <select name="duration_unit" class="form-select" style="max-width: 120px;" required>
-                                <option value="minutes">Dakika</option>
-                                <option value="hours">Saat</option>
-                                <option value="days">Gün</option>
-                                <option value="weeks">Hafta</option>
-                                <option value="months">Ay</option>
-                            </select>
+                    <form method="POST" action="{% url 'isletme_hizmetler' %}" class="space-y-5">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-1.5">Hizmet Adı</label>
+                            <input type="text" name="name" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" placeholder="Örn: Saç Kesimi" required>
                         </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-1.5">Fiyat (₺)</label>
+                            <input type="number" name="price" class="w-full bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" placeholder="Örn: 250" required>
+                        </div>
+
+                        <div class="p-4 bg-background border border-border rounded-xl">
+                            <label class="block text-sm font-semibold text-gray-300 mb-3 border-b border-border pb-2">Bu Hizmet Nerelerde Verilebilir?</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" name="is_in_store" checked class="w-4 h-4 rounded border-border text-accent focus:ring-accent bg-card">
+                                    <span class="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">📍 İşletmenizde (Dükkan/Klinik)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" name="is_at_home" class="w-4 h-4 rounded border-border text-accent focus:ring-accent bg-card">
+                                    <span class="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">🏠 Müşteri Adresinde (Ev/Ofis)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" name="is_online" class="w-4 h-4 rounded border-border text-accent focus:ring-accent bg-card">
+                                    <span class="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">💻 Online (Görüntülü/Sesli)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-1.5">Tahmini Süre (İsteğe Bağlı)</label>
+                            <div class="flex gap-3">
+                                <input type="number" name="duration_value" class="w-1/2 bg-background border border-border text-white px-4 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all" placeholder="Örn: 30">
+                                <select name="duration_unit" class="w-1/2 bg-background border border-border text-white px-3 py-2.5 rounded-xl focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all cursor-pointer">
+                                    <option value="minutes">Dakika</option>
+                                    <option value="hours">Saat</option>
+                                    <option value="days">Gün</option>
+                                    <option value="weeks">Hafta</option>
+                                    <option value="months">Ay</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-accent text-black font-bold rounded-xl hover:bg-accent-hover hover:shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all duration-300 mt-2">
+                            Vitrine Ekle
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="premium-card overflow-hidden h-full">
+                    <div class="p-6 border-b border-border">
+                        <h2 class="text-lg font-bold text-white">Mevcut Hizmetleriniz</h2>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">➕ Vitrine Ekle</button>
-                </form>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-card text-muted text-xs uppercase tracking-wider font-semibold border-b border-border">
+                                <tr>
+                                    <th class="px-6 py-4">Hizmet Adı</th>
+                                    <th class="px-6 py-4">Süre</th>
+                                    <th class="px-6 py-4 text-accent">Fiyat</th>
+                                    <th class="px-6 py-4 text-right">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                {% for hizmet in hizmetler %}
+                                <tr class="hover:bg-white/[0.02] transition-colors duration-200 group">
+                                    <td class="px-6 py-4">
+                                        <div class="font-bold text-gray-200">{{ hizmet.name }}</div>
+                                        <div class="text-xs text-muted mt-1 flex gap-2">
+                                            {% if hizmet.is_in_store %}<span title="İşletmede">📍</span>{% endif %}
+                                            {% if hizmet.is_at_home %}<span title="Evde">🏠</span>{% endif %}
+                                            {% if hizmet.is_online %}<span title="Online">💻</span>{% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-300">
+                                        {% if hizmet.duration %}
+                                            ⏱️ {{ hizmet.duration }}
+                                            {% if hizmet.duration_type == 'minutes' %}Dk
+                                            {% elif hizmet.duration_type == 'hours' %}Saat
+                                            {% elif hizmet.duration_type == 'days' %}Gün
+                                            {% elif hizmet.duration_type == 'weeks' %}Hafta
+                                            {% elif hizmet.duration_type == 'months' %}Ay
+                                            {% endif %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 font-bold text-white text-lg">
+                                        {{ hizmet.price }} ₺
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <a href="{% url 'hizmet_sil' hizmet.id %}" class="inline-flex items-center justify-center p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors" onclick="return confirm('Bu hizmeti silmek istediğinize emin misiniz?');">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="py-16 text-center">
+                                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 text-muted mb-4">
+                                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" /></svg>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-white mb-2">Henüz hizmet eklemediniz</h3>
+                                        <p class="text-muted text-sm">Sol taraftaki formu kullanarak vitrininizi oluşturmaya başlayın.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-8">
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="px-4 py-3 border-0">Hizmet Adı</th>
-                        <th class="py-3 border-0">Süre</th>
-                        <th class="py-3 border-0">Fiyat</th>
-                        <th class="py-3 text-end px-4 border-0">İşlem</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for hizmet in hizmetler %}
-                    <tr>
-                        <td class="px-4 fw-bold text-dark border-light">
-                            {{ hizmet.name }} <br>
-                            {% if hizmet.location_type == 'in_store' %}
-                                <span class="badge bg-secondary border small mt-1">📍 İşletmede</span>
-                            {% elif hizmet.location_type == 'at_home' %}
-                                <span class="badge bg-info text-dark border small mt-1">🏠 Müşteri Adresinde</span>
-                            {% elif hizmet.location_type == 'online' %}
-                                <span class="badge bg-primary border small mt-1">💻 Online</span>
-                            {% endif %}
-                        </td>
-                        <td class="border-light"><span class="text-muted">⏱️ {{ hizmet.formatted_duration }}</span></td>
-                        <td class="border-light"><span class="badge bg-success fs-6">{{ hizmet.price }} ₺</span></td>
-                        <td class="text-end px-4 border-light">
-                            <a href="{% url 'hizmet_sil' hizmet.id %}" class="btn btn-sm btn-outline-danger fw-bold" onclick="return confirm('Bu hizmeti vitrinden kaldırmak istediğinize emin misiniz?');">🗑️ Sil</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center py-5 text-muted border-0">
-                            <div class="display-1 text-light mb-3">✂️</div>
-                            <h5>Vitrininizde henüz bir hizmet yok.</h5>
-                            <p class="mb-0">Sol taraftaki formu kullanarak eklemeye başlayın!</p>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    {% else %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">✂️ Hizmetlerim</h3>
         </div>
-    </div>
-</div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="fw-bold mb-0">Yeni Hizmet Ekle</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" action="{% url 'isletme_hizmetler' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Hizmet Adı</label>
+                                <input type="text" name="name" class="form-control" placeholder="Örn: Saç Kesimi" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Fiyat (₺)</label>
+                                <input type="number" name="price" class="form-control" placeholder="Örn: 250" required>
+                            </div>
+
+                            <div class="form-group mb-3 p-3 bg-light rounded-3 border">
+                                <label class="form-label fw-bold">Bu Hizmet Nerelerde Verilebilir?</label>
+                                <div class="d-flex flex-column gap-2 mt-2">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_in_store" id="locStoreFree" checked>
+                                        <label class="form-check-label" for="locStoreFree">📍 İşletmenizde (Dükkan/Klinik)</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_at_home" id="locHomeFree">
+                                        <label class="form-check-label" for="locHomeFree">🏠 Müşteri Adresinde (Ev/Ofis)</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_online" id="locOnlineFree">
+                                        <label class="form-check-label" for="locOnlineFree">💻 Online (Görüntülü/Sesli)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Tahmini Süre (İsteğe Bağlı)</label>
+                                <div class="input-group">
+                                    <input type="number" name="duration_value" class="form-control" placeholder="Örn: 30">
+                                    <select name="duration_unit" class="form-select" style="max-width: 110px;">
+                                        <option value="minutes">Dakika</option>
+                                        <option value="hours">Saat</option>
+                                        <option value="days">Gün</option>
+                                        <option value="weeks">Hafta</option>
+                                        <option value="months">Ay</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 fw-bold">➕ Vitrine Ekle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="fw-bold mb-0">📋 Mevcut Hizmetleriniz</h5>
+                    </div>
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="px-4 py-3">Hizmet Adı</th>
+                                    <th class="py-3">Süre</th>
+                                    <th class="py-3">Fiyat</th>
+                                    <th class="py-3 text-end px-4">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hizmet in hizmetler %}
+                                <tr>
+                                    <td class="px-4 fw-bold text-dark">
+                                        {{ hizmet.name }}
+                                        <div class="small text-muted mt-1">
+                                            {% if hizmet.is_in_store %}<span title="İşletmede">📍 İşletme</span>{% endif %}
+                                            {% if hizmet.is_at_home %}<span title="Evde">🏠 Evde</span>{% endif %}
+                                            {% if hizmet.is_online %}<span title="Online">💻 Online</span>{% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if hizmet.duration %}
+                                            <span class="badge bg-info text-dark">⏱️ {{ hizmet.duration }}
+                                            {% if hizmet.duration_type == 'minutes' %}Dk
+                                            {% elif hizmet.duration_type == 'hours' %}Saat
+                                            {% elif hizmet.duration_type == 'days' %}Gün
+                                            {% elif hizmet.duration_type == 'weeks' %}Hafta
+                                            {% elif hizmet.duration_type == 'months' %}Ay
+                                            {% endif %}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><span class="fw-bold text-success">{{ hizmet.price }} ₺</span></td>
+                                    <td class="text-end px-4">
+                                        <a href="{% url 'hizmet_sil' hizmet.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Silmek istediğinize emin misiniz?');">🗑️ Sil</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-5 text-muted">Vitrininizde henüz bir hizmet yok.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
