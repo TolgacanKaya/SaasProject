@@ -1,5 +1,6 @@
 from datetime import timedelta
-
+import csv
+from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -8,8 +9,10 @@ from django.utils.dateparse import parse_datetime
 from businesses.models import Category
 from django.core.paginator import Paginator
 from appointments.models import Appointment
-from .models import Business, Customer, Service
-
+from .models import Business, Customer, Service, Review
+from django.db.models import Avg, Sum
+from .tasks import send_review_email_task
+from django.views.decorators.cache import never_cache
 
 def isletme_detay(request, slug):
     isletme = get_object_or_404(Business, slug=slug)
@@ -32,6 +35,7 @@ def isletme_detay(request, slug):
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         phone = request.POST.get("phone")
+        email = request.POST.get("email")
 
         gelen_adres = request.POST.get("customer_address")
         gelen_uygulama = request.POST.get("online_app")
@@ -104,7 +108,7 @@ def isletme_detay(request, slug):
 
         o_gunun_randevulari = isletme.appointments.filter(
             date_time__date=randevu_zamani.date(),
-            status__in=["pending", "approved"],
+            status__in=["pending", "confirmed"],
         )
 
         cakisma_var = False
@@ -134,16 +138,25 @@ def isletme_detay(request, slug):
         # ==========================================
         # TÜM KONTROLLER GEÇİLDİYSE RANDEVUYU KAYDET
         # ==========================================
+
+        # Müşteriyi E-posta ile kaydet (veya güncelle)
         musteri, created = Customer.objects.get_or_create(
             business=isletme,
             phone=phone,
             defaults={
                 "first_name": first_name,
                 "last_name": last_name,
+                "email": email,  # YENİ EKLENDİ
             },
         )
 
-        Appointment.objects.create(
+        # Eğer müşteri önceden varsa ama maili yoksa güncelleyelim
+        if not created and email and not musteri.email:
+            musteri.email = email
+            musteri.save()
+
+        # DİKKAT: Başına yeni_randevu = ekledik
+        yeni_randevu = Appointment.objects.create(
             business=isletme,
             customer=musteri,
             service=secilen_hizmet,
@@ -153,11 +166,22 @@ def isletme_detay(request, slug):
             online_app=gelen_uygulama,
             online_link=gelen_link,
             customer_note=gelen_not,
-            chosen_location = secilen_konum
+            chosen_location=secilen_konum
         )
+
+        # ==========================================
+        # CELERY İLE ARKA PLAN GÖREVİNİ TETİKLEME
+        # ==========================================
+        if email:
+            # Geliştirme/Test için countdown=10 (10 saniye), Canlıda 3600 (1 saat) yapabilirsin.
+            send_review_email_task.apply_async(args=[yeni_randevu.id, request.get_host()], countdown=10)
 
         messages.success(request, "🎉 Randevu talebiniz başarıyla alındı!")
         return redirect("isletme_detay", slug=slug)
+
+    # DİKKAT: Burası artık if bloğunun dışına hizalandı!
+    yorumlar = isletme.reviews.all().order_by('-created_at')
+    ortalama_puan = yorumlar.aggregate(Avg('rating'))['rating__avg'] or 0
 
     return render(
         request,
@@ -165,9 +189,10 @@ def isletme_detay(request, slug):
         {
             "isletme": isletme,
             "hizmetler": hizmetler,
+            "yorumlar": yorumlar,
+            "ortalama_puan": round(ortalama_puan, 1),
         },
     )
-
 
 @login_required(login_url="/hesap/giris/")
 def dashboard(request):
@@ -175,9 +200,8 @@ def dashboard(request):
     if not isletme:
         return redirect("kayit")
 
-    # KURAL 1: Sadece "Bekleyen" ve "Zamanı GEÇMEMİŞ" (Şu andan büyük) olanları al
-    # KURAL 2: En yakın tarihli olan en üstte çıksın (order_by("date_time"))
     now = timezone.now()
+    # Yaklaşan randevular listesi
     randevular_list = isletme.appointments.filter(
         status="pending",
         date_time__gte=now
@@ -188,12 +212,24 @@ def dashboard(request):
     page = request.GET.get('page')
     randevular = paginator.get_page(page)
 
+    # ==========================================
+    # YENİ: AYLIK OLASI KAZANÇ HESAPLAYICI
+    # ==========================================
+    # Bulunduğumuz yılı ve ayı baz alarak filtreler. İptal olanları (cancelled) saymaz.
+    aylik_kazanc = isletme.appointments.filter(
+        date_time__year=now.year,
+        date_time__month=now.month,
+        status__in=['pending', 'approved', 'confirmed']
+    ).aggregate(toplam=Sum('service__price'))['toplam'] or 0
+
     context = {
         "isletme": isletme,
         "randevular": randevular,
         "toplam_randevu": isletme.appointments.count(),
         "toplam_musteri": isletme.customers.count(),
         "toplam_hizmet": isletme.services.count(),
+        "aylik_kazanc": aylik_kazanc,  # HTML'e parayı gönderiyoruz
+        "simdi": now,                  # HTML'e güncel ayı gönderiyoruz
     }
 
     return render(request, "businesses/dashboard.html", context)
@@ -346,3 +382,52 @@ def pro_yap(request):
         messages.success(request, "🎉 Tebrikler! Pro Plan aktifleştirildi!")
 
     return redirect("dashboard")
+
+
+@login_required(login_url="/hesap/giris/")
+def musterileri_indir_csv(request):
+    isletme = get_object_or_404(Business, owner=request.user)
+    musteriler = isletme.customers.all()
+
+    # CSV Yanıtı Oluşturma
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{isletme.slug}_musteri_listesi.csv"'
+    response.write(u'\ufeff'.encode('utf8')) # Türkçe karakter desteği için BOM
+
+    writer = csv.writer(response)
+    writer.writerow(['Ad', 'Soyad', 'Telefon', 'Toplam Randevu'])
+
+    for m in musteriler:
+        writer.writerow([m.first_name, m.last_name, m.phone, m.appointments.count()])
+
+    return response
+
+@never_cache
+def degerlendirme_yap(request, token):
+    # UUID token'a göre randevuyu bul
+    randevu = get_object_or_404(Appointment, review_token=token)
+
+    # Eğer randevu iptal edilmişse veya zaten değerlendirilmişse YENİ SAYFAYA AT
+    if randevu.is_reviewed:
+        # İŞTE BURASI DÜZELDİ: hata.html yerine islem_tamam.html oldu
+        return render(request, 'businesses/islem_tamam.html', {'randevu': randevu})
+
+    if request.method == 'POST':
+        puan = request.POST.get('rating')
+        yorum = request.POST.get('comment')
+
+        if puan:
+            Review.objects.create(
+                business=randevu.business,
+                appointment=randevu,
+                rating=int(puan),
+                comment=yorum
+            )
+            # Randevuyu değerlendirildi olarak işaretle ki link tek kullanımlık olsun
+            randevu.is_reviewed = True
+            randevu.save()
+
+            messages.success(request, 'Değerlendirmeniz için teşekkür ederiz!')
+            return redirect('isletme_detay', slug=randevu.business.slug)
+
+    return render(request, 'businesses/degerlendirme_yap.html', {'randevu': randevu})

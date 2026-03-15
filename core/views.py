@@ -8,17 +8,19 @@ def ana_sayfa(request):
     vip_isletmeler = Business.objects.filter(is_premium=True).order_by('-id')[:6]
     return render(request, 'core/ana_sayfa.html', {'vip_isletmeler': vip_isletmeler})
 
+
 def kesfet(request):
     kategoriler = Category.objects.all()
 
     # Önce Premium olanlar en üstte sıralansın, sonra en yeniler!
     isletmeler = Business.objects.all().order_by('-is_premium', '-id')
 
-    # Formdan gelen verileri alıyoruz (İlçe eklendi)
+    # Formdan gelen verileri alıyoruz (Premium şalteri dahil)
     arama_kelimesi = request.GET.get('arama')
     sehir = request.GET.get('sehir')
     ilce = request.GET.get('ilce')
     kategori_id = request.GET.get('kategori')
+    sadece_premium = request.GET.get('is_premium')  # YENİ: Premium şalterinden gelen veri
 
     # Filtreleme Mantığı
     if arama_kelimesi:
@@ -29,6 +31,10 @@ def kesfet(request):
         isletmeler = isletmeler.filter(district__icontains=ilce)  # İlçe araması (Tam veya kısmi eşleşme)
     if kategori_id:
         isletmeler = isletmeler.filter(category_id=kategori_id)
+
+    # YENİ: Şalter açıksa (değeri '1' ise) listeyi sadece premium olanlarla daralt
+    if sadece_premium == '1':
+        isletmeler = isletmeler.filter(is_premium=True)
 
     return render(request, 'core/kesfet.html', {
         'kategoriler': kategoriler,

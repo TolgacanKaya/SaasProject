@@ -2,110 +2,202 @@
 
 {% block title %}T-Randevu | İşletmenizi Dijitale Taşıyın{% endblock %}
 
-{% block extra_css %}
-<style>
-    .hero-section {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-        position: relative;
-        overflow: hidden;
-    }
-    .hero-section::before {
-        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-        background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 50%);
-        animation: pulse 10s infinite;
-    }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-    .feature-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 1rem; border: 1px solid #f1f5f9; }
-    .feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border-color: #e2e8f0; }
-    .icon-box { width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center; border-radius: 1rem; margin-bottom: 1.5rem; font-size: 1.75rem;}
-</style>
-{% endblock %}
-
 {% block content %}
-    <div class="hero-section text-white text-center py-5 shadow-lg">
-        <div class="container py-5 position-relative z-1">
-            <span class="badge bg-white text-dark mb-3 px-3 py-2 rounded-pill fw-bold shadow-sm">🚀 T-Randevu v2.0 Yayında</span>
-            <h1 class="display-4 fw-bold mb-4 text-white">İşletmenizi Tek Bir Ekrandan <span style="color: #cbd5e1;">Yönetin</span></h1>
-            <p class="lead mb-5 mx-auto text-light" style="max-width: 700px;">Randevu takipleri, müşteri yönetimi ve dijital görünürlük. Eski usul defterleri çöpe atın, T-Randevu ile markanızı çağ atlatın.</p>
-            <div class="d-flex gap-3 justify-content-center">
-                <a href="{% url 'kayit' %}" class="btn btn-light btn-lg fw-bold px-5 py-3 rounded-pill shadow-sm">Ücretsiz Başla</a>
-                <a href="{% url 'kesfet' %}" class="btn btn-outline-light btn-lg fw-bold px-5 py-3 rounded-pill">İşletmeleri Keşfet</a>
+    <div class="relative bg-slate-900 overflow-hidden pt-24 pb-32 border-b border-slate-800 shadow-2xl">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[100px] animate-pulse"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-[fadeSlideUp_0.8s_ease-out_forwards]">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm font-bold mb-8 backdrop-blur-sm shadow-lg">
+                <span class="text-emerald-400">🚀</span> T-Randevu Sizlerle
             </div>
-            <p class="mt-4 small opacity-75">Kredi kartı gerektirmez. İstediğiniz zaman iptal edebilirsiniz.</p>
+
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-lg">
+                İşletmenizi Tek Bir Ekrandan <br class="hidden md:block">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Yönetin</span>
+            </h1>
+
+            <p class="mt-4 text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-10 font-medium">
+                Randevu takipleri, müşteri yönetimi ve dijital görünürlük. Eski usul defterleri çöpe atın, T-Randevu ile markanızı çağ atlatın.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-blue-500 text-white font-extrabold rounded-2xl shadow-xl shadow-indigo-500/20 hover:-translate-y-1 transition-all duration-300">
+                        Panele Git →
+                    </a>
+                {% else %}
+                    <a href="{% url 'kayit' %}" class="w-full sm:w-auto px-8 py-4 bg-white text-slate-900 font-extrabold rounded-2xl shadow-xl shadow-white/10 hover:bg-slate-50 hover:-translate-y-1 transition-all duration-300">
+                        Ücretsiz Başla
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'kesfet' %}" class="w-full sm:w-auto px-8 py-4 bg-white/10 text-white font-bold rounded-2xl border border-white/20 hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 backdrop-blur-md">
+                    İşletmeleri Keşfet
+                </a>
+            </div>
+
+            {% if not request.user.is_authenticated %}
+                <p class="mt-6 text-sm text-slate-400 font-medium">İstediğiniz zaman iptal edebilirsiniz.</p>
+            {% endif %}
         </div>
     </div>
 
-    <div class="container py-5 my-5">
-        <div class="text-center mb-5 pb-3">
-            <h2 class="fw-bold text-dark">Sıradan Bir Randevu Sisteminden Çok Daha Fazlası</h2>
-            <p class="text-muted fs-5">İşletmenizi büyütmek için ihtiyacınız olan her şey T-Randevu'da.</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 overflow-hidden">
+        <div class="text-center mb-16 reveal-item opacity-0 translate-y-12 transition-all duration-700 ease-out">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Sıradan Bir Randevu Sisteminden Çok Daha Fazlası</h2>
+            <p class="text-lg text-slate-500 font-medium max-w-2xl mx-auto">İşletmenizi büyütmek için ihtiyacınız olan her şey T-Randevu'da.</p>
         </div>
 
-        <div class="row g-4 text-center">
-            <div class="col-md-4">
-                <div class="feature-card p-5 bg-white h-100">
-                    <div class="icon-box bg-primary bg-opacity-10 text-primary">📱</div>
-                    <h4 class="fw-bold mb-3">7/24 Online Vitrin</h4>
-                    <p class="text-muted mb-0">Size özel oluşturulan linki sosyal medyada paylaşın. Müşterileriniz size mesaj atmadan saniyeler içinde randevu oluştursun.</p>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/40 border border-slate-100 hover:border-indigo-200 transition-colors duration-300 group reveal-item opacity-0 translate-y-12 delay-100 transition-all duration-700 ease-out">
+                <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:bg-indigo-100 transition-all">📱</div>
+                <h4 class="text-xl font-bold text-slate-900 mb-3">7/24 Online Vitrin</h4>
+                <p class="text-slate-500 font-medium leading-relaxed">Size özel oluşturulan linki sosyal medyada paylaşın. Müşterileriniz size mesaj atmadan saniyeler içinde randevu oluştursun.</p>
             </div>
-            <div class="col-md-4">
-                <div class="feature-card p-5 bg-white h-100">
-                    <div class="icon-box bg-success bg-opacity-10 text-success">📍</div>
-                    <h4 class="fw-bold mb-3">Çoklu Lokasyon Zekası</h4>
-                    <p class="text-muted mb-0">İşletmede, müşterinin evinde veya online... Hizmetlerinizi nerede vereceğinizi siz belirleyin, sistem yönlendirsin.</p>
-                </div>
+
+            <div class="bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/40 border border-slate-100 hover:border-emerald-200 transition-colors duration-300 group reveal-item opacity-0 translate-y-12 delay-200 transition-all duration-700 ease-out">
+                <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:bg-emerald-100 transition-all">📍</div>
+                <h4 class="text-xl font-bold text-slate-900 mb-3">Çoklu Lokasyon Zekası</h4>
+                <p class="text-slate-500 font-medium leading-relaxed">İşletmede, müşterinin evinde veya online... Hizmetlerinizi nerede vereceğinizi siz belirleyin, sistem yönlendirsin.</p>
             </div>
-            <div class="col-md-4">
-                <div class="feature-card p-5 bg-white h-100">
-                    <div class="icon-box bg-warning bg-opacity-10 text-warning">🤖</div>
-                    <h4 class="fw-bold mb-3">Akıllı Çakışma Önleyici</h4>
-                    <p class="text-muted mb-0">Aynı saate iki kişinin randevu alması imkansız! Gelişmiş zaman algoritması ile mesai saatleriniz tam koruma altında.</p>
+
+            <div class="bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/40 border border-slate-100 hover:border-amber-200 transition-colors duration-300 group reveal-item opacity-0 translate-y-12 delay-300 transition-all duration-700 ease-out">
+                <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:bg-amber-100 transition-all">🤖</div>
+                <h4 class="text-xl font-bold text-slate-900 mb-3">Akıllı Çakışma Önleyici</h4>
+                <p class="text-slate-500 font-medium leading-relaxed">Aynı saate iki kişinin randevu alması imkansız! Gelişmiş zaman algoritması ile mesai saatleriniz tam koruma altında.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-slate-900 py-24 border-y border-slate-800 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-30"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 reveal-item opacity-0 translate-y-12 transition-all duration-700 ease-out">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Sadece 3 Adımda İşinizi Büyütün</h2>
+                <p class="text-lg text-slate-400 font-medium max-w-2xl mx-auto">Teknik bilgiye gerek yok. Birkaç dakika içinde müşterilerinizi dijitalde ağırlamaya başlayın.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+                <div class="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-slate-800 z-0"></div>
+
+                <div class="relative z-10 text-center reveal-item opacity-0 translate-y-12 delay-100 transition-all duration-700 ease-out">
+                    <div class="w-24 h-24 mx-auto bg-slate-800 border-4 border-slate-900 rounded-full flex items-center justify-center text-3xl font-black text-indigo-400 mb-6 shadow-xl">1</div>
+                    <h4 class="text-xl font-bold text-white mb-3">Ücretsiz Kayıt Olun</h4>
+                    <p class="text-slate-400 font-medium">Saniyeler içinde işletme profilinizi oluşturun ve temel bilgilerinizi girin.</p>
+                </div>
+
+                <div class="relative z-10 text-center reveal-item opacity-0 translate-y-12 delay-200 transition-all duration-700 ease-out">
+                    <div class="w-24 h-24 mx-auto bg-slate-800 border-4 border-slate-900 rounded-full flex items-center justify-center text-3xl font-black text-emerald-400 mb-6 shadow-xl">2</div>
+                    <h4 class="text-xl font-bold text-white mb-3">Vitrini Hazırlayın</h4>
+                    <p class="text-slate-400 font-medium">Hizmetlerinizi, fiyatlarınızı ve çalışma saatlerinizi ekleyerek işletmenizi dijitale yansıtın.</p>
+                </div>
+
+                <div class="relative z-10 text-center reveal-item opacity-0 translate-y-12 delay-300 transition-all duration-700 ease-out">
+                    <div class="w-24 h-24 mx-auto bg-slate-800 border-4 border-slate-900 rounded-full flex items-center justify-center text-3xl font-black text-amber-400 mb-6 shadow-xl">3</div>
+                    <h4 class="text-xl font-bold text-white mb-3">Linkinizi Paylaşın</h4>
+                    <p class="text-slate-400 font-medium">Instagram veya WhatsApp'a size özel T-Randevu linkinizi ekleyin</p>
                 </div>
             </div>
         </div>
     </div>
 
     {% if vip_isletmeler %}
-    <div class="container-fluid bg-light py-5 border-top">
-        <div class="container py-4">
-            <div class="d-flex justify-content-between align-items-end mb-5">
-                <div>
-                    <h2 class="fw-bold text-dark mb-2">Platformun Yıldızları 🌟</h2>
-                    <p class="text-muted mb-0">T-Randevu kullanan elit işletmeleri keşfedin.</p>
+    <div class="bg-slate-50 py-24 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center sm:items-end mb-12 gap-6 reveal-item opacity-0 translate-y-12 transition-all duration-700 ease-out">
+                <div class="text-center sm:text-left">
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Platformun Yıldızları 🌟</h2>
+                    <p class="text-slate-500 font-medium">T-Randevu kullanan elit işletmeleri keşfedin.</p>
                 </div>
-                <a href="{% url 'kesfet' %}" class="btn btn-outline-dark fw-bold rounded-pill px-4">Tümünü Gör</a>
+                <a href="{% url 'kesfet' %}" class="px-6 py-3 border-2 border-slate-300 hover:border-slate-800 text-slate-700 hover:text-white hover:bg-slate-800 font-bold rounded-2xl transition-all duration-300">
+                    Tümünü Gör
+                </a>
             </div>
 
-            <div class="row g-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {% for vip in vip_isletmeler %}
-                <div class="col-md-4 col-lg-3">
-                    <a href="/{{ vip.slug }}/" class="text-decoration-none">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden feature-card">
+                <a href="/{{ vip.slug }}/" class="block group reveal-item opacity-0 translate-y-12 delay-[{{ forloop.counter0|add:1 }}00ms] transition-all duration-700 ease-out">
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-2 overflow-hidden transition-all duration-300 h-full flex flex-col relative">
+                        <div class="absolute top-4 right-4 z-10 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-lg">⭐</div>
+
+                        <div class="h-32 w-full relative">
                             {% if vip.cover_image %}
-                                <img src="{{ vip.cover_image.url }}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                <img src="{{ vip.cover_image.url }}" class="w-full h-full object-cover">
                             {% else %}
-                                <div class="bg-dark" style="height: 120px;"></div>
+                                <div class="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900"></div>
                             {% endif %}
-                            <div class="card-body text-center position-relative mt-n4">
-                                {% if vip.logo %}
-                                    <img src="{{ vip.logo.url }}" class="rounded-circle border border-4 border-white shadow-sm mb-2 bg-white" style="width: 60px; height: 60px; object-fit: cover; position: relative; z-index: 2; margin-top: -40px;">
-                                {% else %}
-                                    <div class="rounded-circle border border-4 border-white shadow-sm mb-2 bg-warning text-dark d-inline-flex align-items-center justify-content-center fw-bold fs-4" style="width: 60px; height: 60px; position: relative; z-index: 2; margin-top: -40px;">{{ vip.name|make_list|first|upper }}</div>
-                                {% endif %}
-                                <h6 class="fw-bold text-dark mb-1 text-truncate">{{ vip.name }}</h6>
-                                <p class="small text-muted mb-0">📍 {{ vip.city|default:"Konum Yok" }}</p>
-                            </div>
                         </div>
-                    </a>
-                </div>
+
+                        <div class="px-6 pb-8 text-center flex-1 flex flex-col relative">
+                            <div class="flex justify-center -mt-10 mb-4">
+                                {% if vip.logo %}
+                                    <img src="{{ vip.logo.url }}" class="w-20 h-20 rounded-full border-4 border-white bg-white shadow-md object-cover relative z-10 group-hover:scale-110 transition-transform duration-300">
+                                {% else %}
+                                    <div class="w-20 h-20 rounded-full border-4 border-white bg-amber-400 text-slate-900 shadow-md flex items-center justify-center font-extrabold text-3xl relative z-10 group-hover:scale-110 transition-transform duration-300">
+                                        {{ vip.name|make_list|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="font-bold text-slate-900 text-lg mb-1 truncate">{{ vip.name }}</h6>
+                            <p class="text-sm font-medium text-slate-500">📍 {{ vip.city|default:"Konum Yok" }}</p>
+                        </div>
+                    </div>
+                </a>
                 {% endfor %}
             </div>
         </div>
     </div>
     {% endif %}
 
-    <footer class="bg-dark text-white text-center py-4">
-        <p class="mb-0">© 2026 T-Randevu SaaS Projesi. Tüm hakları saklıdır.</p>
+    <footer class="bg-slate-950 text-slate-400 text-center py-8 border-t border-slate-900">
+        <p class="text-sm font-medium">© 2026 T-Randevu SaaS Projesi. Tüm hakları saklıdır.</p>
     </footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Scroll animasyonları için Intersection Observer
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15 // Elemanın %15'i göründüğünde tetikle
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Gizleme sınıflarını kaldır, görünüm sınıflarını ekle
+                    entry.target.classList.remove('opacity-0', 'translate-y-12');
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+
+                    // Animasyon bir kere çalışsın diye takibi bırak
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // reveal-item sınıfına sahip tüm elemanları gözlemle
+        document.querySelectorAll('.reveal-item').forEach((el) => {
+            observer.observe(el);
+        });
+    });
+</script>
+<style>
+    /* İlk açılıştaki Hero Section animasyonu için Keyframe */
+    @keyframes fadeSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 {% endblock %}
