@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hizmet Değerlendirmesi</title>
+</head>
+<body style="background-color: #f4f4f5; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 40px 0; color: #333333;">
+
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+
+        <div style="background-color: #4f46e5; padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">{{ randevu.business.name }}</h1>
+            <p style="color: #e0e7ff; margin: 5px 0 0 0; font-size: 14px;">Bizi tercih ettiğiniz için teşekkür ederiz!</p>
+        </div>
+
+        <div style="padding: 30px;">
+            <h2 style="margin-top: 0; font-size: 20px; color: #1e293b;">Merhaba {{ randevu.customer.first_name }},</h2>
+            <p style="font-size: 16px; line-height: 1.6; color: #475569;">
+                Umarız <strong>{{ randevu.service.name }}</strong> hizmetimizden memnun kalmışsınızdır.
+                Size daha iyi hizmet verebilmemiz için 1 dakikanızı ayırıp deneyiminizi puanlar mısınız?
+            </p>
+
+            <div style="text-align: center; margin: 35px 0;">
+                <a href="{{ review_url }}" style="background-color: #4f46e5; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
+                    ⭐ Deneyimi Değerlendir
+                </a>
+            </div>
+
+            <p style="font-size: 13px; color: #94a3b8; text-align: center; margin-bottom: 0;">
+                Bu bağlantı tek kullanımlıktır ve güvenliğiniz için değerlendirme yapıldıktan sonra iptal olur. Butona tıklayamıyorsanız, aşağıdaki linki kopyalayıp tarayıcınıza yapıştırabilirsiniz:<br><br>
+                <a href="{{ review_url }}" style="color: #4f46e5; word-break: break-all;">{{ review_url }}</a>
+            </p>
+        </div>
+
+        <div style="background-color: #f8fafc; padding: 15px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 12px; color: #64748b; margin: 0;">Bu e-posta otomatik olarak gönderilmiştir. T-Randevu © 2026</p>
+        </div>
+    </div>
+
+</body>
+</html>

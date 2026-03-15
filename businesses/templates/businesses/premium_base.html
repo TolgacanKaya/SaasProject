@@ -29,7 +29,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style type="text/tailwindcss">
-        /* Kartlara özel yumuşak parlama efekti (Glassmorphism + Glow) */
+        /* Kartlara özel yumuşak parlama efekti */
         .premium-card {
             @apply bg-card border border-border rounded-2xl transition-all duration-300;
         }
@@ -45,18 +45,12 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-        /* Modal Animasyonu */
-        .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(5px); }
-        .modal-overlay.show { opacity: 1; pointer-events: auto; }
-        .modal-content { transform: scale(0.95); transition: transform 0.3s ease; }
-        .modal-overlay.show .modal-content { transform: scale(1); }
     </style>
 </head>
 
 <body class="bg-background text-white flex h-screen overflow-hidden font-sans antialiased">
 
-    <aside class="w-[280px] bg-background border-r border-border flex flex-col justify-between hidden md:flex">
+    <aside class="w-[280px] bg-background border-r border-border flex flex-col justify-between hidden md:flex z-40 relative">
         <div class="p-6">
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-10 h-10 rounded-lg bg-accent text-black flex items-center justify-center font-bold text-xl">
@@ -116,8 +110,8 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="h-20 border-b border-border bg-background/80 backdrop-blur-md flex items-center justify-between px-8 z-40">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
+        <header class="h-20 border-b border-border bg-background/80 backdrop-blur-md flex items-center justify-between px-8 z-30 relative">
             <h2 class="text-xl font-semibold tracking-tight text-white">{% block page_title %}Genel Bakış{% endblock %}</h2>
 
             <div class="flex items-center gap-6">
@@ -143,7 +137,7 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-8 animate-fade-in">
+        <div class="flex-1 overflow-y-auto p-8 animate-fade-in relative z-20">
             {% if messages %}
                 {% for message in messages %}
                     <div class="mb-6 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-accent text-sm font-medium flex items-center gap-2">
@@ -157,31 +151,7 @@
         </div>
     </main>
 
-    <script>
-        function openPremiumModal(id) {
-            const modal = document.getElementById(id);
+    {% block extra_js %}{% endblock %}
 
-            // 1. Z-Index hapsinden kurtulmak için modalı HTML'in en dışına (body) taşıyoruz
-            if (modal.parentNode !== document.body) {
-                document.body.appendChild(modal);
-            }
-
-            // 2. Tarayıcının taşınmayı algılayıp animasyonu pürüzsüz oynatması için ufak tetikleme
-            requestAnimationFrame(() => {
-                modal.classList.add('show');
-            });
-        }
-
-        function closePremiumModal(id) {
-            document.getElementById(id).classList.remove('show');
-        }
-
-        // Bonus: Modalın dışındaki siyah alana tıklayınca da kapanmasını sağlayalım
-        window.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal-overlay')) {
-                e.target.classList.remove('show');
-            }
-        });
-    </script>
 </body>
 </html>

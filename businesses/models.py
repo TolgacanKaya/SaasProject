@@ -107,3 +107,14 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+class Review(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='reviews')
+    # OneToOneField kullanıyoruz çünkü bir randevuya sadece BİR yorum yapılabilir
+    appointment = models.OneToOneField('appointments.Appointment', on_delete=models.CASCADE, related_name='review')
+    rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], verbose_name="Puan (1-5)")
+    comment = models.TextField(blank=True, null=True, verbose_name="Müşteri Yorumu")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.business.name} - {self.rating} Yıldız"

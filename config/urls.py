@@ -25,6 +25,7 @@ urlpatterns = [
     path('randevu-yonetimi/', include('appointments.urls')),
     path('', include('core.urls')),
     path('', include('businesses.urls')),
+    path('odeme/', include('payments.urls')),
 ]
 
 # Geliştirme aşamasında medya dosyalarını göstermek için bu satırı ekliyoruz:

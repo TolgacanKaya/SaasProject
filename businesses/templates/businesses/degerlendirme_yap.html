@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Hizmet Değerlendirmesi | {{ randevu.business.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+    <div class="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 p-8 md:p-12 text-center">
+
+        <div class="w-20 h-20 mx-auto bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner">
+            ⭐
+        </div>
+
+        <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Hizmetimizi Değerlendirin</h2>
+        <p class="text-slate-500 mb-8 font-medium">
+            Sayın <span class="text-slate-800 font-bold">{{ randevu.customer.first_name }}</span>,
+            <span class="text-slate-800 font-bold">{{ randevu.business.name }}</span> işletmesinden aldığınız
+            <span class="text-indigo-600 font-bold">"{{ randevu.service.name }}"</span> hizmeti için puanınızı bekliyoruz.
+        </p>
+
+        <form method="POST" class="space-y-8">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Puanınız</label>
+                <div class="flex justify-center gap-2 flex-row-reverse" id="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5" class="hidden peer" required />
+                    <label for="star5" class="text-4xl text-slate-300 cursor-pointer peer-checked:text-amber-400 hover:text-amber-400 transition-colors">★</label>
+
+                    <input type="radio" id="star4" name="rating" value="4" class="hidden peer" />
+                    <label for="star4" class="text-4xl text-slate-300 cursor-pointer peer-checked:text-amber-400 hover:text-amber-400 transition-colors">★</label>
+
+                    <input type="radio" id="star3" name="rating" value="3" class="hidden peer" />
+                    <label for="star3" class="text-4xl text-slate-300 cursor-pointer peer-checked:text-amber-400 hover:text-amber-400 transition-colors">★</label>
+
+                    <input type="radio" id="star2" name="rating" value="2" class="hidden peer" />
+                    <label for="star2" class="text-4xl text-slate-300 cursor-pointer peer-checked:text-amber-400 hover:text-amber-400 transition-colors">★</label>
+
+                    <input type="radio" id="star1" name="rating" value="1" class="hidden peer" />
+                    <label for="star1" class="text-4xl text-slate-300 cursor-pointer peer-checked:text-amber-400 hover:text-amber-400 transition-colors">★</label>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-700 uppercase tracking-wider mb-3 text-left">Yorumunuz (İsteğe Bağlı)</label>
+                <textarea name="comment" rows="4" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 resize-none" placeholder="Hizmet hakkındaki düşüncelerinizi buraya yazabilirsiniz..."></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-lg rounded-2xl shadow-xl shadow-indigo-600/30 transition-all transform hover:-translate-y-1">
+                Değerlendirmeyi Gönder
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* CSS hilesi ile yıldızları soldan sağa doldurma efekti */
+    #star-rating label:hover,
+    #star-rating label:hover ~ label {
+        color: #fbbf24; /* Tailwind amber-400 */
+    }
+</style>
+{% endblock %}

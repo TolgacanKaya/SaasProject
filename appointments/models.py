@@ -2,6 +2,7 @@ from django.db import models
 # YENİ: Diğer uygulamadaki modelleri buraya çağırıyoruz
 from businesses.models import Business, Customer, Service
 from django.utils import timezone
+import uuid
 
 class Appointment(models.Model):
     STATUS_CHOICES = (
@@ -30,6 +31,13 @@ class Appointment(models.Model):
     online_app = models.CharField(max_length=50, blank=True, null=True, verbose_name="Online Uygulama")
     online_link = models.CharField(max_length=255, blank=True, null=True, verbose_name="Kullanıcı Adı / Link")
     customer_note = models.TextField(blank=True, null=True, verbose_name="Müşteri Notu")
+
+    # YENİ: Yorum Sistemi İçin Gerekli Alanlar
+    review_token = models.UUIDField(default=uuid.uuid4, editable=False, null=True)
+    is_reviewed = models.BooleanField(default=False, verbose_name="Değerlendirildi mi?")
+
+    def __str__(self):
+        return f"{self.customer} - {self.date_time.strftime('%d.%m.%Y %H:%M')}"
 
     def __str__(self):
         return f"{self.customer} - {self.date_time.strftime('%d.%m.%Y %H:%M')}"

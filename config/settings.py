@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,6 +46,7 @@ INSTALLED_APPS = [
     'accounts',      # YENİ: Üyelik, giriş, çıkış
     'businesses',    # YENİ: Dükkan, hizmetler, müşteriler
     'appointments',  # YENİ: Randevular, takvim, saatler
+    'payments',      # YENİ: Ödeme İşlemleri
 ]
 
 MIDDLEWARE = [
@@ -123,3 +128,21 @@ STATIC_URL = 'static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# --- GERÇEK MAİL AYARLARI ---
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+# --- CELERY & REDIS AYARLARI ---
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+# --- IYZICO ÖDEME AYARLARI ---
+IYZICO_API_KEY = os.getenv('IYZICO_API_KEY')
+IYZICO_SECRET_KEY = os.getenv('IYZICO_SECRET_KEY')
+IYZICO_BASE_URL = os.getenv('IYZICO_BASE_URL')
