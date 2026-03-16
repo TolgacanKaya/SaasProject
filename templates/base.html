@@ -54,6 +54,34 @@
         {% endblock %}
     </main>
 
+    <footer class="bg-slate-950 pt-12 pb-8 border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left mb-8">
+                <div>
+                    <h3 class="text-xl font-black text-white mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">T-Randevu</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Yeni nesil randevu ve işletme yönetim platformu. Zamanınızı daha verimli yönetin.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="{% url 'kesfet' %}" class="hover:text-indigo-400 transition-colors">İşletmeleri Keşfet</a></li>
+                        <li><a href="{% url 'rozetler' %}" class="hover:text-amber-400 transition-colors flex items-center justify-center md:justify-start gap-1">Rozetler Ne Anlama Geliyor? 👑</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Kurumsal</h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="{% url 'hakkimizda' %}" class="hover:text-indigo-400 transition-colors">Hakkımızda</a></li>
+                        <li><a href="{% url 'iletisim' %}" class="hover:text-indigo-400 transition-colors">İletişim</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 text-center text-slate-500 text-sm font-medium">
+                © 2026 T-Randevu SaaS Projesi. Tüm hakları saklıdır.
+            </div>
+        </div>
+    </footer>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

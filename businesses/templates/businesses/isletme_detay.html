@@ -2,6 +2,54 @@
 
 {% block title %}{{ isletme.name }} | Randevu Al{% endblock %}
 
+{% block extra_css %}
+{% if isletme.is_premium %}
+<style>
+    /* 👑 T-RANDEVU LÜKS PREMIUM TEMA (DARK & AMBER) 👑 */
+
+    body { background-color: #09090b !important; color: #f8fafc !important; }
+
+    .bg-white { background-color: #18181b !important; border-color: #27272a !important; }
+    .bg-slate-50 { background-color: #09090b !important; border-color: #27272a !important; }
+
+    .border-slate-100, .border-slate-200, .border-slate-300 { border-color: #27272a !important; }
+
+    .text-slate-900, .text-slate-800, .text-slate-700 { color: #f8fafc !important; }
+    .text-slate-600, .text-slate-500 { color: #a1a1aa !important; }
+    .text-slate-400 { color: #94a3b8 !important; }
+
+    .border-t-indigo-500 { border-top-color: #eab308 !important; }
+
+    .bg-slate-900 { background-color: #eab308 !important; color: #000000 !important; }
+    .hover\:bg-slate-800:hover { background-color: #ca8a04 !important; color: #000000 !important; }
+
+    .bg-indigo-50, .bg-indigo-100 { background-color: rgba(234, 179, 8, 0.1) !important; color: #eab308 !important; }
+    .text-indigo-600 { color: #eab308 !important; }
+    .hover\:text-indigo-600:hover { color: #eab308 !important; }
+
+    /* YENİ FİX: Görünmez olan o sarı puan kutusunu lüks siyah/altın temaya uydurduk! */
+    .bg-amber-50 { background-color: rgba(234, 179, 8, 0.05) !important; border-color: rgba(234, 179, 8, 0.2) !important; }
+    .text-amber-600 { color: #facc15 !important; }
+
+    input, select, textarea {
+        background-color: #09090b !important;
+        color: #f8fafc !important;
+        border-color: #27272a !important;
+    }
+    input:focus, select:focus, textarea:focus {
+        border-color: #eab308 !important;
+        --tw-ring-color: #eab308 !important;
+    }
+
+    .hover\:border-indigo-500:hover { border-color: #eab308 !important; }
+    .hover\:bg-indigo-50\/50:hover { background-color: rgba(234, 179, 8, 0.05) !important; }
+    input[type="radio"]:checked { background-color: #eab308 !important; border-color: #eab308 !important; }
+
+    .bg-slate-800 { background-color: #27272a !important; color: #eab308 !important; }
+</style>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="w-full h-[350px] relative flex items-center justify-center text-center shadow-inner"
      style="{% if isletme.cover_image %}background: linear-gradient(to bottom, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.8)), url('{{ isletme.cover_image.url }}') center/cover;{% else %}background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);{% endif %}">
@@ -42,27 +90,27 @@
 
         <div class="lg:col-span-5 space-y-8">
 
-            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8 hover:-translate-y-1 transition-transform duration-300">
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
                 <h4 class="text-xl font-bold text-slate-800 border-b border-slate-100 pb-4 mb-4">İşletme Bilgileri</h4>
                 <p class="text-slate-600 leading-relaxed mb-6">{{ isletme.description|default:"Bu işletme henüz bir açıklama eklememiş." }}</p>
 
-                <div class="bg-slate-50 p-5 rounded-2xl space-y-4 border border-slate-100">
-                    <div class="flex items-start gap-3">
-                        <span class="text-xl">📞</span>
+                <div class="bg-slate-50 p-5 rounded-2xl space-y-5 border border-slate-100 hover:-translate-y-1 transition-all duration-300">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-indigo-50 text-indigo-600">📞</div>
                         <div>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Telefon</p>
                             <a href="tel:{{ isletme.phone }}" class="text-slate-800 font-bold hover:text-indigo-600 transition-colors">{{ isletme.phone|default:"Belirtilmemiş" }}</a>
                         </div>
                     </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-xl">⏰</span>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-indigo-50 text-indigo-600">⏰</div>
                         <div>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mesai Saatleri</p>
                             <p class="text-slate-800 font-bold">{{ isletme.opening_time|time:"H:i" }} - {{ isletme.closing_time|time:"H:i" }}</p>
                         </div>
                     </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-xl">🏠</span>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-indigo-50 text-indigo-600">🏠</div>
                         <div>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Adres</p>
                             <p class="text-slate-800 font-medium text-sm">{{ isletme.address|default:"Belirtilmemiş" }}</p>
@@ -71,18 +119,18 @@
                 </div>
 
                 {% if isletme.phone %}
-                <button onclick="openWhatsApp()" class="w-full mt-6 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold rounded-2xl shadow-lg shadow-[#25D366]/30 flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5">
+                <button onclick="openWhatsApp()" class="w-full mt-6 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold rounded-2xl shadow-lg shadow-[#25D366]/30 flex items-center justify-center gap-2 transition-all hover:-translate-y-1 duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
                     WhatsApp'tan Ulaşın
                 </button>
                 {% endif %}
             </div>
 
-            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
                 <h4 class="text-xl font-bold text-slate-800 border-b border-slate-100 pb-4 mb-4">Sunulan Hizmetler</h4>
                 <div class="space-y-3 mt-4">
                     {% for hizmet in hizmetler %}
-                    <div class="flex justify-between items-center p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:border-slate-300 hover:bg-white transition-all">
+                    <div class="flex justify-between items-center p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:border-slate-300 hover:bg-white transition-all hover:-translate-y-1 hover:shadow-md duration-300">
                         <div>
                             <h6 class="font-bold text-slate-800 mb-1">{{ hizmet.name }}</h6>
                             <div class="flex flex-wrap gap-2 mt-1.5">
@@ -91,9 +139,6 @@
                                         ⏱️ {{ hizmet.duration }} {% if hizmet.duration_type == 'minutes' %}Dk{% elif hizmet.duration_type == 'hours' %}Saat{% elif hizmet.duration_type == 'days' %}Gün{% elif hizmet.duration_type == 'weeks' %}Hafta{% elif hizmet.duration_type == 'months' %}Ay{% endif %}
                                     </span>
                                 {% endif %}
-                                {% if hizmet.is_in_store %}<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 text-indigo-600 border border-indigo-100">📍 İşletmede</span>{% endif %}
-                                {% if hizmet.is_at_home %}<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">🏠 Evde</span>{% endif %}
-                                {% if hizmet.is_online %}<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-sky-50 text-sky-600 border border-sky-100">💻 Online</span>{% endif %}
                             </div>
                         </div>
                         <span class="px-3 py-1.5 bg-slate-800 text-white font-extrabold text-sm rounded-lg shadow-md whitespace-nowrap">{{ hizmet.price }} ₺</span>
@@ -109,7 +154,7 @@
         </div>
 
         <div class="lg:col-span-7">
-            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border-t-8 {% if isletme.is_premium %}border-t-amber-400{% else %}border-t-indigo-500{% endif %} border-x border-b border-slate-100 p-6 md:p-10 h-full">
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/40 border-t-8 border-t-indigo-500 border-x border-b border-slate-100 p-6 md:p-10 h-full hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
 
                 <h3 class="text-2xl font-extrabold text-slate-900 mb-2">Hemen Randevu Oluştur</h3>
                 <p class="text-slate-500 mb-8 border-b border-slate-100 pb-6">İstediğiniz hizmeti ve saati seçin, randevunuzu anında onaylayalım.</p>
@@ -129,7 +174,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">1. Almak İstediğiniz Hizmet</label>
-                        <select name="service_id" id="serviceSelect" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium cursor-pointer appearance-none" required>
+                        <select name="service_id" id="serviceSelect" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium cursor-pointer appearance-none hover:-translate-y-0.5 hover:shadow-sm" required>
                             <option value="" disabled selected>-- Lütfen Hizmet Seçin --</option>
                             {% for hizmet in hizmetler %}
                             <option value="{{ hizmet.id }}"
@@ -145,48 +190,47 @@
                     <div id="dynamicLocationArea" class="hidden space-y-3 p-5 bg-slate-50 rounded-2xl border border-slate-200">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">📍 Hizmetin Konumu</label>
                         <div class="grid grid-cols-1 gap-3">
-                            <label id="lbl_store" class="flex items-center gap-3 p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all bg-white group">
+                            <label id="lbl_store" class="flex items-center gap-3 p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all bg-white group hover:-translate-y-0.5 hover:shadow-sm">
                                 <input type="radio" name="chosen_location" value="in_store" id="rad_store" class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500" required>
-                                <span class="font-bold text-slate-700 group-hover:text-indigo-700">İşletmede Gerçekleşecek</span>
+                                <span class="font-bold text-slate-700 transition-colors">İşletmede Gerçekleşecek</span>
                             </label>
 
-                            <label id="lbl_home" class="flex items-center gap-3 p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all bg-white group">
+                            <label id="lbl_home" class="flex items-center gap-3 p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all bg-white group hover:-translate-y-0.5 hover:shadow-sm">
                                 <input type="radio" name="chosen_location" value="at_home" id="rad_home" class="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500">
-                                <span class="font-bold text-slate-700 group-hover:text-emerald-700">Müşteri Adresinde (Benim Adresimde)</span>
+                                <span class="font-bold text-slate-700 transition-colors">Müşteri Adresinde (Benim Adresimde)</span>
                             </label>
 
-                            <label id="lbl_online" class="flex items-center gap-3 p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-sky-500 hover:bg-sky-50/50 transition-all bg-white group">
+                            <label id="lbl_online" class="flex items-center gap-3 p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-sky-500 hover:bg-sky-50/50 transition-all bg-white group hover:-translate-y-0.5 hover:shadow-sm">
                                 <input type="radio" name="chosen_location" value="online" id="rad_online" class="w-4 h-4 text-sky-600 border-slate-300 focus:ring-sky-500">
-                                <span class="font-bold text-slate-700 group-hover:text-sky-700">Online (Görüntülü / Link İle)</span>
+                                <span class="font-bold text-slate-700 transition-colors">Online (Görüntülü / Link İle)</span>
                             </label>
                         </div>
                     </div>
 
-                    <div id="address-box" class="hidden bg-emerald-50/50 p-5 rounded-2xl border border-emerald-200">
-                        <label class="block text-sm font-bold text-emerald-800 mb-2">🏡 Açık Adresiniz <span class="text-rose-500">*</span></label>
-                        <textarea name="customer_address" id="customer_address" rows="2" class="w-full px-4 py-3 bg-white border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-slate-800 resize-none" placeholder="Hizmetin verileceği tam adresi giriniz..."></textarea>
-                        <p class="text-xs text-emerald-600/80 font-medium mt-2">Bu hizmet adresinize gelineceği için zorunludur.</p>
+                    <div id="address-box" class="hidden bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                        <label class="block text-sm font-bold text-slate-800 mb-2">🏡 Açık Adresiniz <span class="text-rose-500">*</span></label>
+                        <textarea name="customer_address" id="customer_address" rows="2" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 resize-none hover:-translate-y-0.5 hover:shadow-sm" placeholder="Hizmetin verileceği tam adresi giriniz..."></textarea>
                     </div>
 
-                    <div id="online-box" class="hidden bg-sky-50/50 p-5 rounded-2xl border border-sky-200 space-y-4">
+                    <div id="online-box" class="hidden bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
                         <div>
-                            <label class="block text-sm font-bold text-sky-800 mb-2">💻 Görüşme Uygulaması <span class="text-rose-500">*</span></label>
-                            <input type="text" name="online_app" id="online_app" class="w-full px-4 py-3 bg-white border border-sky-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all text-slate-800" placeholder="Örn: Zoom, Skype, Google Meet, WhatsApp">
+                            <label class="block text-sm font-bold text-slate-800 mb-2">💻 Görüşme Uygulaması <span class="text-rose-500">*</span></label>
+                            <input type="text" name="online_app" id="online_app" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 hover:-translate-y-0.5 hover:shadow-sm" placeholder="Örn: Zoom, Skype, Google Meet">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-sky-800 mb-2">Kullanıcı Adı / Telefon Numarası <span class="text-rose-500">*</span></label>
-                            <input type="text" name="online_link" id="online_link" class="w-full px-4 py-3 bg-white border border-sky-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition-all text-slate-800" placeholder="Size ulaşabileceğimiz kullanıcı adınız veya numaranız">
+                            <label class="block text-sm font-bold text-slate-800 mb-2">Kullanıcı Adı / Telefon Numarası <span class="text-rose-500">*</span></label>
+                            <input type="text" name="online_link" id="online_link" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 hover:-translate-y-0.5 hover:shadow-sm" placeholder="İletişim adresiniz">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">2. Tarih</label>
-                            <input type="date" name="date" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium cursor-pointer" required>
+                            <input type="date" name="date" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium cursor-pointer hover:-translate-y-0.5 hover:shadow-sm" required>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">3. Saat</label>
-                            <input type="time" name="time" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium cursor-pointer" required>
+                            <input type="time" name="time" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium cursor-pointer hover:-translate-y-0.5 hover:shadow-sm" required>
                         </div>
                     </div>
 
@@ -194,13 +238,13 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">4. Kişisel Bilgileriniz</label>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <input type="text" name="first_name" placeholder="Adınız" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium">
-                            <input type="text" name="last_name" placeholder="Soyadınız" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium">
+                            <input type="text" name="first_name" placeholder="Adınız" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium hover:-translate-y-0.5 hover:shadow-sm">
+                            <input type="text" name="last_name" placeholder="Soyadınız" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium hover:-translate-y-0.5 hover:shadow-sm">
                         </div>
 
-                        <input type="tel" id="phone" name="phone" placeholder="Telefon Numaranız (05XX XXX XX XX)" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium">
-                        <input type="email" name="email" placeholder="E-posta Adresiniz (Yorum Linki İçin)" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none mt-6 transition-all text-slate-800 font-medium">
-                        <textarea name="customer_note" rows="3" placeholder="Eklemek İstediğiniz Not (İsteğe Bağlı)" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium resize-none"></textarea>
+                        <input type="tel" id="phone" name="phone" placeholder="Telefon Numaranız (05XX XXX XX XX)" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium hover:-translate-y-0.5 hover:shadow-sm">
+                        <input type="email" name="email" placeholder="E-posta Adresiniz (Yorum Linki İçin)" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none mt-6 transition-all text-slate-800 font-medium hover:-translate-y-0.5 hover:shadow-sm">
+                        <textarea name="customer_note" rows="3" placeholder="Eklemek İstediğiniz Not (İsteğe Bağlı)" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 font-medium resize-none hover:-translate-y-0.5 hover:shadow-sm"></textarea>
                     </div>
 
                     <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-lg rounded-2xl shadow-xl shadow-slate-900/20 hover:-translate-y-1 transition-all duration-300">
@@ -221,14 +265,14 @@
         </div>
     </div>
 
-    <div class="mt-16 bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-10 mb-10">
+    <div class="mt-16 bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-10 mb-10 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-100 pb-6 gap-4">
             <div>
                 <h3 class="text-2xl font-extrabold text-slate-900">Müşteri Değerlendirmeleri</h3>
                 <p class="text-slate-500">Sadece bu işletmeden hizmet alan onaylı müşterilerin yorumlarıdır.</p>
             </div>
 
-            <div class="flex items-center gap-3 bg-amber-50 px-5 py-3 rounded-2xl border border-amber-100">
+            <div class="flex items-center gap-3 px-5 py-3 rounded-2xl border bg-amber-50 border-amber-100 hover:-translate-y-1 transition-all duration-300">
                 <span class="text-3xl text-amber-400">★</span>
                 <div>
                     <div class="text-2xl font-black text-slate-800">{{ ortalama_puan }}<span class="text-sm text-slate-500 font-medium"> / 5.0</span></div>
@@ -239,10 +283,10 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% for yorum in yorumlar %}
-            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg bg-indigo-100 text-indigo-600">
                             {{ yorum.appointment.customer.first_name|make_list|first|upper }}
                         </div>
                         <div>
@@ -258,26 +302,22 @@
                 </div>
                 {% if yorum.comment %}
                     <p class="text-slate-600 text-sm leading-relaxed italic">"{{ yorum.comment }}"</p>
-                {% else %}
-                    <p class="text-slate-400 text-sm italic">Müşteri sadece puan bıraktı.</p>
                 {% endif %}
             </div>
             {% empty %}
             <div class="col-span-full text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
                 <span class="text-4xl block mb-3 opacity-50">💬</span>
                 <p class="text-slate-500 font-medium">Bu işletme için henüz bir değerlendirme yapılmamış.</p>
-                <p class="text-slate-400 text-sm mt-1">İlk randevunuzu alıp ilk değerlendiren siz olun!</p>
             </div>
             {% endfor %}
         </div>
     </div>
-    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Tailwind Uyumlu Dinamik Lokasyon Sistemi
         const serviceSelect = document.getElementById('serviceSelect');
         const locationArea = document.getElementById('dynamicLocationArea');
 
@@ -287,10 +327,9 @@
         const onlineAppInput = document.getElementById('online_app');
         const onlineLinkInput = document.getElementById('online_link');
 
-        // Stil Sınıfları (Tailwind)
-        const activeStoreClass = "flex items-center gap-3 p-4 border-2 border-indigo-200 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all bg-white group";
-        const activeHomeClass = "flex items-center gap-3 p-4 border-2 border-emerald-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all bg-white group";
-        const activeOnlineClass = "flex items-center gap-3 p-4 border-2 border-sky-200 rounded-xl cursor-pointer hover:border-sky-500 hover:bg-sky-50/50 transition-all bg-white group";
+        const activeStoreClass = "flex items-center gap-3 p-4 border-2 border-indigo-200 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition-all bg-white group hover:-translate-y-0.5 hover:shadow-sm";
+        const activeHomeClass = "flex items-center gap-3 p-4 border-2 border-emerald-200 rounded-xl cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all bg-white group hover:-translate-y-0.5 hover:shadow-sm";
+        const activeOnlineClass = "flex items-center gap-3 p-4 border-2 border-sky-200 rounded-xl cursor-pointer hover:border-sky-500 hover:bg-sky-50/50 transition-all bg-white group hover:-translate-y-0.5 hover:shadow-sm";
 
         const disabledClass = "flex items-center gap-3 p-4 border-2 border-slate-100 rounded-xl cursor-not-allowed bg-slate-50 opacity-50 select-none";
 
@@ -318,15 +357,15 @@
 
             const lblStore = document.getElementById('lbl_store');
             lblStore.className = canStore ? activeStoreClass : disabledClass;
-            lblStore.innerHTML = canStore ? `<input type="radio" name="chosen_location" value="in_store" class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500" required> <span class="font-bold text-slate-700 group-hover:text-indigo-700">📍 İşletmede Gerçekleşecek</span>` : `🚫 Sadece İşletme: Mevcut Değil`;
+            lblStore.innerHTML = canStore ? `<input type="radio" name="chosen_location" value="in_store" class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500" required> <span class="font-bold text-slate-700 transition-colors">📍 İşletmede Gerçekleşecek</span>` : `🚫 Sadece İşletme: Mevcut Değil`;
 
             const lblHome = document.getElementById('lbl_home');
             lblHome.className = canHome ? activeHomeClass : disabledClass;
-            lblHome.innerHTML = canHome ? `<input type="radio" name="chosen_location" value="at_home" class="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500" required> <span class="font-bold text-slate-700 group-hover:text-emerald-700">🏠 Müşteri Adresinde (Benim Adresimde)</span>` : `🚫 Müşteri Adresinde: Mevcut Değil`;
+            lblHome.innerHTML = canHome ? `<input type="radio" name="chosen_location" value="at_home" class="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500" required> <span class="font-bold text-slate-700 transition-colors">🏠 Müşteri Adresinde (Benim Adresimde)</span>` : `🚫 Müşteri Adresinde: Mevcut Değil`;
 
             const lblOnline = document.getElementById('lbl_online');
             lblOnline.className = canOnline ? activeOnlineClass : disabledClass;
-            lblOnline.innerHTML = canOnline ? `<input type="radio" name="chosen_location" value="online" class="w-4 h-4 text-sky-600 border-slate-300 focus:ring-sky-500" required> <span class="font-bold text-slate-700 group-hover:text-sky-700">💻 Online (Görüntülü/Link İle)</span>` : `🚫 Online Hizmet: Mevcut Değil`;
+            lblOnline.innerHTML = canOnline ? `<input type="radio" name="chosen_location" value="online" class="w-4 h-4 text-sky-600 border-slate-300 focus:ring-sky-500" required> <span class="font-bold text-slate-700 transition-colors">💻 Online (Görüntülü/Link İle)</span>` : `🚫 Online Hizmet: Mevcut Değil`;
         });
 
         document.body.addEventListener('change', function(e) {
@@ -344,7 +383,6 @@
             }
         });
 
-        // Telefon Formatlama
         const phoneInput = document.getElementById('phone');
         if(phoneInput) {
             phoneInput.addEventListener('input', function (e) {
@@ -354,7 +392,6 @@
         }
     });
 
-    // Tarih Sınırları
     var today = new Date();
     var offset = today.getTimezoneOffset() * 60000;
     var localToday = new Date(today.getTime() - offset);
@@ -368,7 +405,6 @@
     dateInput.setAttribute('min', minDate);
     dateInput.setAttribute('max', maxDate);
 
-    // WhatsApp
     function openWhatsApp() {
         let phone = "{{ isletme.phone|default:'' }}";
         if (!phone) return alert("İşletme telefon numarası bulunmuyor.");

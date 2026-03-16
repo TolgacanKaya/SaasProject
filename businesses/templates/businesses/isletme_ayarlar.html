@@ -282,25 +282,18 @@
 
 {% block extra_js %}
 <script>
-    // Fotoğraf Seçildiğinde Anında Önizleme Gösteren Fonksiyon
     function previewImage(input, previewId, placeholderId) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
-
             reader.onload = function(e) {
-                // Önizleme resminin src değerini seçilen dosya ile değiştir
                 var previewObj = document.getElementById(previewId);
                 previewObj.src = e.target.result;
-                previewObj.classList.remove('hidden'); // Resmi görünür yap
-
-                // Eğer "Logo Yok" veya "Kapak Yok" yazan yer tutucu (placeholder) varsa onu gizle
+                previewObj.classList.remove('hidden');
                 var placeholderObj = document.getElementById(placeholderId);
                 if(placeholderObj) {
                     placeholderObj.classList.add('hidden');
                 }
             }
-
-            // Dosyayı URL verisi olarak oku
             reader.readAsDataURL(input.files[0]);
         }
     }

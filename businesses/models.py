@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from datetime import time
+from django.utils import timezone  # Zaman hesaplamaları için
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Kategori Adı (Örn: Kuaför, Tamirci)")
@@ -30,7 +32,12 @@ class Business(models.Model):
     cover_image = models.ImageField(upload_to='isletme_kapaklari/', blank=True, null=True,
                                     verbose_name="Kapak Fotoğrafı")
 
+    # --- YENİ ABONELİK SİSTEMİ ALANLARI ---
     is_premium = models.BooleanField(default=False, verbose_name="Premium İşletme")
+    premium_end_date = models.DateTimeField(null=True, blank=True, verbose_name="Premium Bitiş Tarihi")
+    cancel_at_period_end = models.BooleanField(default=False, verbose_name="Dönem Sonunda İptal Edilecek")
+    # -------------------------------------
+
     theme_color = models.CharField(max_length=7, default="#0d6efd", verbose_name="Tema Rengi (Hex)")
 
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefon")
@@ -39,11 +46,20 @@ class Business(models.Model):
     opening_time = models.TimeField(default=time(9, 0), verbose_name="Açılış Saati")
     closing_time = models.TimeField(default=time(18, 0), verbose_name="Kapanış Saati")
 
-
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+    # Süresi biten Premium'u otomatik düşüren zeka
+    def check_premium_status(self):
+        if self.is_premium and self.premium_end_date:
+            if timezone.now() > self.premium_end_date:
+                self.is_premium = False
+                self.cancel_at_period_end = False
+                self.premium_end_date = None
+                self.save()
+        return self.is_premium
 
     def __str__(self):
         return f"{self.name} ({self.city})"
@@ -67,7 +83,6 @@ class Service(models.Model):
     name = models.CharField(max_length=100, verbose_name="Hizmet Adı")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Fiyat (TL)")
 
-    # YENİ ÇOKLU LOKASYON YAPISI
     is_in_store = models.BooleanField(default=True, verbose_name="İşletmede Verilir")
     is_at_home = models.BooleanField(default=False, verbose_name="Müşteri Adresinde Verilir")
     is_online = models.BooleanField(default=False, verbose_name="Online Verilir")
@@ -108,9 +123,9 @@ class Customer(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+
 class Review(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='reviews')
-    # OneToOneField kullanıyoruz çünkü bir randevuya sadece BİR yorum yapılabilir
     appointment = models.OneToOneField('appointments.Appointment', on_delete=models.CASCADE, related_name='review')
     rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], verbose_name="Puan (1-5)")
     comment = models.TextField(blank=True, null=True, verbose_name="Müşteri Yorumu")

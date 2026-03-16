@@ -12,10 +12,10 @@
             theme: {
                 extend: {
                     colors: {
-                        background: '#09090b', /* Zifiri Antrasit Siyah */
-                        card: '#18181b',       /* Kartların Lüks Gri Rengi */
-                        border: '#27272a',     /* İnce Zarif Sınırlar */
-                        accent: '#eab308',     /* O Efsanevi Lüks Altın/Sarı */
+                        background: '#09090b',
+                        card: '#18181b',
+                        border: '#27272a',
+                        accent: '#eab308',
                         'accent-hover': '#ca8a04',
                         muted: '#a1a1aa'
                     },
@@ -29,7 +29,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style type="text/tailwindcss">
-        /* Kartlara özel yumuşak parlama efekti */
         .premium-card {
             @apply bg-card border border-border rounded-2xl transition-all duration-300;
         }
@@ -38,8 +37,6 @@
             box-shadow: 0 0 20px rgba(234, 179, 8, 0.05);
             transform: translateY(-2px);
         }
-
-        /* Sayfa açılış animasyonu */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -62,8 +59,24 @@
                 </div>
             </div>
 
-            <div class="mb-8 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(234,179,8,0.1)]">
-                👑 VİP İŞLETME
+            <div class="mb-8 flex flex-col items-start gap-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(234,179,8,0.1)]">
+                    👑 VİP İŞLETME
+                </div>
+
+                {% if isletme.premium_end_date %}
+                <div class="flex items-center gap-1.5 px-1.5 text-[11px] font-medium tracking-wide">
+                    <svg class="w-3.5 h-3.5 {% if isletme.cancel_at_period_end %}text-red-400{% else %}text-accent/70{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+
+                    {% if isletme.cancel_at_period_end %}
+                        <span class="text-red-400">İptal Edildi</span>
+                        <span class="text-muted">(Bitiş: {{ isletme.premium_end_date|date:"d M Y" }})</span>
+                    {% else %}
+                        <span class="text-muted">Yenilenme:</span>
+                        <span class="text-gray-300">{{ isletme.premium_end_date|date:"d M Y" }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
 
             <nav class="space-y-1.5">
@@ -115,10 +128,25 @@
             <h2 class="text-xl font-semibold tracking-tight text-white">{% block page_title %}Genel Bakış{% endblock %}</h2>
 
             <div class="flex items-center gap-6">
-                <button class="relative text-gray-400 hover:text-white transition-colors">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                    <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background"></span>
-                </button>
+
+                <div class="relative" id="notificationDropdown">
+                    <button onclick="toggleNotifications()" class="relative text-gray-400 hover:text-white transition-colors focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+
+                        <span id="notificationBadge" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background hidden animate-pulse"></span>
+                    </button>
+
+                    <div id="notificationMenu" class="absolute right-0 mt-4 w-80 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible transform scale-95 transition-all duration-200 z-50">
+                        <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                            <h3 class="font-bold text-white">Bildirimler</h3>
+                        </div>
+                        <div class="p-2" id="notificationList">
+                            <div class="p-6 text-center text-sm text-slate-500" id="emptyNotification">
+                                Şu an yeni bildiriminiz yok. 🎉
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="h-8 w-px bg-border"></div>
 
@@ -153,5 +181,69 @@
 
     {% block extra_js %}{% endblock %}
 
+    <script>
+        // Bildirim kutusunu aç/kapat
+        function toggleNotifications() {
+            const menu = document.getElementById('notificationMenu');
+            if (menu.classList.contains('invisible')) {
+                menu.classList.remove('invisible', 'opacity-0', 'scale-95');
+                menu.classList.add('opacity-100', 'scale-100');
+            } else {
+                menu.classList.add('invisible', 'opacity-0', 'scale-95');
+                menu.classList.remove('opacity-100', 'scale-100');
+            }
+        }
+
+        // Dışarı tıklanınca kutuyu kapat
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('notificationDropdown');
+            if (dropdown && !dropdown.contains(event.target)) {
+                const menu = document.getElementById('notificationMenu');
+                menu.classList.add('invisible', 'opacity-0', 'scale-95');
+                menu.classList.remove('opacity-100', 'scale-100');
+            }
+        });
+
+        // Sayfa yüklendiğinde Abonelik Süresini Kontrol Et
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if isletme.premium_end_date and not isletme.cancel_at_period_end %}
+                // Django'dan tarihi al
+                const endDateStr = "{{ isletme.premium_end_date|date:'c' }}";
+                if (endDateStr) {
+                    const endDate = new Date(endDateStr);
+                    const now = new Date();
+
+                    // Kalan süreyi Gün olarak hesapla
+                    const diffTime = endDate - now;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    // Eğer süre bitmeye 7 gün veya daha az kaldıysa Alarmı ver!
+                    if (diffDays >= 0 && diffDays <= 7) {
+                        // Kırmızı noktayı görünür yap
+                        document.getElementById('notificationBadge').classList.remove('hidden');
+
+                        // İçeriği güncelle
+                        const notifList = document.getElementById('notificationList');
+                        document.getElementById('emptyNotification').style.display = 'none';
+
+                        notifList.innerHTML = `
+                            <div class="flex gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+                                <div class="text-red-400 mt-0.5">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-red-400 mb-1">Aboneliğiniz Bitiyor!</h4>
+                                    <p class="text-xs text-slate-300 leading-relaxed mb-2">Premium planınızın süresi <strong>${diffDays} gün</strong> içinde dolacaktır. Kesinti yaşamamak için yenilemeyi unutmayın.</p>
+                                    <a href="{% url 'isletme_abonelik' %}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500/20 text-red-400 text-xs font-bold rounded-lg hover:bg-red-500/30 transition-colors">
+                                        Hemen Yenile <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            {% endif %}
+        });
+    </script>
 </body>
 </html>
