@@ -32,8 +32,7 @@
                 <div class="inline-block px-3 py-1 bg-amber-500/10 text-amber-400 text-xs font-bold rounded-full mb-6 border border-amber-500/20">Pro İşletme</div>
 
                 <div class="flex items-baseline mb-8">
-                    <h2 class="text-5xl font-extrabold text-white">299 ₺</h2>
-                    <span class="text-slate-400 ml-2 font-medium">/ ay</span>
+                    <h2 class="text-5xl font-extrabold text-white">Aktif 👑</h2>
                 </div>
 
                 <ul class="space-y-5 mb-10 text-slate-200 text-sm font-medium">
@@ -43,16 +42,59 @@
                     <li class="flex items-center gap-3"><span class="text-amber-400 text-xl">🎧</span> Öncelikli WhatsApp Desteği</li>
                 </ul>
 
-                <button class="w-full py-4 bg-slate-800 border border-slate-700 text-slate-300 font-bold rounded-xl cursor-default flex items-center justify-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Aboneliğiniz Aktif
-                </button>
+                {% if isletme.cancel_at_period_end %}
+                    <div class="flex flex-col gap-3">
+                        <button class="w-full py-4 bg-slate-800 border border-slate-700 text-red-400 font-bold rounded-xl cursor-default flex items-center justify-center gap-2 transition-all">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Dönem Sonunda İptal Olacak
+                        </button>
+
+                        <form action="{% url 'abonelik_iptal_vazgec' %}" method="POST" class="w-full">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full py-2 text-emerald-500 hover:text-emerald-400 text-sm font-medium transition-colors flex items-center justify-center gap-1">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                İptalden Vazgeç (Aboneliği Sürdür)
+                            </button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="flex flex-col gap-3">
+                        <button class="w-full py-4 bg-slate-800 border border-slate-700 text-slate-300 font-bold rounded-xl cursor-default flex items-center justify-center gap-2 transition-all">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Aboneliğiniz Aktif
+                        </button>
+
+                        <div class="grid grid-cols-2 gap-3 mt-2 mb-2">
+                            <a href="{% url 'premium_satin_al' %}?plan=monthly" class="py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold rounded-lg text-center transition-colors">
+                                +1 Ay Uzat
+                            </a>
+                            <a href="{% url 'premium_satin_al' %}?plan=yearly" class="py-2.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-400 text-xs font-bold rounded-lg text-center transition-colors">
+                                +1 Yıl Uzat (İndirimli)
+                            </a>
+                        </div>
+                        <button onclick="openCancelModal()" class="w-full py-2 text-slate-500 hover:text-red-400 text-sm font-medium transition-colors">
+                            Aboneliği İptal Et
+                        </button>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
     {% else %}
-        <div class="text-center mb-12 mt-4">
+        <div class="text-center mb-8 mt-4">
             <h2 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">İşletmenizi Bir Üst Seviyeye Taşıyın 🚀</h2>
             <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Limitlere takılmadan büyümek isteyen işletmeler için tasarlandı.</p>
+        </div>
+
+        <div class="flex justify-center items-center mb-10 gap-4">
+            <span class="text-slate-900 font-extrabold transition-colors duration-300" id="textMonthly">Aylık Ödeme</span>
+
+            <button type="button" id="billingToggle" class="relative inline-flex h-8 w-16 items-center rounded-full bg-slate-300 transition-colors duration-300 focus:outline-none" role="switch">
+                <span id="toggleKnob" class="inline-block h-6 w-6 translate-x-1 rounded-full bg-white transition-transform duration-300 shadow-md"></span>
+            </button>
+
+            <span class="text-slate-400 font-medium flex items-center gap-2 transition-colors duration-300" id="textYearly">
+                Yıllık Ödeme
+                <span class="px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 text-[10px] font-black uppercase tracking-wider animate-pulse">2 Ay Bedava</span>
+            </span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -74,15 +116,16 @@
                 </button>
             </div>
 
-            <div class="bg-slate-900 text-white rounded-3xl p-8 lg:p-10 relative overflow-hidden shadow-2xl transform md:-translate-y-4">
+            <div class="bg-slate-900 text-white rounded-3xl p-8 lg:p-10 relative overflow-hidden shadow-2xl transform md:-translate-y-4 transition-all duration-300" id="proCard">
                 <div class="absolute top-0 right-0 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 px-6 py-1.5 font-bold text-sm rounded-bl-xl shadow-md">
                     En Popüler
                 </div>
 
                 <div class="text-amber-400 font-bold text-sm mb-4 uppercase tracking-wider mt-2">Pro İşletme Planı</div>
-                <div class="flex items-baseline mb-8">
-                    <h2 class="text-5xl font-extrabold">299 ₺</h2>
-                    <span class="text-slate-400 ml-2 font-medium">/ ay</span>
+
+                <div class="flex items-baseline mb-8 transition-all duration-300">
+                    <h2 class="text-5xl font-extrabold" id="priceValue">299 ₺</h2>
+                    <span class="text-slate-400 ml-2 font-medium" id="pricePeriod">/ ay</span>
                 </div>
 
                 <ul class="space-y-5 mb-10 text-slate-300 text-sm">
@@ -92,11 +135,133 @@
                     <li class="flex items-center gap-3"><span class="text-amber-400 text-xl">🎧</span> Öncelikli WhatsApp Desteği</li>
                 </ul>
 
-                <a href="{% url 'premium_satin_al' %}" class="block w-full text-center py-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-900 font-bold rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:-translate-y-0.5">
+                <a href="{% url 'premium_satin_al' %}?plan=monthly" id="upgradeBtn" class="block w-full text-center py-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-900 font-bold rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:-translate-y-0.5">
                     Hemen Yükselt
                 </a>
                 <p class="text-center text-slate-500 text-xs mt-4">İstediğiniz zaman iptal edebilirsiniz.</p>
             </div>
         </div>
     {% endif %}
+
+    <div id="cancelModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="cancelModalContent">
+
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">Aboneliği İptal Et</h3>
+                <button onclick="closeCancelModal()" class="text-slate-500 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <div class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl mb-6">
+                <p class="text-red-400 text-sm font-medium">Aboneliğinizi iptal etmek istediğinize emin misiniz?</p>
+                <p class="text-slate-400 text-xs mt-1">Premium özelliklerinizi dönem sonuna kadar kullanmaya devam edebilirsiniz. İptali onaylamak için lütfen hesap şifrenizi girin.</p>
+            </div>
+
+            <form action="{% url 'abonelik_iptal' %}" method="POST">
+                {% csrf_token %}
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-slate-300 mb-2">Hesap Şifreniz</label>
+                    <input type="password" name="password" id="password" required class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors placeholder-slate-600" placeholder="••••••••">
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeCancelModal()" class="flex-1 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl transition-colors">Vazgeç</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-colors shadow-[0_0_15px_rgba(239,68,68,0.3)]">Evet, İptal Et</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // MODAL AÇMA / KAPATMA JS KODLARI
+    function openCancelModal() {
+        const modal = document.getElementById('cancelModal');
+        const content = document.getElementById('cancelModalContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeCancelModal() {
+        const modal = document.getElementById('cancelModal');
+        const content = document.getElementById('cancelModalContent');
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('billingToggle');
+        if(!toggleBtn) return; // Eğer premiumsa ve toggle yoksa hata vermesin
+
+        const toggleKnob = document.getElementById('toggleKnob');
+        const priceValue = document.getElementById('priceValue');
+        const pricePeriod = document.getElementById('pricePeriod');
+        const upgradeBtn = document.getElementById('upgradeBtn');
+        const textMonthly = document.getElementById('textMonthly');
+        const textYearly = document.getElementById('textYearly');
+        const proCard = document.getElementById('proCard');
+
+        let isYearly = false;
+
+        toggleBtn.addEventListener('click', function() {
+            isYearly = !isYearly;
+
+            // Ufak bir kart animasyonu
+            proCard.classList.add('scale-[0.98]', 'opacity-90');
+            setTimeout(() => {
+                proCard.classList.remove('scale-[0.98]', 'opacity-90');
+            }, 150);
+
+            if (isYearly) {
+                // Şalter Sağda (Yıllık)
+                toggleBtn.classList.remove('bg-slate-300');
+                toggleBtn.classList.add('bg-amber-400');
+                toggleKnob.classList.remove('translate-x-1');
+                toggleKnob.classList.add('translate-x-9');
+
+                // SATIŞ PSİKOLOJİSİ VE RENK AYARLARI:
+                // Üstü çizili eski fiyat: KIRMIZI (text-red-500 ve line-through)
+                // İndirimli yeni fiyat: YEŞİL (text-emerald-500)
+                priceValue.innerHTML = '<span class="text-3xl text-red-500 line-through decoration-red-500 mr-3 font-bold">3.588 ₺</span><span class="text-emerald-500">2.990 ₺</span>';
+                pricePeriod.innerHTML = '/ yıl';
+
+                // Renkleri Vurgula (Yıllık tarafı sarı ve kalın)
+                textMonthly.classList.replace('text-slate-900', 'text-slate-400');
+                textMonthly.classList.replace('font-extrabold', 'font-medium');
+                textYearly.classList.replace('text-slate-400', 'text-slate-900');
+                textYearly.classList.replace('font-medium', 'font-extrabold');
+
+                // Linke parametreyi ekle
+                upgradeBtn.href = "{% url 'premium_satin_al' %}?plan=yearly";
+            } else {
+                // Şalter Solda (Aylık)
+                toggleBtn.classList.add('bg-slate-300');
+                toggleBtn.classList.remove('bg-amber-400');
+                toggleKnob.classList.add('translate-x-1');
+                toggleKnob.classList.remove('translate-x-9');
+
+                // Metinleri Güncelle (Orijinal aylık görünüm)
+                priceValue.innerHTML = '299 ₺';
+                pricePeriod.innerHTML = '/ ay';
+
+                // Renkleri Vurgula (Aylık tarafı sarı ve kalın)
+                textMonthly.classList.replace('text-slate-400', 'text-slate-900');
+                textMonthly.classList.replace('font-medium', 'font-extrabold');
+                textYearly.classList.replace('text-slate-900', 'text-slate-400');
+                textYearly.classList.replace('font-extrabold', 'font-medium');
+
+                // Linke parametreyi ekle
+                upgradeBtn.href = "{% url 'premium_satin_al' %}?plan=monthly";
+            }
+        });
+    });
+</script>
 {% endblock %}

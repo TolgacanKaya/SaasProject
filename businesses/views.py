@@ -258,6 +258,12 @@ def isletme_ayarlar(request):
         isletme.city = request.POST.get("city", "")
         isletme.district = request.POST.get("district", "")
 
+        # YENİ: Tema Rengini Kaydet (Sadece Premiumlar değiştirebilir)
+        if isletme.is_premium:
+            isletme.theme_color = request.POST.get("theme_color", isletme.theme_color)
+
+        # KATEGORİ GÜNCELLEMESİ (Yeni eklendi)
+
         # KATEGORİ GÜNCELLEMESİ (Yeni eklendi)
         kategori_id = request.POST.get("category")
         if kategori_id:

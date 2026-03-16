@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}İletişim | T-Randevu{% endblock %}
+
+{% block content %}
+<div class="bg-slate-50 min-h-screen pb-20">
+    <div class="bg-slate-900 pt-16 pb-32 border-b border-slate-800 relative">
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Bize Ulaşın</h1>
+            <p class="text-slate-400 text-lg font-medium leading-relaxed">Soru, görüş veya destek talepleriniz için ekibimiz her zaman yanınızda.</p>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-4 -mt-20 relative z-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 hover:-translate-y-1 transition-all duration-300 h-full flex flex-col justify-center">
+                <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">İletişim Bilgilerimiz</h3>
+                
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-indigo-50 text-indigo-600">📧</div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">E-Posta Desteği</p>
+                            <a href="mailto:destek@t-randevu.com" class="text-slate-800 font-bold hover:text-indigo-600 transition-colors">destek@t-randevu.com</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-indigo-50 text-indigo-600">📞</div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Müşteri Hizmetleri</p>
+                            <p class="text-slate-800 font-bold">0850 XXX XX XX</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-indigo-50 text-indigo-600">📍</div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Merkez Ofis</p>
+                            <p class="text-slate-800 font-medium">Bilişim Vadisi, Teknoloji Mah. No:1, İstanbul</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 hover:-translate-y-1 transition-all duration-300">
+                <h3 class="text-2xl font-bold text-slate-900 mb-6">Mesaj Gönderin</h3>
+                <form action="#" method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <input type="text" placeholder="Adınız Soyadınız" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium">
+                    </div>
+                    <div>
+                        <input type="email" placeholder="E-Posta Adresiniz" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium">
+                    </div>
+                    <div>
+                        <textarea rows="4" placeholder="Mesajınız..." class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium resize-none"></textarea>
+                    </div>
+                    <button type="button" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-0.5" onclick="alert('Mesajınız başarıyla iletildi. (Demo form)')">
+                        Gönder
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

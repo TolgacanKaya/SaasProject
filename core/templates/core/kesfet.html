@@ -2,6 +2,20 @@
 {% load static %}
 {% block title %}İşletmeleri Keşfet | T-Randevu{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* KARTLARIN SÜZÜLEREK (FADE-UP) GELMESİ İÇİN ANİMASYON */
+    @keyframes fadeUpStagger {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-card {
+        opacity: 0; /* Başlangıçta görünmez */
+        animation: fadeUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="bg-slate-50 min-h-screen pb-20">
     <div class="bg-slate-900 pt-16 pb-32 border-b border-slate-800 relative">
@@ -58,7 +72,7 @@
                     <input type="checkbox" name="is_premium" value="1" class="sr-only peer" {% if request.GET.is_premium %}checked{% endif %}>
                     <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-400"></div>
                     <span class="ml-3 text-sm font-extrabold text-slate-600 uppercase tracking-wider flex items-center gap-1.5 transition-colors group-hover:text-slate-900">
-                        <span class="text-amber-400 text-lg drop-shadow-sm">👑</span> Sadece Premium İşletmeler
+                        <span class="text-amber-400 text-lg drop-shadow-sm">⭐</span> Sadece Premium İşletmeler
                     </span>
                 </label>
 
@@ -73,16 +87,26 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
             <h4 class="text-2xl font-extrabold text-slate-900">Arama Sonuçları</h4>
-            <span class="px-4 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-100 font-bold rounded-lg text-sm shadow-sm">{{ isletmeler|length }} İşletme</span>
+            <span class="px-4 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-100 font-bold rounded-lg text-sm shadow-sm">{{ toplam_sonuc }} İşletme Bulundu</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for isletme in isletmeler %}
-            <div class="bg-white rounded-3xl overflow-hidden flex flex-col relative transition-all duration-300 hover:-translate-y-1 group {% if isletme.is_premium %}border-2 border-amber-400 shadow-xl shadow-amber-500/10{% else %}border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-slate-200/50{% endif %}">
+            {% for isletme in page_obj %}
+            <div class="animate-card bg-white rounded-3xl overflow-hidden flex flex-col relative transition-all duration-300 hover:-translate-y-1 group {% if isletme.is_premium %}border-2 border-amber-400 shadow-xl shadow-amber-500/10{% else %}border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-slate-200/50{% endif %}"
+                 style="animation-delay: calc({{ forloop.counter0 }} * 0.1s);">
 
                 <div class="relative h-48 w-full">
-                    {% if isletme.is_premium %}
-                        <div class="absolute top-4 left-4 z-10 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 px-3 py-1 rounded-full text-xs font-black shadow-lg">⭐ ÖNE ÇIKAN</div>
+                    {% if isletme.is_premium and isletme.ortalama_puan >= 4.5 %}
+                        <div class="absolute top-4 left-4 z-10 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 px-3 py-1 rounded-full text-xs font-black shadow-lg border border-amber-300">👑 ELİT İŞLETME</div>
+                    {% elif isletme.is_premium %}
+                        <div class="absolute top-4 left-4 z-10 bg-slate-900 text-amber-400 px-3 py-1 rounded-full text-xs font-black shadow-lg border border-slate-700">⭐ ÖNE ÇIKAN</div>
+                    {% elif isletme.ortalama_puan >= 4.5 %}
+                        <div class="absolute top-4 left-4 z-10 bg-gradient-to-r from-rose-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-black shadow-lg border border-rose-400">🔥 POPÜLER</div>
+                    {% endif %}
+                    {% if isletme.ortalama_puan > 0 %}
+                    <div class="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur text-slate-900 px-2 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1">
+                        <span class="text-amber-500">★</span> {{ isletme.ortalama_puan|floatformat:1 }}
+                    </div>
                     {% endif %}
 
                     {% if isletme.cover_image %}
@@ -140,6 +164,29 @@
             </div>
             {% endfor %}
         </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="mt-12 flex justify-center">
+            <nav class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-200">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="p-2 text-slate-500 hover:text-indigo-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </a>
+                {% endif %}
+
+                <span class="px-4 py-2 text-sm font-bold text-slate-700 bg-slate-50 rounded-xl border border-slate-100">
+                    Sayfa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="p-2 text-slate-500 hover:text-indigo-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
     </div>
 </div>
 
@@ -155,14 +202,12 @@
         const sehirDatalist = document.getElementById("sehir-onerileri");
         const ilceDatalist = document.getElementById("ilce-onerileri");
 
-        // 1. Şehir Listesini Doldur
         for (let sehir in trData) {
             let option = document.createElement("option");
             option.value = sehir;
             sehirDatalist.appendChild(option);
         }
 
-        // 2. İlçe Doldurma Fonksiyonu
         function ilceleriDoldur(secilenSehirAdi) {
             ilceDatalist.innerHTML = "";
             let ilceler = trData[secilenSehirAdi];
@@ -184,12 +229,10 @@
             }
         }
 
-        // 3. Sayfa yüklendiğinde url'de şehir varsa otomatik aç
         if (sehirInput.value.trim() !== "") {
             ilceleriDoldur(sehirInput.value.trim());
         }
 
-        // 4. Müşteri şehir yazdıkça ilçeyi güncelle
         sehirInput.addEventListener("input", function() {
             ilceInput.value = "";
             ilceleriDoldur(this.value.trim());
