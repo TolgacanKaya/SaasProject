@@ -6,6 +6,7 @@ from django.utils.text import slugify
 from businesses.models import Business, Category
 from django.views.decorators.cache import never_cache
 
+
 @never_cache
 def isletme_giris(request):
     if request.user.is_authenticated:
@@ -29,9 +30,11 @@ def isletme_giris(request):
 
     return render(request, 'accounts/giris.html')
 
+
 def isletme_cikis(request):
     logout(request)
     return redirect('ana_sayfa')
+
 
 def isletme_kayit(request):
     if request.user.is_authenticated:
@@ -44,7 +47,7 @@ def isletme_kayit(request):
     if request.method == 'POST':
         dukkan_adi = request.POST.get('business_name')
         kategori_id = request.POST.get('category')
-        
+
         # Ortak Kategori Mantığı
         secilen_kategori = None
         if kategori_id == "diger":
@@ -52,27 +55,32 @@ def isletme_kayit(request):
         elif kategori_id:
             secilen_kategori = Category.objects.filter(id=kategori_id).first()
 
-        # Slug Oluşturma
-        base_slug = slugify(dukkan_adi)
+        # YENİ: Türkçe Karakter Düzeltme (Slug patlamasın diye)
+        temiz_isim = dukkan_adi.replace('ı', 'i').replace('ş', 's').replace('ğ', 'g').replace('ü', 'u').replace('ö',
+                                                                                                                'o').replace(
+            'ç', 'c').replace('I', 'i').replace('Ş', 's').replace('Ğ', 'g').replace('Ü', 'u').replace('Ö', 'o').replace(
+            'Ç', 'c')
+        base_slug = slugify(temiz_isim)
+
         unique_slug = base_slug
         sayac = 1
         while Business.objects.filter(slug=unique_slug).exists():
             unique_slug = f"{base_slug}-{sayac}"
             sayac += 1
 
-        # SENARYO A: Kullanıcı Zaten Giriş Yapmış (Sadece İşletme Oluştur)
+        # SENARYO A: Kullanıcı Zaten Giriş Yapmış
         if request.user.is_authenticated:
             Business.objects.create(
-                owner=request.user, # Mevcut kullanıcı
+                owner=request.user,
                 name=dukkan_adi,
                 slug=unique_slug,
                 category=secilen_kategori,
                 is_premium=False
             )
-            messages.success(request, '🎉 İşletmeniz oluşturuldu!')
+            messages.success(request, '🎉 İşletmeniz başarıyla oluşturuldu!')
             return redirect('dashboard')
 
-        # SENARYO B: Yeni Üye (Kullanıcı + İşletme Oluştur)
+        # SENARYO B: Yeni Üye
         else:
             kullanici_adi = request.POST.get('username')
             email = request.POST.get('email')
@@ -84,11 +92,16 @@ def isletme_kayit(request):
                 return redirect('kayit')
 
             if User.objects.filter(username=kullanici_adi).exists():
-                messages.error(request, '❌ Kullanıcı adı alınmış.')
+                messages.error(request, '❌ Bu kullanıcı adı başkası tarafından alınmış.')
+                return redirect('kayit')
+
+            # YENİ: E-Posta Kontrolü
+            if User.objects.filter(email=email).exists():
+                messages.error(request, '❌ Bu e-posta adresi sistemde zaten kayıtlı.')
                 return redirect('kayit')
 
             yeni_patron = User.objects.create_user(username=kullanici_adi, email=email, password=sifre)
-            
+
             Business.objects.create(
                 owner=yeni_patron,
                 name=dukkan_adi,
@@ -98,7 +111,7 @@ def isletme_kayit(request):
             )
 
             login(request, yeni_patron)
-            messages.success(request, '🎉 Hoş geldin! Ücretsiz planınla hemen başlayabilirsin.')
+            messages.success(request, '🎉 Hoş geldin! İşletmeni başarıyla dijitale taşıdın.')
             return redirect('dashboard')
 
     return render(request, 'accounts/kayit.html', {'kategoriler': kategoriler})

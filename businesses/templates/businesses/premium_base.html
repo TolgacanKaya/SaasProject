@@ -29,6 +29,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style type="text/tailwindcss">
+        /* VIP Panel Özel Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; border: 2px solid #09090b; }
+        ::-webkit-scrollbar-thumb:hover { background: #eab308; }
+
         .premium-card {
             @apply bg-card border border-border rounded-2xl transition-all duration-300;
         }
@@ -42,14 +48,47 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* WhatsApp Butonu Dalga Efekti */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .wa-pulse {
+            animation: pulse-ring 2s infinite;
+        }
+
+        /* 3 Kere Zıplama Efekti */
+        @keyframes jump-three-times {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25%); }
+        }
+        .animate-bounce-3 {
+            animation: jump-three-times 0.8s ease-in-out 3; /* Sadece 3 kere çalışır ve durur */
+        }
+
+        /* Scrollbar Gizleme */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
     </style>
 </head>
 
 <body class="bg-background text-white flex h-screen overflow-hidden font-sans antialiased">
 
-    <aside class="w-[280px] bg-background border-r border-border flex flex-col justify-between hidden md:flex z-40 relative">
-        <div class="p-6">
-            <div class="flex items-center gap-3 mb-8">
+    <aside class="w-[280px] bg-background border-r border-border flex flex-col hidden md:flex z-40 relative h-screen">
+
+        <!-- ÜST VE MENÜ KISMI (Kaydırılabilir ama scrollbar gizli) -->
+        <div class="flex-1 overflow-y-auto hide-scrollbar flex flex-col pt-6 pb-2 px-6">
+
+            <!-- Logo Alanı -->
+            <div class="flex items-center gap-3 mb-6 shrink-0">
                 <div class="w-10 h-10 rounded-lg bg-accent text-black flex items-center justify-center font-bold text-xl">
                     {{ isletme.name|make_list|first|upper }}
                 </div>
@@ -59,15 +98,15 @@
                 </div>
             </div>
 
-            <div class="mb-8 flex flex-col items-start gap-2">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent text-xs font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(234,179,8,0.1)]">
+            <!-- VIP Bilgi Alanı -->
+            <div class="mb-5 flex flex-col items-start gap-2 shrink-0">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(234,179,8,0.1)]">
                     👑 VİP İŞLETME
                 </div>
 
                 {% if isletme.premium_end_date %}
-                <div class="flex items-center gap-1.5 px-1.5 text-[11px] font-medium tracking-wide">
+                <div class="flex items-center gap-1.5 px-1.5 text-[10px] font-medium tracking-wide">
                     <svg class="w-3.5 h-3.5 {% if isletme.cancel_at_period_end %}text-red-400{% else %}text-accent/70{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-
                     {% if isletme.cancel_at_period_end %}
                         <span class="text-red-400">İptal Edildi</span>
                         <span class="text-muted">(Bitiş: {{ isletme.premium_end_date|date:"d M Y" }})</span>
@@ -79,38 +118,65 @@
                 {% endif %}
             </div>
 
-            <nav class="space-y-1.5">
-                <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {% if request.resolver_match.url_name == 'dashboard' %}bg-accent/10 text-accent font-medium{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
+            <!-- Menü Linkleri -->
+            <nav class="space-y-2 mt-2">
+                <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'dashboard' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
                     Genel Bakış
                 </a>
-                <a href="{% url 'isletme_randevular' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {% if request.resolver_match.url_name == 'isletme_randevular' %}bg-accent/10 text-accent font-medium{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path stroke-width="2" d="M16 2v4M8 2v4M3 10h18"/></svg>
+
+                <a href="{% url 'isletme_analiz' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_analiz' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    İşletme Analizi
+                </a>
+
+                <a href="{% url 'isletme_randevular' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_randevular' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path stroke-width="2" d="M16 2v4M8 2v4M3 10h18"/></svg>
                     Randevular
                 </a>
-                <a href="{% url 'isletme_musteriler' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {% if request.resolver_match.url_name == 'isletme_musteriler' %}bg-accent/10 text-accent font-medium{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+
+                <a href="{% url 'isletme_musteriler' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_musteriler' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     Müşteriler
                 </a>
-                <a href="{% url 'isletme_hizmetler' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {% if request.resolver_match.url_name == 'isletme_hizmetler' %}bg-accent/10 text-accent font-medium{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" /></svg>
+
+                <a href="{% url 'isletme_hizmetler' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_hizmetler' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" /></svg>
                     Hizmetler
                 </a>
-                <a href="{% url 'isletme_ayarlar' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {% if request.resolver_match.url_name == 'isletme_ayarlar' %}bg-accent/10 text-accent font-medium{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+
+                <a href="{% url 'isletme_personeller' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_personeller' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    Ekip / Personeller
+                </a>
+
+                <a href="{% url 'isletme_kuponlar' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_kuponlar' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
+                    İndirim Kuponları
+                </a>
+
+                <a href="{% url 'isletme_ayarlar' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_ayarlar' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     İşletme Ayarları
                 </a>
-                <a href="{% url 'isletme_abonelik' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {% if request.resolver_match.url_name == 'isletme_abonelik' %}bg-accent/10 text-accent font-medium{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+
+                <a href="{% url 'rehber' %}" target="_blank" class="flex items-center gap-3 px-4 py-3 mt-6 rounded-xl transition-all duration-200 font-bold bg-card border border-dashed border-border text-gray-400 hover:text-accent hover:border-accent/50 hover:bg-accent/5">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    Kullanım Rehberi
+                </a>
+
+                <a href="{% url 'isletme_abonelik' %}" class="flex items-center gap-3 px-4 py-3 mt-4 mb-4 rounded-xl transition-all duration-200 font-bold {% if request.resolver_match.url_name == 'isletme_abonelik' %}bg-accent/10 text-accent border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                     Abonelik Yönetimi
                 </a>
             </nav>
         </div>
 
-        <div class="p-6">
-            <a href="{% url 'isletme_detay' slug=isletme.slug %}" target="_blank" class="flex items-center justify-between px-4 py-3 mb-4 rounded-xl border border-accent/50 text-accent hover:bg-accent hover:text-black transition-all duration-300 font-medium">
+        <!-- ALT KISIM (Sabit) -->
+        <div class="p-6 pt-4 border-t border-border bg-background shrink-0 z-10">
+            <a href="{% url 'isletme_detay' slug=isletme.slug %}" target="_blank" class="flex items-center justify-between px-4 py-3 mb-4 rounded-xl border border-accent/50 text-accent hover:bg-accent hover:text-black transition-all duration-300 font-bold shadow-[0_0_15px_rgba(234,179,8,0.15)] hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] group">
                 <span>Vitrinimi Gör</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
             </a>
 
             <div class="flex items-center gap-2 px-4 text-xs text-gray-500 font-medium tracking-wide">
@@ -136,14 +202,56 @@
                         <span id="notificationBadge" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background hidden animate-pulse"></span>
                     </button>
 
-                    <div id="notificationMenu" class="absolute right-0 mt-4 w-80 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible transform scale-95 transition-all duration-200 z-50">
-                        <div class="p-4 border-b border-slate-800 flex justify-between items-center">
-                            <h3 class="font-bold text-white">Bildirimler</h3>
+                    <div id="notificationMenu" class="absolute right-0 mt-4 w-[350px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible transform scale-95 transition-all duration-200 z-50 overflow-hidden">
+
+                        <!-- YENİ: Başlık ve Okundu Say Butonu -->
+                        <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
+                            <h3 class="font-bold text-white flex items-center gap-2">🔔 Bildirimler</h3>
+                            <button onclick="markAllAsRead()" class="text-[10px] text-indigo-400 hover:text-white font-bold px-2.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/40 rounded-lg transition-colors border border-indigo-500/20">
+                                Tümünü Okundu Say ✔
+                            </button>
                         </div>
-                        <div class="p-2" id="notificationList">
+
+                        <!-- GÜNCELLEME UYGULANAN KISIM -->
+                        <div class="p-2 max-h-[350px] overflow-y-auto hide-scrollbar flex flex-col gap-1.5" id="notificationList">
+
                             <div class="p-6 text-center text-sm text-slate-500" id="emptyNotification">
                                 Şu an yeni bildiriminiz yok. 🎉
                             </div>
+
+                            <!-- 1. DİNAMİK RANDEVU BİLDİRİMLERİ (Kesin Çözüm: appointments) -->
+                            {% for randevu in isletme.appointments.all|dictsortreversed:"id"|slice:":5" %}
+                                <a href="{% url 'isletme_randevular' %}" data-notif-id="randevu_{{ randevu.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-indigo-500/30">
+                                        📅
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-indigo-300 transition-colors">Yeni Randevu Oluşturuldu!</h4>
+                                        <p class="text-[11px] text-slate-300 leading-relaxed">
+                                            <strong class="text-indigo-400">{{ randevu.customer.first_name|default:"Müşteri" }} {{ randevu.customer.last_name|default:"" }}</strong> adlı kişi randevu oluşturdu.
+                                        </p>
+                                        <span class="text-[10px] text-slate-500 mt-1 block">Tarih: {{ randevu.date_time|date:"d M Y - H:i" }}</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+
+                            <!-- 2. DİNAMİK PERSONEL BİLDİRİMLERİ (Doğru Anahtar: staff_members) -->
+                            {% for personel in isletme.staff_members.all|dictsortreversed:"id"|slice:":3" %}
+                                {% if personel.is_approved %}
+                                <a href="{% url 'isletme_personeller' %}" data-notif-id="personel_{{ personel.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-emerald-500/30">
+                                        ✅
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-emerald-300 transition-colors">Personel Onaylandı</h4>
+                                        <p class="text-[11px] text-slate-300 leading-relaxed">
+                                            <strong class="text-emerald-400">{{ personel.name }}</strong> adlı uzmanınız sistem tarafından onaylandı.
+                                        </p>
+                                    </div>
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+
                         </div>
                     </div>
                 </div>
@@ -177,72 +285,198 @@
 
             {% block content %}{% endblock %}
         </div>
+
+        <!-- YENİ: PREMIUM WHATSAPP DESTEK BUTONU (GARANTİLİ API LİNKİ) -->
+        <a href="https://api.whatsapp.com/send?phone=905068556816&text=Merhaba%20T-Randevu%20Destek%20Ekibi,%20{{ isletme.name|urlencode }}%20işletmesi%20olarak%20VIP%20desteğe%20ihtiyacım%20var."
+           target="_blank"
+           rel="noopener noreferrer"
+           class="fixed bottom-8 right-8 z-[9999] flex items-center justify-center w-14 h-14 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all duration-300 wa-pulse group"
+           title="T-Randevu VIP Destek Hattı">
+
+            <!-- WhatsApp İkonu -->
+            <svg class="w-8 h-8 relative z-10" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+            </svg>
+
+            <!-- Hover Anında Çıkan Mesaj -->
+            <span class="absolute right-16 px-4 py-2 bg-slate-800 text-white text-sm font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-xl border border-slate-700">
+                VIP Canlı Destek
+                <div class="absolute w-2 h-2 bg-slate-800 border-r border-b border-slate-700 transform rotate-45 top-1/2 -mt-1 -right-1"></div>
+            </span>
+        </a>
+
     </main>
 
     {% block extra_js %}{% endblock %}
 
+    <!-- GÜNCELLENEN GERÇEK ZAMANLI JS BLOĞU -->
     <script>
-        // Bildirim kutusunu aç/kapat
+        // Bildirim menüsünü aç/kapat
         function toggleNotifications() {
             const menu = document.getElementById('notificationMenu');
-            if (menu.classList.contains('invisible')) {
-                menu.classList.remove('invisible', 'opacity-0', 'scale-95');
-                menu.classList.add('opacity-100', 'scale-100');
-            } else {
-                menu.classList.add('invisible', 'opacity-0', 'scale-95');
-                menu.classList.remove('opacity-100', 'scale-100');
-            }
+            menu.classList.toggle('invisible');
+            menu.classList.toggle('opacity-0');
+            menu.classList.toggle('scale-95');
+            menu.classList.toggle('opacity-100');
+            menu.classList.toggle('scale-100');
         }
 
-        // Dışarı tıklanınca kutuyu kapat
+        // Dışarı tıklanınca kapat
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('notificationDropdown');
             if (dropdown && !dropdown.contains(event.target)) {
                 const menu = document.getElementById('notificationMenu');
-                menu.classList.add('invisible', 'opacity-0', 'scale-95');
-                menu.classList.remove('opacity-100', 'scale-100');
+                if(menu && !menu.classList.contains('invisible')) {
+                    toggleNotifications();
+                }
             }
         });
 
-        // Sayfa yüklendiğinde Abonelik Süresini Kontrol Et
-        document.addEventListener('DOMContentLoaded', function() {
+        // ==========================================
+        // 1. OKUNDU SAYMA VE HAFIZA SİSTEMİ
+        // ==========================================
+        function getReadNotifs() {
+            // Tarayıcıdan daha önce okunanların ID listesini al
+            return JSON.parse(localStorage.getItem('readNotifs_{{ request.user.username }}') || '[]');
+        }
+
+        function markAllAsRead() {
+            const notifItems = document.querySelectorAll('.notif-item');
+            let readNotifs = getReadNotifs();
+
+            notifItems.forEach(item => {
+                const id = item.getAttribute('data-notif-id');
+                if (id && !readNotifs.includes(id)) {
+                    readNotifs.push(id);
+                }
+                item.remove(); // Ekrandan anında sil
+            });
+
+            // Yeni okunanları tarayıcıya kaydet
+            localStorage.setItem('readNotifs_{{ request.user.username }}', JSON.stringify(readNotifs));
+            updateNotificationUI(); // Arayüzü güncelle (Boş mesajını göster vb)
+        }
+
+        // ==========================================
+        // 2. BİLDİRİMLERİ FİLTRELE VE PREMIUM UYARIYI EKLE
+        // ==========================================
+        function processNotifications(listElement) {
+            let readNotifs = getReadNotifs();
+
+            // Okunmuş (silinmiş) bildirimleri ekrandan gizle
+            const items = listElement.querySelectorAll('.notif-item');
+            items.forEach(item => {
+                const id = item.getAttribute('data-notif-id');
+                if (id && readNotifs.includes(id)) {
+                    item.remove();
+                }
+            });
+
+            // PREMIUM ABONELİK SÜRESİ UYARISI
             {% if isletme.premium_end_date and not isletme.cancel_at_period_end %}
-                // Django'dan tarihi al
                 const endDateStr = "{{ isletme.premium_end_date|date:'c' }}";
                 if (endDateStr) {
                     const endDate = new Date(endDateStr);
                     const now = new Date();
+                    const diffDays = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
 
-                    // Kalan süreyi Gün olarak hesapla
-                    const diffTime = endDate - now;
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                    // Eğer süre bitmeye 7 gün veya daha az kaldıysa Alarmı ver!
                     if (diffDays >= 0 && diffDays <= 7) {
-                        // Kırmızı noktayı görünür yap
-                        document.getElementById('notificationBadge').classList.remove('hidden');
-
-                        // İçeriği güncelle
-                        const notifList = document.getElementById('notificationList');
-                        document.getElementById('emptyNotification').style.display = 'none';
-
-                        notifList.innerHTML = `
-                            <div class="flex gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
-                                <div class="text-red-400 mt-0.5">
-                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        // Eğer uyarı zaten eklenmemişse ekle (Çoğalmasını engeller)
+                        if (!listElement.querySelector('.premium-warning-notif')) {
+                            listElement.insertAdjacentHTML('afterbegin', `
+                                <div class="premium-warning-notif flex gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl mb-1 shadow-lg shadow-red-500/5">
+                                    <div class="text-red-400 mt-0.5 animate-bounce-3">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-red-400 mb-1">Aboneliğiniz Bitiyor!</h4>
+                                        <p class="text-[11px] text-slate-300 leading-relaxed mb-2">Premium planınızın süresi <strong>${diffDays} gün</strong> içinde dolacaktır. Kesinti yaşamamak için yenilemeyi unutmayın.</p>
+                                        <a href="{% url 'isletme_abonelik' %}" class="inline-flex items-center gap-1 px-3 py-1 bg-red-500/20 text-red-400 text-[10px] font-bold rounded-lg hover:bg-red-500/30 transition-colors">
+                                            Hemen Yenile
+                                        </a>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-red-400 mb-1">Aboneliğiniz Bitiyor!</h4>
-                                    <p class="text-xs text-slate-300 leading-relaxed mb-2">Premium planınızın süresi <strong>${diffDays} gün</strong> içinde dolacaktır. Kesinti yaşamamak için yenilemeyi unutmayın.</p>
-                                    <a href="{% url 'isletme_abonelik' %}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500/20 text-red-400 text-xs font-bold rounded-lg hover:bg-red-500/30 transition-colors">
-                                        Hemen Yenile <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                    </a>
-                                </div>
-                            </div>
-                        `;
+                            `);
+                        }
                     }
                 }
             {% endif %}
+
+            return listElement;
+        }
+
+        // ==========================================
+        // 3. ARAYÜZ (UI) GÜNCELLEMELERİ VE CANLI BAĞLANTI (HEARTBEAT)
+        // ==========================================
+        function updateNotificationUI() {
+            const notifList = document.getElementById('notificationList');
+            // Premium uyarı VEYA okunmamış bildirim varsa Kırmızı Noktayı yak!
+            const hasUnread = notifList.querySelectorAll('.notif-item').length > 0 || notifList.querySelectorAll('.premium-warning-notif').length > 0;
+
+            if (hasUnread) {
+                document.getElementById('notificationBadge').classList.remove('hidden');
+                const emptyMsg = document.getElementById('emptyNotification');
+                if(emptyMsg) emptyMsg.style.display = 'none';
+            } else {
+                document.getElementById('notificationBadge').classList.add('hidden');
+                const emptyMsg = document.getElementById('emptyNotification');
+                if(emptyMsg) emptyMsg.style.display = 'block';
+            }
+        }
+
+        let currentNotificationCount = -1;
+
+        function checkRealTimeNotifications() {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    let newNotifList = doc.getElementById('notificationList');
+
+                    if (newNotifList) {
+                        // Yeni gelen listeyi bizim filtreden (Okunanları sil, Premiumu ekle) geçir
+                        newNotifList = processNotifications(newNotifList);
+                        document.getElementById('notificationList').innerHTML = newNotifList.innerHTML;
+
+                        // Sadece yeni gelen Randevu/Personel sayısını say (Premium uyarıyı sayma ki her 15sn'de bir ses çalmasın)
+                        const unreadCount = newNotifList.querySelectorAll('.notif-item').length;
+                        updateNotificationUI();
+
+                        // EĞER GERÇEKTEN YENİ BİR ŞEY GELDİYSE SES ÇAL!
+                        if (currentNotificationCount !== -1 && unreadCount > currentNotificationCount) {
+                            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                            audio.play().catch(e => console.log("Tarayıcı sese izin vermedi."));
+
+                            if (Notification.permission === "granted") {
+                                new Notification("T-Randevu: Yeni Bildirim!", {
+                                    body: "Hesabınızda yeni bir hareket var (Randevu / Onay).",
+                                    icon: "https://cdn-icons-png.flaticon.com/512/2875/2875394.png"
+                                });
+                            }
+                        }
+                        currentNotificationCount = unreadCount;
+                    }
+                });
+        }
+
+        // BAŞLANGIÇ AYARLARI
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tarayıcı İzni
+            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+
+            // Sayfa ilk yüklendiğinde filtrelemeyi hemen yap
+            const list = document.getElementById('notificationList');
+            if (list) {
+                processNotifications(list);
+                updateNotificationUI();
+                currentNotificationCount = list.querySelectorAll('.notif-item').length;
+            }
+
+            // Hayalet Sistemi Başlat (Her 15 saniyede bir sessizce güncelle)
+            setInterval(checkRealTimeNotifications, 15000);
         });
     </script>
 </body>

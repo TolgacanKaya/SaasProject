@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Kullanım Koşulları | T-Randevu{% endblock %}
+
+{% block content %}
+<div class="bg-slate-50 min-h-screen pb-20">
+    <!-- HERO BÖLÜMÜ -->
+    <div class="bg-slate-900 pt-16 pb-32 border-b border-slate-800 relative overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[100px] animate-pulse"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-sm font-bold mb-6 backdrop-blur-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-amber-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Yasal Bilgilendirme
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Kullanım Koşulları</h1>
+            <p class="text-lg text-amber-400 font-medium">Son Güncelleme: 19 Mart 2026</p>
+        </div>
+    </div>
+
+    <!-- İÇERİK KARTI -->
+    <div class="max-w-4xl mx-auto px-4 -mt-20 relative z-20">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
+
+            <!-- Dekoratif Çizgi -->
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-400 to-amber-500"></div>
+
+            <div class="space-y-12">
+                <!-- Madde 1 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 text-amber-600 text-sm font-black border border-amber-100 shrink-0">1</span>
+                        Taraflar ve Kabul
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        Bu kullanım koşulları, T-Randevu (SaaS Platformu) ile platforma kayıt olan "İşletme" ve platformu randevu almak için kullanan "Müşteri" arasındaki hukuki ilişkiyi düzenler. Platformu kullanan her birey veya kurum, bu koşulları peşinen kabul etmiş sayılır.
+                    </p>
+                </div>
+
+                <!-- Madde 2 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 text-amber-600 text-sm font-black border border-amber-100 shrink-0">2</span>
+                        Hizmetin Tanımı ve Sınırları
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        T-Randevu, işletmelere dijital bir randevu takip ve müşteri yönetimi (CRM) altyapısı sunan bir yazılımdır. Platform, işletme ile müşteri arasında gerçekleşen hizmet kalitesinden, ödemelerden veya ortaya çıkabilecek uyuşmazlıklardan sorumlu tutulamaz. T-Randevu yalnızca bir teknik altyapı sağlayıcısıdır.
+                    </p>
+                </div>
+
+                <!-- Madde 3 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 text-amber-600 text-sm font-black border border-amber-100 shrink-0">3</span>
+                        Abonelik ve Ödemeler
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        Premium üyelik satın alan işletmeler, seçtikleri paket dahilindeki özellikleri kullanma hakkına sahip olur. Abonelik ücretleri, aksi belirtilmedikçe iade edilemez. Sistem üzerinden alınan online randevu ödemelerinde uygulanan komisyon oranları ve işlem bedelleri, ödeme sayfasında işletmeye şeffaf bir şekilde gösterilir.
+                    </p>
+                </div>
+
+                <!-- Madde 4 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 text-amber-600 text-sm font-black border border-amber-100 shrink-0">4</span>
+                        Hesap Güvenliği ve İptal
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        Kullanıcılar, hesap şifrelerinin güvenliğinden kendileri sorumludur. T-Randevu, yasadışı, ahlaka aykırı veya platformun güvenliğini tehdit eden kullanımlarda önceden haber vermeksizin hesapları dondurma veya iptal etme hakkını saklı tutar.
+                    </p>
+                </div>
+
+                <!-- Madde 5 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 text-amber-600 text-sm font-black border border-amber-100 shrink-0">5</span>
+                        Kesintiler ve Güncellemeler
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        Platform, %99.9 çalışma süresi (uptime) hedeflemekle birlikte; bakım, güncelleme veya mücbir sebeplerden kaynaklı kısa süreli erişim kesintilerinden sorumlu tutulamaz. Sistem güncellemeleri, kullanıcı deneyimini iyileştirmek amacıyla düzenli olarak yapılır.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

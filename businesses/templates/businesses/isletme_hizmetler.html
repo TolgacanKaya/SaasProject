@@ -9,7 +9,10 @@
             <div class="lg:col-span-1">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-xl">
                     <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
-                        <span class="text-amber-400 text-2xl">➕</span> Yeni Hizmet Ekle
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7 text-amber-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Yeni Hizmet Ekle
                     </h2>
 
                     <form method="POST" action="{% url 'isletme_hizmetler' %}" class="space-y-6">
@@ -29,34 +32,71 @@
                             <div class="space-y-3">
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="checkbox" name="is_in_store" checked class="w-5 h-5 rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900 focus:ring-offset-slate-900 transition-all">
-                                    <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors">📍 İşletmenizde (Dükkan/Klinik)</span>
+                                    <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                                        İşletmenizde (Dükkan/Klinik)
+                                    </span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="checkbox" name="is_at_home" class="w-5 h-5 rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900 focus:ring-offset-slate-900 transition-all">
-                                    <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors">🏠 Müşteri Adresinde (Ev/Ofis)</span>
+                                    <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                                        Müşteri Adresinde (Ev/Ofis)
+                                    </span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="checkbox" name="is_online" class="w-5 h-5 rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900 focus:ring-offset-slate-900 transition-all">
-                                    <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors">💻 Online (Görüntülü/Sesli)</span>
+                                    <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" /></svg>
+                                        Online (Görüntülü/Sesli)
+                                    </span>
                                 </label>
                             </div>
                         </div>
 
+                        {% if personeller %}
+                        <div class="p-5 bg-slate-950 border border-slate-800 rounded-xl">
+                            <label class="block text-sm font-semibold text-slate-300 mb-4 border-b border-slate-800 pb-3">Bu Hizmeti Kimler Verebilir?</label>
+                            <div class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                                {% for personel in personeller %}
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" name="staffs" value="{{ personel.id }}" checked class="w-5 h-5 rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900 :ring-offset-slate-900 transition-all">
+                                    <span class="flex items-center gap-2 text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors">
+                                        {% if personel.photo %}
+                                            <img src="{{ personel.photo.url }}" class="w-6 h-6 rounded-full object-cover border border-slate-700">
+                                        {% else %}
+                                            <span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 flex items-center justify-center text-[10px] font-bold border border-slate-700">{{ personel.name|make_list|first|upper }}</span>
+                                        {% endif %}
+                                        {{ personel.name }}
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-3">* İşaretlemediğiniz personeller bu hizmet için randevu alamaz.</p>
+                        </div>
+                        {% endif %}
+
                         <div>
                             <label class="block text-sm font-semibold text-slate-400 mb-2">Tahmini Süre (İsteğe Bağlı)</label>
-                            <div class="flex gap-3">
+                            <div class="flex gap-3 relative">
                                 <input type="number" name="duration_value" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" placeholder="Örn: 30">
-                                <select name="duration_unit" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-200 px-3 py-3 rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all cursor-pointer appearance-none">
+                                <select name="duration_unit" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all cursor-pointer appearance-none">
                                     <option value="minutes">Dakika</option>
                                     <option value="hours">Saat</option>
                                     <option value="days">Gün</option>
                                     <option value="weeks">Hafta</option>
                                     <option value="months">Ay</option>
                                 </select>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 font-extrabold rounded-xl hover:-translate-y-0.5 shadow-[0_0_20px_rgba(251,191,36,0.25)] transition-all duration-300 mt-4">
+                        <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 font-extrabold rounded-xl hover:-translate-y-0.5 shadow-[0_0_20px_rgba(251,191,36,0.25)] transition-all duration-300 mt-4 flex items-center justify-center gap-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                             Vitrine Ekle
                         </button>
                     </form>
@@ -66,14 +106,19 @@
             <div class="lg:col-span-2">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden h-full flex flex-col">
                     <div class="p-6 border-b border-slate-800 bg-slate-900/50">
-                        <h2 class="text-lg font-bold text-white">Mevcut Hizmetleriniz</h2>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-amber-400">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                            </svg>
+                            Mevcut Hizmetleriniz
+                        </h2>
                     </div>
 
                     <div class="overflow-x-auto flex-1">
                         <table class="w-full text-left border-collapse">
                             <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-700">
                                 <tr>
-                                    <th class="px-6 py-4">Hizmet Adı</th>
+                                    <th class="px-6 py-4">Hizmet Adı & Personeller</th>
                                     <th class="px-6 py-4">Süre</th>
                                     <th class="px-6 py-4 text-amber-400">Fiyat</th>
                                     <th class="px-6 py-4 text-right">İşlem</th>
@@ -85,20 +130,51 @@
                                     <td class="px-6 py-4">
                                         <div class="font-bold text-slate-200 text-base">{{ hizmet.name }}</div>
                                         <div class="text-xs text-slate-500 mt-1.5 flex gap-2">
-                                            {% if hizmet.is_in_store %}<span title="İşletmede">📍 İşletme</span>{% endif %}
-                                            {% if hizmet.is_at_home %}<span title="Evde">🏠 Evde</span>{% endif %}
-                                            {% if hizmet.is_online %}<span title="Online">💻 Online</span>{% endif %}
+                                            {% if hizmet.is_in_store %}
+                                                <span title="İşletmede" class="flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                                                    İşletme
+                                                </span>
+                                            {% endif %}
+                                            {% if hizmet.is_at_home %}
+                                                <span title="Evde" class="flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                                                    Evde
+                                                </span>
+                                            {% endif %}
+                                            {% if hizmet.is_online %}
+                                                <span title="Online" class="flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" /></svg>
+                                                    Online
+                                                </span>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="mt-2 flex flex-wrap gap-1">
+                                            {% if hizmet.staffs.all %}
+                                                {% for s in hizmet.staffs.all %}
+                                                <span class="px-2 py-0.5 bg-slate-800 text-slate-400 text-[10px] rounded-md border border-slate-700 flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                                                    {{ s.name }}
+                                                </span>
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="text-[10px] text-slate-600 font-medium italic">Personel Atanmadı (Genel)</span>
+                                            {% endif %}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-slate-300 font-medium">
                                         {% if hizmet.duration %}
-                                            ⏱️ {{ hizmet.duration }}
-                                            {% if hizmet.duration_type == 'minutes' %}Dk
-                                            {% elif hizmet.duration_type == 'hours' %}Saat
-                                            {% elif hizmet.duration_type == 'days' %}Gün
-                                            {% elif hizmet.duration_type == 'weeks' %}Hafta
-                                            {% elif hizmet.duration_type == 'months' %}Ay
-                                            {% endif %}
+                                            <span class="flex items-center gap-1">
+                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                {{ hizmet.duration }}
+                                                {% if hizmet.duration_type == 'minutes' %}Dk
+                                                {% elif hizmet.duration_type == 'hours' %}Saat
+                                                {% elif hizmet.duration_type == 'days' %}Gün
+                                                {% elif hizmet.duration_type == 'weeks' %}Hafta
+                                                {% elif hizmet.duration_type == 'months' %}Ay
+                                                {% endif %}
+                                            </span>
                                         {% else %}
                                             <span class="text-slate-600">-</span>
                                         {% endif %}
@@ -107,7 +183,10 @@
                                         {{ hizmet.price }} ₺
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <a href="{% url 'hizmet_sil' hizmet.id %}" class="inline-flex items-center justify-center p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors border border-rose-500/20 hover:border-transparent" onclick="return confirm('Bu hizmeti silmek istediğinize emin misiniz?');">
+                                        <a href="{% url 'hizmet_duzenle' hizmet.id %}" class="inline-flex items-center justify-center p-2 rounded-lg bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-slate-900 transition-colors border border-amber-500/20 hover:border-transparent mr-2" title="Düzenle">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                        </a>
+                                        <a href="{% url 'hizmet_sil' hizmet.id %}" class="inline-flex items-center justify-center p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors border border-rose-500/20 hover:border-transparent" onclick="return confirm('Bu hizmeti silmek istediğinize emin misiniz?');" title="Sil">
                                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                         </a>
                                     </td>
@@ -115,7 +194,7 @@
                                 {% empty %}
                                 <tr>
                                     <td colspan="4" class="py-20 text-center">
-                                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 text-slate-500 mb-4 shadow-inner">
+                                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 text-slate-500 mb-4 shadow-inner border border-slate-700">
                                             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" /></svg>
                                         </div>
                                         <h3 class="text-lg font-bold text-white mb-2">Henüz hizmet eklemediniz</h3>
@@ -171,9 +250,30 @@
                             </label>
                         </div>
 
+                        {% if personeller %}
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                            <label class="block text-sm font-bold text-slate-700 border-b border-slate-200 pb-2 mb-3">Bu Hizmeti Kimler Verebilir?</label>
+                            <div class="max-h-40 overflow-y-auto space-y-3 pr-2">
+                                {% for personel in personeller %}
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" name="staffs" value="{{ personel.id }}" checked class="w-5 h-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                                    <span class="flex items-center gap-2 text-sm font-medium text-slate-700 group-hover:text-indigo-700 transition-colors">
+                                        {% if personel.photo %}
+                                            <img src="{{ personel.photo.url }}" class="w-6 h-6 rounded-full object-cover border border-slate-200">
+                                        {% else %}
+                                            <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">{{ personel.name|make_list|first|upper }}</span>
+                                        {% endif %}
+                                        {{ personel.name }}
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Tahmini Süre (İsteğe Bağlı)</label>
-                            <div class="flex gap-3">
+                            <div class="flex gap-3 relative">
                                 <input type="number" name="duration_value" class="w-1/2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800" placeholder="Örn: 30">
                                 <select name="duration_unit" class="w-1/2 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 appearance-none">
                                     <option value="minutes">Dakika</option>
@@ -182,11 +282,17 @@
                                     <option value="weeks">Hafta</option>
                                     <option value="months">Ay</option>
                                 </select>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-500 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 hover:-translate-y-0.5 transition-all duration-300 mt-2">
-                            ➕ Vitrine Ekle
+                        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 hover:-translate-y-0.5 transition-all duration-300 mt-2 flex items-center justify-center gap-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Vitrine Ekle
                         </button>
                     </form>
                 </div>
@@ -195,14 +301,19 @@
             <div class="lg:col-span-2">
                 <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden h-full flex flex-col">
                     <div class="bg-slate-50 border-b border-slate-200 px-6 py-4">
-                        <h5 class="font-bold text-slate-700 m-0">📋 Mevcut Hizmetleriniz</h5>
+                        <h5 class="font-bold text-slate-700 m-0 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-indigo-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                            </svg>
+                            Mevcut Hizmetleriniz
+                        </h5>
                     </div>
 
                     <div class="overflow-x-auto flex-1">
                         <table class="w-full text-left border-collapse">
                             <thead class="bg-white text-slate-500 text-sm border-b border-slate-200">
                                 <tr>
-                                    <th class="px-6 py-3 font-semibold">Hizmet Adı</th>
+                                    <th class="px-6 py-3 font-semibold">Hizmet Adı & Personeller</th>
                                     <th class="px-6 py-3 font-semibold">Süre</th>
                                     <th class="px-6 py-3 font-semibold">Fiyat</th>
                                     <th class="px-6 py-3 font-semibold text-right">İşlem</th>
@@ -218,11 +329,22 @@
                                             {% if hizmet.is_at_home %}<span title="Evde">🏠 Evde</span>{% endif %}
                                             {% if hizmet.is_online %}<span title="Online">💻 Online</span>{% endif %}
                                         </div>
+
+                                        <div class="mt-2 flex flex-wrap gap-1">
+                                            {% if hizmet.staffs.all %}
+                                                {% for s in hizmet.staffs.all %}
+                                                <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md border border-slate-200">{{ s.name }}</span>
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="text-[10px] text-slate-400 font-medium italic">Personel Atanmadı (Genel)</span>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4">
                                         {% if hizmet.duration %}
                                             <span class="inline-flex items-center px-2 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg border border-slate-200">
-                                                ⏱️ {{ hizmet.duration }}
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                {{ hizmet.duration }}
                                                 {% if hizmet.duration_type == 'minutes' %}Dk
                                                 {% elif hizmet.duration_type == 'hours' %}Saat
                                                 {% elif hizmet.duration_type == 'days' %}Gün
@@ -238,6 +360,9 @@
                                         {{ hizmet.price }} ₺
                                     </td>
                                     <td class="px-6 py-4 text-right">
+                                        <a href="{% url 'hizmet_duzenle' hizmet.id %}" class="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-indigo-600 text-sm font-bold rounded-lg hover:bg-indigo-50 transition-colors mr-2">
+                                            ✏️ Düzenle
+                                        </a>
                                         <a href="{% url 'hizmet_sil' hizmet.id %}" class="inline-flex items-center px-3 py-1.5 border border-rose-200 text-rose-600 text-sm font-bold rounded-lg hover:bg-rose-50 transition-colors" onclick="return confirm('Silmek istediğinize emin misiniz?');">
                                             🗑️ Sil
                                         </a>

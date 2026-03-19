@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Gizlilik Politikası | T-Randevu{% endblock %}
+
+{% block content %}
+<div class="bg-slate-50 min-h-screen pb-20">
+    <!-- HERO BÖLÜMÜ -->
+    <div class="bg-slate-900 pt-16 pb-32 border-b border-slate-800 relative overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] animate-pulse"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-sm font-bold mb-6 backdrop-blur-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-indigo-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+                Veri Güvenliği
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Gizlilik Politikası</h1>
+            <p class="text-lg text-indigo-400 font-medium">Son Güncelleme: 19 Mart 2026</p>
+        </div>
+    </div>
+
+    <!-- İÇERİK KARTI -->
+    <div class="max-w-4xl mx-auto px-4 -mt-20 relative z-20">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
+
+            <!-- Dekoratif Çizgi -->
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+
+            <div class="space-y-12">
+                <!-- Madde 1 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 text-sm font-black border border-indigo-100 shrink-0">1</span>
+                        Veri Toplama ve Kullanım
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        T-Randevu (bundan böyle "Platform" olarak anılacaktır), hizmetlerini sunabilmek amacıyla işletmelerden ve bu işletmelerin müşterilerinden belirli kişisel verileri (ad, soyad, telefon numarası, e-posta adresi vb.) toplamaktadır. Bu veriler, yalnızca randevu süreçlerinin yönetilmesi, iletişim kurulması ve kullanıcı deneyiminin iyileştirilmesi amacıyla kullanılmaktadır.
+                    </p>
+                </div>
+
+                <!-- Madde 2 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 text-sm font-black border border-indigo-100 shrink-0">2</span>
+                        Verilerin Korunması
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        Kişisel verileriniz, endüstri standartlarında şifreleme yöntemleri ile korunmakta ve güvenli sunucularda saklanmaktadır. Platform, kullanıcı verilerini yetkisiz erişime, değiştirilmeye veya silinmeye karşı korumak için gerekli tüm teknik ve idari tedbirleri alır.
+                    </p>
+                </div>
+
+                <!-- Madde 3 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 text-sm font-black border border-indigo-100 shrink-0">3</span>
+                        Üçüncü Taraflarla Paylaşım
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        Platform, kullanıcı verilerini yasal bir zorunluluk olmadıkça veya kullanıcının açık rızası bulunmadıkça hiçbir şekilde üçüncü şahıslara satmaz, kiralamaz veya paylaşmaz. Sadece ödeme işlemleri (örneğin Iyzico) gibi zorunlu entegrasyonlarda gerekli asgari bilgiler güvenli bir şekilde ilgili kurumlarla paylaşılır.
+                    </p>
+                </div>
+
+                <!-- Madde 4 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 text-sm font-black border border-indigo-100 shrink-0">4</span>
+                        Çerezler (Cookies)
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        Sitemizin düzgün çalışması, kullanıcı oturumlarının yönetilmesi ve istatistiksel analizlerin yapılabilmesi amacıyla çerezler kullanılmaktadır. Tarayıcı ayarlarınızı değiştirerek çerez kullanımını reddedebilirsiniz, ancak bu durum sitenin bazı işlevlerini yerine getirememesine neden olabilir.
+                    </p>
+                </div>
+
+                <!-- Madde 5 -->
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 text-sm font-black border border-indigo-100 shrink-0">5</span>
+                        İletişim
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed pl-11">
+                        Gizlilik politikamız veya kişisel verilerinizle ilgili her türlü soru, talep ve şikayetiniz için <a href="{% url 'iletisim' %}" class="text-indigo-600 font-bold hover:underline">İletişim</a> sayfamız üzerinden bizimle irtibata geçebilirsiniz.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
