@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Randevunuz İptal Edildi</title>
+</head>
+<body style="background-color: #f8fafc; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 40px 20px; color: #334155; -webkit-font-smoothing: antialiased;">
+
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
+
+        <div style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); padding: 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">{{ randevu.business.name }}</h1>
+            <p style="color: #ffe4e6; margin: 8px 0 0 0; font-size: 15px; font-weight: 500;">Randevu İptal Bilgilendirmesi</p>
+        </div>
+
+        <div style="padding: 40px 30px;">
+            <h2 style="margin-top: 0; font-size: 22px; color: #0f172a; font-weight: 700;">Merhaba {{ randevu.customer.first_name }},</h2>
+
+            <div style="background-color: #fff1f2; border-left: 4px solid #f43f5e; padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 25px;">
+                <p style="font-size: 15px; line-height: 1.6; color: #be123c; margin: 0;">
+                    Maalesef <strong>{{ randevu.date_time|date:"d F Y" }} - {{ randevu.date_time|time:"H:i" }}</strong> tarihindeki <strong>{{ randevu.service.name }}</strong> randevunuz işletme tarafından iptal edilmiştir.
+                </p>
+            </div>
+
+            <p style="font-size: 15px; line-height: 1.6; color: #475569;">
+                Konuyla ilgili detaylı bilgi almak veya yeni bir uygun saate randevu oluşturmak için doğrudan işletme ile iletişime geçebilirsiniz. Anlayışınız için teşekkür ederiz.
+            </p>
+
+            {% if randevu.business.phone %}
+            <div style="text-align: center; margin: 35px 0;">
+                <a href="tel:{{ randevu.business.phone }}" style="background-color: #0f172a; color: #ffffff; padding: 16px 36px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2);">
+                    İşletmeyi Ara ({{ randevu.business.phone }})
+                </a>
+            </div>
+            {% else %}
+            <div style="text-align: center; margin: 35px 0; background-color: #f8fafc; padding: 20px; border-radius: 8px;">
+                <p style="color: #64748b; font-size: 14px; margin: 0;">İletişim için işletmeyi ziyaret edebilir veya sistem üzerinden mesaj atabilirsiniz.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 13px; font-weight: 600; color: #94a3b8; margin: 0;">T-Randevu © 2026 SaaS Platformu</p>
+        </div>
+    </div>
+
+</body>
+</html>

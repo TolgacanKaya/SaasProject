@@ -4,36 +4,44 @@
     <meta charset="UTF-8">
     <title>Hizmet Değerlendirmesi</title>
 </head>
-<body style="background-color: #f4f4f5; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 40px 0; color: #333333;">
+<body style="background-color: #f8fafc; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 40px 20px; color: #334155; -webkit-font-smoothing: antialiased;">
 
-    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
 
-        <div style="background-color: #4f46e5; padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">{{ randevu.business.name }}</h1>
-            <p style="color: #e0e7ff; margin: 5px 0 0 0; font-size: 14px;">Bizi tercih ettiğiniz için teşekkür ederiz!</p>
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); padding: 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">{{ randevu.business.name }}</h1>
+            <p style="color: #e0e7ff; margin: 8px 0 0 0; font-size: 15px; font-weight: 500;">Bizi tercih ettiğiniz için teşekkür ederiz!</p>
         </div>
 
-        <div style="padding: 30px;">
-            <h2 style="margin-top: 0; font-size: 20px; color: #1e293b;">Merhaba {{ randevu.customer.first_name }},</h2>
-            <p style="font-size: 16px; line-height: 1.6; color: #475569;">
+        <!-- Content -->
+        <div style="padding: 40px 30px;">
+            <h2 style="margin-top: 0; font-size: 22px; color: #0f172a; font-weight: 700;">Merhaba {{ randevu.customer.first_name }},</h2>
+            <p style="font-size: 16px; line-height: 1.6; color: #475569; margin-bottom: 30px;">
                 Umarız <strong>{{ randevu.service.name }}</strong> hizmetimizden memnun kalmışsınızdır.
-                Size daha iyi hizmet verebilmemiz için 1 dakikanızı ayırıp deneyiminizi puanlar mısınız?
+                Size daha iyi hizmet verebilmemiz ve diğer müşterilerimize yol göstermesi için 1 dakikanızı ayırıp deneyiminizi puanlar mısınız?
             </p>
 
-            <div style="text-align: center; margin: 35px 0;">
-                <a href="{{ review_url }}" style="background-color: #4f46e5; color: #ffffff; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
-                    ⭐ Deneyimi Değerlendir
+            <!-- Call to Action Button -->
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="{{ review_url }}" style="background-color: #4f46e5; color: #ffffff; padding: 16px 36px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.25);">
+                    Hizmeti Değerlendir
                 </a>
             </div>
 
-            <p style="font-size: 13px; color: #94a3b8; text-align: center; margin-bottom: 0;">
-                Bu bağlantı tek kullanımlıktır ve güvenliğiniz için değerlendirme yapıldıktan sonra iptal olur. Butona tıklayamıyorsanız, aşağıdaki linki kopyalayıp tarayıcınıza yapıştırabilirsiniz:<br><br>
-                <a href="{{ review_url }}" style="color: #4f46e5; word-break: break-all;">{{ review_url }}</a>
-            </p>
+            <!-- Footer Note -->
+            <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; text-align: center;">
+                <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">
+                    Bu bağlantı tek kullanımlıktır ve güvenliğiniz için değerlendirme yapıldıktan sonra iptal olur.<br><br>
+                    Butona tıklayamıyorsanız, aşağıdaki linki kopyalayıp tarayıcınıza yapıştırabilirsiniz:<br>
+                    <a href="{{ review_url }}" style="color: #4f46e5; word-break: break-all; text-decoration: underline;">{{ review_url }}</a>
+                </p>
+            </div>
         </div>
 
-        <div style="background-color: #f8fafc; padding: 15px; text-align: center; border-top: 1px solid #e2e8f0;">
-            <p style="font-size: 12px; color: #64748b; margin: 0;">Bu e-posta otomatik olarak gönderilmiştir. T-Randevu © 2026</p>
+        <!-- Brand Footer -->
+        <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 13px; font-weight: 600; color: #94a3b8; margin: 0;">T-Randevu © 2026 SaaS Platformu</p>
         </div>
     </div>
 

@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Ödeme ve Onay | {{ randevu.business.name }}{% endblock %}
+
+{% block extra_css %}
+{% if randevu.business.is_premium %}
+<style>
+    /* 👑 T-RANDEVU LÜKS PREMIUM TEMA (DARK & AMBER) 👑 */
+    body { background-color: #09090b !important; color: #f8fafc !important; }
+
+    .bg-white { background-color: #18181b !important; border-color: #27272a !important; }
+    .bg-slate-50, .bg-slate-100 { background-color: #09090b !important; border-color: #27272a !important; }
+
+    .border-slate-100, .border-slate-200 { border-color: #27272a !important; }
+
+    .text-slate-900, .text-slate-800, .text-slate-700 { color: #f8fafc !important; }
+    .text-slate-600, .text-slate-500 { color: #a1a1aa !important; }
+    .text-slate-400 { color: #94a3b8 !important; }
+
+    .brand-bg { background-color: #eab308 !important; color: #000000 !important; }
+    .hover\:brand-bg:hover { background-color: #ca8a04 !important; color: #000000 !important; }
+
+    .brand-bg-light { background-color: rgba(234, 179, 8, 0.1) !important; color: #eab308 !important; border-color: rgba(234, 179, 8, 0.2) !important;}
+    .brand-text { color: #eab308 !important; }
+
+    input, select, textarea { background-color: #09090b !important; color: #f8fafc !important; border-color: #27272a !important; }
+    input:focus { border-color: #eab308 !important; --tw-ring-color: #eab308 !important; }
+</style>
+{% else %}
+<style>
+    /* STANDART AÇIK TEMA RENKLERİ */
+    .brand-bg { background-color: #4f46e5 !important; color: #ffffff !important; }
+    .hover\:brand-bg:hover { background-color: #4338ca !important; }
+    .brand-bg-light { background-color: #eef2ff !important; color: #4f46e5 !important; border-color: #e0e7ff !important; }
+    .brand-text { color: #4f46e5 !important; }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-12 pb-24 relative overflow-hidden">
+    <!-- Arka plan süslemesi -->
+    <div class="absolute -top-40 -right-40 w-96 h-96 brand-bg opacity-[0.05] rounded-full blur-[100px] pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full brand-bg-light border mb-5 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 brand-text">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Son Bir Adım Kaldı</h1>
+            <p class="text-slate-500 font-medium">İşlem bedelini güvenle ödeyerek randevunuzu kesinleştirin.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <div class="lg:col-span-7 space-y-6">
+                <!-- DETAY KARTI -->
+                <div class="bg-white rounded-3xl p-8 md:p-10 border border-slate-200 shadow-xl relative overflow-hidden transition-all">
+                    <div class="absolute top-0 left-0 w-full h-1.5 brand-bg"></div>
+
+                    <h3 class="text-2xl font-extrabold text-slate-900 mb-8 border-b border-slate-100 pb-4">
+                        Randevu Özeti
+                    </h3>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl brand-bg-light border flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 brand-text"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">İşletme</p>
+                                <p class="text-slate-800 font-extrabold text-lg">{{ randevu.business.name }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl brand-bg-light border flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 brand-text"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Hizmet</p>
+                                <p class="text-slate-800 font-extrabold text-lg">{{ randevu.service.name }}</p>
+                            </div>
+                        </div>
+
+                        {% if randevu.staff %}
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl brand-bg-light border flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 brand-text"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Uzman</p>
+                                <p class="text-slate-800 font-extrabold text-lg">{{ randevu.staff.name }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl brand-bg-light border flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 brand-text"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008z" /></svg>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tarih & Saat</p>
+                                <p class="text-slate-800 font-extrabold text-lg">{{ randevu.date_time|date:"d F Y" }} <span class="text-slate-400 mx-1">•</span> {{ randevu.date_time|time:"H:i" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÜŞTERİ BİLGİSİ -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-extrabold text-slate-800">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</p>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5">{{ randevu.customer.phone }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÖDEME KARTI -->
+            <div class="lg:col-span-5 space-y-6">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="p-4 rounded-xl text-sm font-bold shadow-sm {% if message.tags == 'error' %}bg-rose-50 text-rose-600 border border-rose-200{% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-xl">
+                    <h3 class="text-xl font-black text-slate-900 mb-6">Ödeme Özeti</h3>
+
+                    <!-- KUPON ALANI -->
+                    {% if not randevu.coupon_used %}
+                    <form method="POST" class="mb-6 flex gap-2">
+                        {% csrf_token %}
+                        <input type="text" name="coupon_code" placeholder="Kupon Kodu" class="w-full border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none font-bold uppercase transition-all bg-slate-50 focus:bg-white" required>
+                        <button type="submit" class="px-6 py-3 brand-bg text-white font-extrabold rounded-xl shadow-md transition-colors whitespace-nowrap hover:brand-bg hover:-translate-y-0.5">
+                            Uygula
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3 font-bold text-sm text-emerald-700 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        '{{ randevu.coupon_used.code }}' Kuponu Uygulandı
+                    </div>
+                    {% endif %}
+
+                    <!-- FİYAT HESAPLAMA -->
+                    <div class="space-y-4 text-sm border-b border-dashed border-slate-200 pb-5 mb-5">
+                        <!-- flex-wrap kapalı, boşluklar korundu, sayı ve sembol mühürlendi (whitespace-nowrap) -->
+                        <div class="flex justify-between items-center gap-4 text-slate-600 font-medium">
+                            <span>Hizmet Bedeli</span>
+                            <span class="font-bold text-slate-800 whitespace-nowrap">{{ randevu.service.price }} ₺</span>
+                        </div>
+
+                        {% if randevu.coupon_used %}
+                        <div class="flex justify-between items-center gap-4 text-emerald-600 font-bold">
+                            <span>İndirim ({{ randevu.coupon_used.code }})</span>
+                            <span class="whitespace-nowrap">- {% if randevu.coupon_used.discount_type == 'fixed' %}{{ randevu.coupon_used.discount_value }} ₺{% else %}%{{ randevu.coupon_used.discount_value }}{% endif %}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="flex justify-between items-center gap-4 text-slate-500 font-medium">
+                            <span>Platform İşlem Bedeli</span>
+                            <span class="font-bold text-slate-800 whitespace-nowrap">+ {{ randevu.platform_fee_paid }} ₺</span>
+                        </div>
+                    </div>
+
+                    <!-- TOPLAM TUTAR -->
+                    <div class="flex justify-between items-center bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-6">
+                        <div class="pr-2">
+                            <span class="block text-slate-900 font-black text-lg">Ödenecek Tutar</span>
+                            <span class="block text-[11px] font-medium text-slate-500 mt-1 leading-tight">Sadece bu tutar tahsil edilecektir.</span>
+                        </div>
+                        <!-- Fiyat ve ₺ simgesi asla kopmaz -->
+                        <span class="text-3xl font-black brand-text whitespace-nowrap">{{ randevu.total_online_charged }} ₺</span>
+                    </div>
+
+                    <!-- İYZİCO FORM -->
+                    <div id="iyzipay-checkout-form" class="w-full mt-4">
+                        {{ iyzico_html|safe }}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

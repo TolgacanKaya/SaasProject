@@ -8,8 +8,9 @@ from datetime import timedelta
 from django.utils import timezone
 from businesses.models import Business
 from .models import SubscriptionPayment
+from decimal import Decimal
 import iyzipay
-import json  # YENİ: Gelen makine kodunu okumak için ekledik
+import json
 
 
 @login_required(login_url='/hesap/giris/')
@@ -18,33 +19,29 @@ def premium_satin_al(request):
     if not isletme:
         return redirect('kayit')
 
-    # YENİ: URL'den gelen o gizli sinyali yakalıyoruz! (Varsayılan olarak 'monthly' yaptık)
     secilen_plan = request.GET.get('plan', 'monthly')
 
-    # Sinyale göre fiyatı ve paket adını belirliyoruz
+    # BUG FIX 1: Fiyatları String değil Decimal olarak tanımla ki veritabanı patlamasın!
     if secilen_plan == 'yearly':
-        fiyat = "2990.00"
+        fiyat = Decimal("2990.00")
         paket_adi = "T-Randevu Premium Plan (Yıllık)"
         sepet_id = "PREM_YIL_001"
     else:
-        fiyat = "299.00"
+        fiyat = Decimal("299.00")
         paket_adi = "T-Randevu Premium Plan (Aylık)"
         sepet_id = "PREM_AY_001"
 
-    # 1. Ödeme Kaydını Veritabanında Oluştur
     odeme_kaydi = SubscriptionPayment.objects.create(
         business=isletme,
         amount=fiyat
     )
 
-    # 2. Iyzico Şifrelerimizi Girelim
     options = {
         'api_key': str(settings.IYZICO_API_KEY).replace("'", "").replace('"', '').strip(),
         'secret_key': str(settings.IYZICO_SECRET_KEY).replace("'", "").replace('"', '').strip(),
         'base_url': 'sandbox-api.iyzipay.com'
     }
 
-    # 3. Iyzico'ya Göndereceğimiz Paketi Hazırlayalım
     callback_url = request.build_absolute_uri(reverse('odeme_sonuc'))
 
     alici_ad = request.user.first_name.strip() if request.user.first_name else "T-Randevu"
@@ -76,10 +73,10 @@ def premium_satin_al(request):
     request_data = {
         'locale': 'tr',
         'conversationId': str(odeme_kaydi.conversation_id),
-        'price': fiyat,
-        'paidPrice': fiyat,
+        'price': str(fiyat), # İyzico string ister
+        'paidPrice': str(fiyat),
         'currency': 'TRY',
-        'basketId': sepet_id,  # Güncellendi
+        'basketId': sepet_id,
         'paymentGroup': 'SUBSCRIPTION',
         'callbackUrl': callback_url,
         'enabledInstallments': ['2', '3', '6', '9'],
@@ -88,16 +85,15 @@ def premium_satin_al(request):
         'billingAddress': address,
         'basketItems': [
             {
-                'id': sepet_id,  # Güncellendi
-                'name': paket_adi,  # Güncellendi (Aylık/Yıllık dinamik oldu)
+                'id': sepet_id,
+                'name': paket_adi,
                 'category1': 'Abonelik',
                 'itemType': 'VIRTUAL',
-                'price': fiyat
+                'price': str(fiyat)
             }
         ]
     }
 
-    # 4. Paketi Iyzico'ya Fırlat ve Formu İste
     checkout_form_initialize = iyzipay.CheckoutFormInitialize().create(request_data, options)
 
     raw_cevap = checkout_form_initialize.read()
@@ -111,12 +107,16 @@ def premium_satin_al(request):
             'form_content': form_content,
             'isletme': isletme,
             'fiyat': fiyat,
-            'paket_adi': paket_adi  # YENİ: Paket adını ödeme sayfasına da yolluyoruz
+            'paket_adi': paket_adi
         })
     else:
         hata_mesaji = cevap.get('errorMessage')
+        odeme_kaydi.status = 'failed'
+        odeme_kaydi.error_message = hata_mesaji
+        odeme_kaydi.save()
         messages.error(request, f"Ödeme sistemi başlatılamadı: {hata_mesaji}")
-        return redirect
+        # BUG FIX 2: Eksik olan redirect hedefi tamamlandı
+        return redirect('isletme_abonelik')
 
 
 @csrf_exempt
@@ -150,31 +150,26 @@ def odeme_sonuc(request):
                 odeme_kaydi.iyzico_payment_id = result_data.get('paymentId')
                 odeme_kaydi.save()
 
-                # --- İŞTE ZAMAN HESAPLAMA SİHRİ BURADA BAŞLIYOR ---
                 isletme = odeme_kaydi.business
                 isletme.is_premium = True
 
-                # Mevcut bir bitiş tarihi varsa (erken yeniliyorsa) onun üstüne ekle, yoksa bugünden başla
                 baslangic = isletme.premium_end_date if isletme.premium_end_date and isletme.premium_end_date > timezone.now() else timezone.now()
 
-                # Ödenen tutara bakarak 1 ay mı 1 yıl mı ekleyeceğimizi anlıyoruz
-                if odeme_kaydi.amount >= 1000:  # Yıllık plan (2990 TL)
+                if odeme_kaydi.amount >= 1000:
                     isletme.premium_end_date = baslangic + timedelta(days=365)
-                else:  # Aylık plan (299 TL)
+                else:
                     isletme.premium_end_date = baslangic + timedelta(days=30)
 
-                # Eğer adam daha önceden iptal talebi verdiyse ama vazgeçip tekrar aldıysa iptali kaldır
                 isletme.cancel_at_period_end = False
                 isletme.save()
-                # --------------------------------------------------
 
-            messages.success(request, "Tebrikler! Ödemeniz alındı ve Premium Plana geçişiniz sağlandı.")
+            messages.success(request, "🎉 Tebrikler! Ödemeniz alındı ve Premium Plana geçişiniz sağlandı.")
         else:
             if odeme_kaydi:
                 odeme_kaydi.status = 'failed'
                 odeme_kaydi.error_message = result_data.get('errorMessage')
                 odeme_kaydi.save()
-            messages.error(request, f"Ödeme başarısız oldu: {result_data.get('errorMessage')}")
+            messages.error(request, f"❌ Ödeme başarısız oldu: {result_data.get('errorMessage')}")
 
         return redirect('dashboard')
 
@@ -184,25 +179,19 @@ def odeme_sonuc(request):
 @login_required(login_url='/hesap/giris/')
 def abonelik_iptal(request):
     if request.method == 'POST':
-        # Formdan gelen şifreyi alıyoruz
         password = request.POST.get('password')
         isletme = Business.objects.filter(owner=request.user).first()
 
-        # 1. Aşama: Kullanıcının girdiği şifre veritabanındakiyle eşleşiyor mu?
         if request.user.check_password(password):
-            # 2. Aşama: İşletme var mı, premium mu ve zaten iptal edilmemiş mi?
             if isletme and isletme.is_premium and not isletme.cancel_at_period_end:
                 isletme.cancel_at_period_end = True
                 isletme.save()
 
-                bitis_tarihi = isletme.premium_end_date.strftime(
-                    "%d.%m.%Y") if isletme.premium_end_date else "dönem sonuna"
-                messages.success(request,
-                                 f"Aboneliğiniz iptal edildi. Premium özelliklerinizi {bitis_tarihi} tarihine kadar kullanmaya devam edebilirsiniz.")
+                bitis_tarihi = isletme.premium_end_date.strftime("%d.%m.%Y") if isletme.premium_end_date else "dönem sonuna"
+                messages.success(request, f"Aboneliğiniz iptal edildi. Premium özelliklerinizi {bitis_tarihi} tarihine kadar kullanmaya devam edebilirsiniz.")
             else:
                 messages.warning(request, "Zaten iptal edilmiş veya geçerli bir premium planınız yok.")
         else:
-            # Şifre yanlışsa uyarı ver
             messages.error(request, "Hatalı şifre girdiniz. İptal işlemi güvenlik sebebiyle reddedildi.")
 
     return redirect('isletme_abonelik')
@@ -213,7 +202,6 @@ def abonelik_iptal_vazgec(request):
     if request.method == 'POST':
         isletme = Business.objects.filter(owner=request.user).first()
 
-        # Eğer işletme premiumsa ve gerçekten iptal sırasındaysa kurtaralım
         if isletme and isletme.is_premium and isletme.cancel_at_period_end:
             isletme.cancel_at_period_end = False
             isletme.save()
