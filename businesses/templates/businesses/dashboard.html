@@ -214,8 +214,8 @@
                             </td>
                         </tr>
 
-                        <div id="vipModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('vipModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity">
-                            <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl text-left overflow-hidden shadow-amber-900/20">
+                        <div id="vipModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('vipModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+                            <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl text-left overflow-hidden shadow-amber-900/20 transform scale-95 transition-transform duration-300">
                                 <div class="flex justify-between items-center p-5 border-b border-slate-800">
                                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-amber-400">
@@ -412,8 +412,8 @@
                             </td>
                         </tr>
 
-                        <div id="freeModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('freeModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
-                            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+                        <div id="freeModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('freeModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+                            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
                                 <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50">
                                     <h5 class="text-lg font-bold text-slate-800">📋 Randevu Detayı</h5>
                                     <button type="button" onclick="closeDetayModal('freeModal{{ randevu.id }}')" class="text-slate-400 hover:text-slate-600 transition-colors text-xl font-bold">✖</button>
@@ -556,21 +556,39 @@
     }
 
     function openDetayModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        // 1. ZEKİ IŞINLANMA: Modalı tablonun (tr) içinden söküp en dışa (body) alıyoruz!
+        // Bu sayede scroll nerede olursa olsun arka plan %100 bulanıklaşır.
+        document.body.appendChild(modal);
+
+        // 2. Modalı Görünür Yap ve Arka Plan Kaymasını Kilitle
+        modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-        const innerScroll = document.querySelector('main .overflow-y-auto');
-        if(innerScroll) {
-            innerScroll.style.overflow = 'hidden';
-        }
+
+        // 3. Jilet Animasyonu Tetikle (Opacity ve Scale)
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.firstElementChild.classList.remove('scale-95');
+            modal.firstElementChild.classList.add('scale-100');
+        }, 10);
     }
 
     function closeDetayModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-        const innerScroll = document.querySelector('main .overflow-y-auto');
-        if(innerScroll) {
-            innerScroll.style.overflow = '';
-        }
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        // 1. Animasyonu Geri Sar
+        modal.classList.add('opacity-0');
+        modal.firstElementChild.classList.remove('scale-100');
+        modal.firstElementChild.classList.add('scale-95');
+
+        // 2. Animasyon Bitince Gizle (300ms sonra)
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
     }
 
     {% if isletme.is_premium and grafik_etiketleri %}

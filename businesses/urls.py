@@ -40,6 +40,9 @@ urlpatterns = [
 
     path('api/available-times/<slug:slug>/', views.get_available_times, name='api_available_times'),
 
+    path('google/login/', views.google_takvim_bagla, name='google_takvim_bagla'),
+    path('google/callback/', views.google_takvim_callback, name='google_takvim_callback'),
+
     # DİKKAT: Slug her zaman en altta olmalıdır!
     path('<slug:slug>/', views.isletme_detay, name='isletme_detay'),
 ]

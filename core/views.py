@@ -1,13 +1,16 @@
-from django.shortcuts import render
-from django.db.models import Q, Avg, Value, FloatField, Case, When, F
+import threading
+from django.shortcuts import render, redirect
+from django.db.models import Q, Avg, Value, FloatField, Case, When, F, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.core.paginator import Paginator
-from businesses.models import Business, Category
-
+from businesses.models import Business, Category, Service  # 🔥 YENİ: Service modelini buraya ekledik!
+from django.contrib import messages
+from django.conf import settings
+from django.core.mail import send_mail
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 def ana_sayfa(request):
-    # BUG FIX: Ana sayfadaki elit rozetleri için puan hesaplaması eklendi
-    # Sadece Premium olanları al ve keşfet sayfasındaki gibi puanlarını hesapla
     vip_isletmeler = Business.objects.filter(is_premium=True).annotate(
         ortalama_puan=Coalesce(Avg('reviews__rating'), 0.0, output_field=FloatField())
     ).order_by('-ortalama_puan', '-id')[:6]
@@ -39,13 +42,18 @@ def kesfet(request):
         isletmeler = isletmeler.filter(is_premium=True)
 
     # ==========================================
-    # BUG FIX: ANNOTATE ZİNCİRİ GÜVENLİ HALE GETİRİLDİ
+    # 🔥 ŞOV BURADA BAŞLIYOR: SUBQUERY ZEKASI 🔥
     # ==========================================
+    # Alt Sorgu: Her işletme için kendi hizmetlerine bakar, en ucuz olanı alır ve köşede bekler.
+    min_price_sq = Service.objects.filter(
+        business=OuterRef('pk')
+    ).order_by('price').values('price')[:1]
+
+    # Ana Sorgu: Puanları ve Alt Sorgudan gelen fiyatı güvenle birleştirir.
     isletmeler = isletmeler.annotate(
-        # Önce puanı hesapla
-        ortalama_puan=Coalesce(Avg('reviews__rating'), 0.0, output_field=FloatField())
+        ortalama_puan=Coalesce(Avg('reviews__rating'), 0.0, output_field=FloatField()),
+        min_price=Subquery(min_price_sq)  # Tabloları çarpıştırmadan fiyatı çeker!
     ).annotate(
-        # Sonra o puanı kullanarak skoru hesapla (Aynı blokta çökme riskini sıfırladık)
         ranking_score=F('ortalama_puan') + Case(
             When(is_premium=True, then=Value(2.5)),
             default=Value(0.0),
@@ -65,14 +73,49 @@ def kesfet(request):
         'toplam_sonuc': toplam_sonuc
     })
 
+
+# Arka Plandaki Yeni Zeki Postacı
+def arka_planda_mail_at(konu, html_icerik, musteri_emaili):
+    try:
+        mail = EmailMessage(
+            subject=konu,
+            body=html_icerik,
+            from_email=settings.EMAIL_HOST_USER,
+            to=[settings.EMAIL_HOST_USER],
+            reply_to=[musteri_emaili]
+        )
+        mail.content_subtype = "html"
+        mail.send()
+    except Exception as e:
+        print("MAIL HATASI DETAYI:", e)
+
+
+def iletisim(request):
+    if request.method == "POST":
+        ad_soyad = request.POST.get("fullname")
+        email = request.POST.get("email")
+        mesaj = request.POST.get("message")
+
+        konu = f"T-Randevu İletişim: {ad_soyad}"
+
+        html_icerik = render_to_string("core/iletisim_mail.html", {
+            "ad_soyad": ad_soyad,
+            "email": email,
+            "mesaj": mesaj
+        })
+
+        threading.Thread(target=arka_planda_mail_at, args=(konu, html_icerik, email)).start()
+
+        messages.success(request, "Mesajınız destek ekibimize başarıyla ulaştı. En kısa sürede dönüş yapacağız.")
+        return redirect('iletisim')
+
+    return render(request, "core/iletisim.html")
+
 def hakkimizda(request):
     return render(request, 'core/hakkimizda.html')
 
 def rozetler(request):
     return render(request, 'core/rozetler.html')
-
-def iletisim(request):
-    return render(request, 'core/iletisim.html')
 
 def rehber(request):
     return render(request, 'core/rehber.html')
