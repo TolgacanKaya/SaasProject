@@ -118,8 +118,8 @@
                             </td>
                         </tr>
 
-                        <div id="vipModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('vipModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity">
-                            <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden shadow-amber-900/20">
+                        <div id="vipModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('vipModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+                            <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden shadow-amber-900/20 transform scale-95 transition-transform duration-300">
                                 <div class="flex justify-between items-center p-5 border-b border-slate-800">
                                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-amber-400"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75v-.008z" /></svg>
@@ -346,8 +346,8 @@
                             </td>
                         </tr>
 
-                        <div id="freeModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('freeModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
-                            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+                        <div id="freeModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('freeModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+                            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
                                 <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50">
                                     <h5 class="text-lg font-bold text-slate-800">📋 Randevu Detayı</h5>
                                     <button type="button" onclick="closeDetayModal('freeModal{{ randevu.id }}')" class="text-slate-400 hover:text-slate-600 transition-colors text-xl font-bold">✖</button>
@@ -480,21 +480,39 @@
 {% block extra_js %}
 <script>
     function openDetayModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        // 1. ZEKİ IŞINLANMA: Modalı tablonun (tr) içinden söküp en dışa (body) alıyoruz!
+        // Bu sayede scroll nerede olursa olsun arka plan %100 bulanıklaşır.
+        document.body.appendChild(modal);
+
+        // 2. Modalı Görünür Yap ve Arka Plan Kaymasını Kilitle
+        modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-        const innerScroll = document.querySelector('main .overflow-y-auto');
-        if(innerScroll) {
-            innerScroll.style.overflow = 'hidden';
-        }
+
+        // 3. Jilet Animasyonu Tetikle (Opacity ve Scale)
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.firstElementChild.classList.remove('scale-95');
+            modal.firstElementChild.classList.add('scale-100');
+        }, 10);
     }
 
     function closeDetayModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-        const innerScroll = document.querySelector('main .overflow-y-auto');
-        if(innerScroll) {
-            innerScroll.style.overflow = '';
-        }
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        // 1. Animasyonu Geri Sar
+        modal.classList.add('opacity-0');
+        modal.firstElementChild.classList.remove('scale-100');
+        modal.firstElementChild.classList.add('scale-95');
+
+        // 2. Animasyon Bitince Gizle (300ms sonra)
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
     }
 </script>
 {% endblock %}

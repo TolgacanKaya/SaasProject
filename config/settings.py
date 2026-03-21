@@ -124,6 +124,10 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 # YENİ EKLENDİ: Maillerin spam klasörüne düşmemesi ve views.py hatasını önlemek için
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# --- GOOGLE CALENDAR API AYARLARI ---
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+
 # Şifre sıfırlama linki geçerlilik süresi (Saniye cinsinden). 7200 saniye = 2 Saat
 PASSWORD_RESET_TIMEOUT = 7200
 

@@ -3,11 +3,14 @@ from datetime import timedelta, datetime
 import csv
 import iyzipay
 import json
+import google.oauth2.credentials
 from decimal import Decimal  # EKLENDİ: Decimal kullanımı için gerekli kütüphane
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from django.http import HttpResponse
 from django.contrib import messages
 from django.http import JsonResponse
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -19,6 +22,10 @@ from .models import Business, Customer, Service, Review, Staff, Coupon  # YENİL
 from django.db.models import Avg, Sum, Count
 from .tasks import send_review_email_task
 from django.views.decorators.cache import never_cache
+from google_auth_oauthlib.flow import Flow
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 
 def isletme_detay(request, slug):
@@ -350,6 +357,20 @@ def randevu_odeme_sonuc(request, randevu_id):
                 randevu.coupon_used.save()
 
             randevu.save()
+
+            if randevu.coupon_used:
+                randevu.coupon_used.times_used += 1
+                randevu.coupon_used.save()
+
+            randevu.save()  # <-- MEVCUT KOD BURADA
+
+            # ==========================================
+            # 🔥 SİHİRLİ DOKUNUŞ: GOOGLE TAKVİME GÖNDER!
+            # ==========================================
+
+
+            if randevu.customer.email:
+                send_review_email_task.apply_async(args=[randevu.id, request.get_host()], countdown=10)
 
             if randevu.customer.email:
                 send_review_email_task.apply_async(args=[randevu.id, request.get_host()], countdown=10)
@@ -976,11 +997,197 @@ from django.contrib.auth import \
 
 @login_required(login_url="/hesap/giris/")
 def hesap_sil(request):
+    isletme = Business.objects.filter(owner=request.user).first()
+
     if request.method == "POST":
+        # ==========================================
+        # 🔒 ZEKİ GÜVENLİK KİLİDİ: İLERİ TARİHLİ RANDEVU KONTROLÜ
+        # ==========================================
+        if isletme:
+            gelecek_randevular = isletme.appointments.filter(
+                date_time__gt=timezone.now(),
+                status__in=['pending', 'approved', 'confirmed']
+            )
+
+            if gelecek_randevular.exists():
+                randevu_sayisi = gelecek_randevular.count()
+                messages.error(request,
+                               f"🚨 DİKKAT: Hesabınızı silemezsiniz! İleri tarihli onaylanmış veya bekleyen {randevu_sayisi} adet randevunuz bulunuyor. Lütfen önce bu randevuları iptal edip müşterilerin ücret iadelerini sağlayınız.")
+                return redirect("isletme_ayarlar")
+
+        # Engel yoksa hesabı sil
         user = request.user
-        user.delete()  # Django'nun muazzam zekası: User silinince ona bağlı işletme, randevular, kuponlar (Cascade olan her şey) silinir.
+        user.delete()
         messages.success(request,
                          "Hesabınız ve işletmenize ait tüm veriler sistemden kalıcı olarak silinmiştir. Elveda! 👋")
         return redirect("ana_sayfa")
 
     return redirect("isletme_ayarlar")
+
+
+# ==========================================
+# 🔥 GOOGLE CALENDAR OAUTH2 (YETKİLENDİRME ŞOVU) 🔥
+# ==========================================
+
+# SADECE GELİŞTİRME ORTAMI İÇİN (Canlıya alırken bu satırı sileceğiz)
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+# Google'dan sadece takvim etkinliklerini yönetme izni istiyoruz
+SCOPES = ['https://www.googleapis.com/auth/calendar.events']
+
+
+def google_takvim_bagla(request):
+    isletme = get_object_or_404(Business, owner=request.user)
+
+    if not isletme.is_premium:
+        messages.error(request, "Bu özellik sadece Premium işletmelere özeldir.")
+        return redirect('isletme_ayarlar')
+
+    client_config = {
+        "web": {
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "project_id": "t-randevu",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "client_secret": settings.GOOGLE_CLIENT_SECRET,
+            "redirect_uris": [request.build_absolute_uri('/businesses/google/callback/')]
+        }
+    }
+
+    flow = Flow.from_client_config(
+        client_config,
+        scopes=SCOPES,
+        redirect_uri=request.build_absolute_uri('/businesses/google/callback/')
+    )
+
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+        prompt='consent'
+    )
+
+    # 1. State bilgisini kaydediyoruz
+    request.session['google_oauth_state'] = state
+    # 2. 🔥 YENİ: PKCE Şifresini Session'a (Hafızaya) kaydediyoruz!
+    request.session['google_code_verifier'] = getattr(flow, 'code_verifier', None)
+
+    return redirect(authorization_url)
+
+
+def google_takvim_callback(request):
+    # Hafızadaki şifreleri geri çağırıyoruz
+    state = request.session.get('google_oauth_state')
+    code_verifier = request.session.get('google_code_verifier')  # 🔥 YENİ!
+
+    isletme = get_object_or_404(Business, owner=request.user)
+
+    client_config = {
+        "web": {
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "project_id": "t-randevu",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "client_secret": settings.GOOGLE_CLIENT_SECRET,
+            "redirect_uris": [request.build_absolute_uri('/businesses/google/callback/')]
+        }
+    }
+
+    flow = Flow.from_client_config(
+        client_config,
+        scopes=SCOPES,
+        state=state,
+        redirect_uri=request.build_absolute_uri('/businesses/google/callback/')
+    )
+
+    # 🔥 YENİ: Hafızadaki şifreyi flow nesnesine geri yüklüyoruz ki Google bizi tanısın!
+    if code_verifier:
+        flow.code_verifier = code_verifier
+
+    authorization_response = request.build_absolute_uri()
+
+    try:
+        flow.fetch_token(authorization_response=authorization_response)
+    except Exception as e:
+        print(f"Token Hatası DETAYI: {e}")  # Konsola gerçek hatayı yazar
+        messages.error(request, "Google onayı sırasında bir güvenlik hatası oluştu. Lütfen tekrar deneyin.")
+        return redirect('isletme_ayarlar')
+
+    credentials = flow.credentials
+
+    # BİNGÖ! Anahtarları veritabanına mühürle
+    isletme.google_access_token = credentials.token
+    if credentials.refresh_token:
+        isletme.google_refresh_token = credentials.refresh_token
+    isletme.google_token_expiry = credentials.expiry
+    isletme.save()
+
+    # Hafızayı temizle (Güvenlik için)
+    if 'google_oauth_state' in request.session:
+        del request.session['google_oauth_state']
+    if 'google_code_verifier' in request.session:
+        del request.session['google_code_verifier']
+
+    messages.success(request, "🎉 Muazzam! Google Takviminiz başarıyla sisteme entegre edildi.")
+    return redirect('isletme_ayarlar')
+
+
+def randevuyu_takvime_ekle(randevu):
+    """ Sihirli anahtarı kullanarak Google Takvime randevuyu işler """
+    isletme = randevu.business
+
+    # Patron takvimi bağlamamışsa sessizce çık
+    if not isletme.google_refresh_token:
+        return False
+
+        # 1. Veritabanındaki anahtarları Google'ın anlayacağı formata çeviriyoruz
+    creds = Credentials(
+        token=isletme.google_access_token,
+        refresh_token=isletme.google_refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=settings.GOOGLE_CLIENT_ID,
+        client_secret=settings.GOOGLE_CLIENT_SECRET,
+    )
+
+    try:
+        # 2. Google Takvim motorunu çalıştır
+        service = build('calendar', 'v3', credentials=creds)
+
+        # 3. Randevunun ne kadar süreceğini hesapla
+        sure_dk = 60
+        if randevu.service and randevu.service.duration:
+            if randevu.service.duration_type == 'minutes':
+                sure_dk = randevu.service.duration
+            elif randevu.service.duration_type == 'hours':
+                sure_dk = randevu.service.duration * 60
+
+        bitis_zamani = randevu.date_time + datetime.timedelta(minutes=sure_dk)
+
+        # 4. Takvime eklenecek fiyakalı etiketi (Paketi) hazırla
+        event = {
+            'summary': f'💇‍♀️ T-Randevu: {randevu.service.name}',
+            'location': isletme.address or 'Belirtilmedi',
+            'description': f'👤 Müşteri: {randevu.customer.first_name} {randevu.customer.last_name}\n📞 Telefon: {randevu.customer.phone}\n📝 Not: {randevu.customer_note or "Yok"}\n💸 Tutar: {randevu.final_service_price} TL',
+            'start': {
+                'dateTime': randevu.date_time.isoformat(),
+                'timeZone': 'Europe/Istanbul',
+            },
+            'end': {
+                'dateTime': bitis_zamani.isoformat(),
+                'timeZone': 'Europe/Istanbul',
+            },
+            'colorId': '5',  # 5 numara Google Takvimde dikkat çekici bir sarı/hardal rengidir
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'popup', 'minutes': 30},  # Randevudan 30 dk önce patronun telefonuna bildirim atar!
+                ],
+            },
+        }
+
+        # 5. ROKETİ FIRLAT! (Etkinliği Google'a yaz)
+        service.events().insert(calendarId='primary', body=event).execute()
+        return True
+
+    except Exception as e:
+        print(f"Google Takvime Eklerken Hata Çıktı: {e}")
+        return False

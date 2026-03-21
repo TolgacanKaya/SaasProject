@@ -34,6 +34,13 @@ class Business(models.Model):
     premium_end_date = models.DateTimeField(null=True, blank=True, verbose_name="Premium Bitiş Tarihi")
     cancel_at_period_end = models.BooleanField(default=False, verbose_name="Dönem Sonunda İptal Edilecek")
 
+    # ==========================================
+    # 🔥 GOOGLE CALENDAR API ENTEGRASYON ALANLARI 🔥
+    # ==========================================
+    google_access_token = models.TextField(blank=True, null=True, verbose_name="Google Geçici Anahtarı")
+    google_refresh_token = models.TextField(blank=True, null=True, verbose_name="Google Kalıcı Yenileme Anahtarı")
+    google_token_expiry = models.DateTimeField(blank=True, null=True, verbose_name="Anahtar Son Kullanma Tarihi")
+
     theme_color = models.CharField(max_length=7, default="#0d6efd", verbose_name="Tema Rengi (Hex)")
 
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefon")

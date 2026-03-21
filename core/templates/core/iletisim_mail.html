@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yeni Mesaj</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <!-- Ana Kutu -->
+                <table width="100%" max-width="600px" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px;">
+
+                    <!-- Başlık / Logo Kısmı -->
+                    <tr>
+                        <td style="background-color: #0f172a; padding: 30px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 1px;">T-RANDEVU</h1>
+                            <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 14px;">Yeni İletişim Formu Mesajı</p>
+                        </td>
+                    </tr>
+
+                    <!-- Müşteri Bilgileri Kısmı -->
+                    <tr>
+                        <td style="padding: 30px 30px 15px 30px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f1f5f9; border-radius: 12px; padding: 20px;">
+                                <tr>
+                                    <td style="padding-bottom: 10px;">
+                                        <span style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold;">Gönderen Kişi</span><br>
+                                        <span style="font-size: 16px; color: #0f172a; font-weight: bold;">{{ ad_soyad }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold;">E-Posta Adresi</span><br>
+                                        <a href="mailto:{{ email }}" style="font-size: 16px; color: #4f46e5; font-weight: bold; text-decoration: none;">{{ email }}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Mesaj İçeriği -->
+                    <tr>
+                        <td style="padding: 15px 30px 40px 30px;">
+                            <h3 style="color: #0f172a; font-size: 16px; margin: 0 0 10px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Mesaj Detayı:</h3>
+                            <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0; white-space: pre-wrap;">{{ mesaj }}</p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center;">
+                            <p style="color: #64748b; font-size: 12px; margin: 0;">Bu e-posta T-Randevu sistemi tarafından otomatik oluşturulmuştur.</p>
+                            <p style="color: #64748b; font-size: 12px; margin: 5px 0 0 0;">Cevaplamak için mail uygulamanızdan <strong>"Yanıtla"</strong> butonuna basmanız yeterlidir.</p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

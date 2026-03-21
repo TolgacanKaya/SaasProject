@@ -211,3 +211,49 @@ def abonelik_iptal_vazgec(request):
             messages.error(request, "İşlem gerçekleştirilemedi.")
 
     return redirect('isletme_abonelik')
+
+
+# ==========================================
+# 🔥 YENİ: IYZICO OTOMATİK ÜCRET İADE ZEKASI 🔥
+# ==========================================
+def iyzico_ucret_iade_et(request, randevu):
+    """
+    Bu fonksiyon çağırıldığında, randevuya ait ödenmiş tutarı
+    kullanıcının kredi kartına otomatik olarak iade eder.
+    """
+    # 1. Ödenmiş bir Iyzico işlemi var mı kontrol et
+    if not randevu.iyzico_transaction_id or not randevu.is_paid:
+        return False, "İade edilecek geçerli bir ödeme bulunamadı."
+
+    try:
+        options = {
+            'api_key': str(settings.IYZICO_API_KEY).replace("'", "").replace('"', '').strip(),
+            'secret_key': str(settings.IYZICO_SECRET_KEY).replace("'", "").replace('"', '').strip(),
+            'base_url': 'sandbox-api.iyzipay.com'
+        }
+
+        # İade İsteği Paketi
+        request_data = {
+            'locale': 'tr',
+            'conversationId': str(randevu.id),
+            'paymentId': randevu.iyzico_transaction_id,  # 🔥 HATA BURADAYDI, DÜZELTİLDİ!
+            'ip': request.META.get('REMOTE_ADDR', '85.34.78.112'),
+        }
+
+        # Iyzico'ya İptal/İade Emri Gönder
+        cancel = iyzipay.Cancel().create(request_data, options)
+
+        # Iyzico'nun cevabını oku
+        raw_result = cancel.read()
+        if isinstance(raw_result, bytes):
+            raw_result = raw_result.decode('utf-8')
+        result_data = json.loads(raw_result)
+
+        # Eğer iade başarılıysa
+        if result_data.get('status') == 'success':
+            return True, "Ücret iadesi bankaya iletildi. (1-3 iş günü içinde karta yansır)."
+        else:
+            return False, f"Iyzico İade Hatası: {result_data.get('errorMessage')}"
+
+    except Exception as e:
+        return False, f"Sistem Hatası: {str(e)}"
