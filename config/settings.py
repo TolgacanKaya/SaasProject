@@ -16,11 +16,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-eqvol@2f&7**)6izql(h=j_na(%1nb-+%2%4gib6vlqd*1shi1'
+# SECURITY WARNING: Sadece .env dosyasından çeker, bulamazsa anında sistemi durdurur (En güvenlisi)
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# SECURITY WARNING: Sadece .env'de True yazıyorsa True olur.
+DEBUG = os.getenv('DJANGO_DEBUG') == 'True'
 
 ALLOWED_HOSTS = ['*'] # Geliştirme aşamasında her yerden erişime izin ver
 
@@ -141,3 +141,7 @@ CELERY_TASK_SERIALIZER = 'json'
 IYZICO_API_KEY = os.getenv('IYZICO_API_KEY')
 IYZICO_SECRET_KEY = os.getenv('IYZICO_SECRET_KEY')
 IYZICO_BASE_URL = os.getenv('IYZICO_BASE_URL')
+
+# --- SPOTIFY API AYARLARI ---
+SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
+SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')

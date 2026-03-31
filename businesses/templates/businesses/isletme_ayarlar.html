@@ -205,21 +205,53 @@
                             <input type="file" name="cover_image" id="cover_input" accept="image/*" class="hidden" onchange="previewImage(this, 'cover_preview', 'cover_placeholder')">
                             <p class="text-xs text-slate-500 text-center mt-3">Geniş format (16:9) önerilir.</p>
                         </div>
+
+                        <div class="mt-8 pt-6 border-t border-slate-700/50">
+                            <div class="flex justify-between items-center mb-4">
+                                <h6 class="text-slate-400 font-bold text-xs uppercase tracking-wide flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+                                    </svg>
+                                    İşletme Galerisi
+                                </h6>
+                                <span class="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded-md">{{ isletme.gallery_images.count }} / 5 Yüklendi</span>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3" id="gallery_grid_premium">
+                                {% for foto in isletme.gallery_images.all %}
+                                    <div class="relative group aspect-square rounded-xl overflow-hidden border border-slate-700 shadow-lg">
+                                        <img src="{{ foto.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        <a href="{% url 'galeri_resim_sil' foto.id %}" class="absolute inset-0 bg-red-900/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300">
+                                            <svg class="w-8 h-8 text-white hover:scale-125 transition-transform drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+
+                                {% if isletme.gallery_images.count < 5 %}
+                                    <label id="gallery_upload_label_premium" class="aspect-square rounded-xl border-2 border-dashed border-slate-600 hover:border-amber-400 hover:bg-amber-400/5 flex flex-col items-center justify-center cursor-pointer transition-all group shadow-inner">
+                                        <div class="w-8 h-8 rounded-full bg-slate-800 group-hover:bg-amber-400 text-slate-400 group-hover:text-slate-900 flex items-center justify-center transition-colors mb-2">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-slate-500 group-hover:text-amber-400 text-center px-2">Çoklu Seçim<br>Yapabilirsiniz</span>
+                                        <input type="file" name="gallery_images" multiple accept="image/*" class="hidden" onchange="previewGalleryImages(this, 'gallery_grid_premium', 'gallery_upload_label_premium', {{ isletme.gallery_images.count }})">
+                                    </label>
+                                {% endif %}
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-3 italic">Müşterileriniz bu fotoğrafları vitrin sayfanızda büyük bir galeri olarak görecektir.</p>
+                        </div>
+
                     </div>
 
-                    <!-- 🔥 YENİ DARK MODE GOOGLE TAKVİM KARTI 🔥 -->
                     <div class="mb-8 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-                        <!-- Hafif premium parlamalar -->
                         <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all"></div>
                         <div class="absolute bottom-0 left-0 w-24 h-24 bg-rose-500/5 rounded-full blur-3xl group-hover:bg-rose-500/10 transition-all"></div>
 
                         <div class="relative z-10 flex flex-col items-center text-center gap-4">
-                            <!-- Logo Kutusu -->
                             <div class="w-16 h-16 bg-slate-950 rounded-2xl shadow-inner border border-slate-800 flex items-center justify-center shrink-0">
                                 <svg viewBox="0 0 24 24" class="w-8 h-8" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                             </div>
 
-                            <!-- Metinler -->
                             <div>
                                 <h4 class="text-lg font-bold text-white flex items-center justify-center gap-2">
                                     Google Takvim
@@ -228,7 +260,6 @@
                                 <p class="text-xs text-slate-400 font-medium mt-2 leading-relaxed">Gelen randevularınızı otomatik olarak işleyin. Çifte rezervasyonlardan kurtulun!</p>
                             </div>
 
-                            <!-- Buton -->
                             <div class="w-full mt-2">
                                 {% if not isletme.is_premium %}
                                     <a href="{% url 'isletme_abonelik' %}" class="block w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold rounded-xl transition-all text-sm border border-slate-700">
@@ -258,9 +289,6 @@
             </div>
         </form>
 
-        <!-- ========================================== -->
-        <!-- 🔥 TEHLİKELİ BÖLGE (PREMIUM İÇİN) 🔥 -->
-        <!-- ========================================== -->
         <div class="mt-12 pt-8 border-t border-rose-500/30">
             <div class="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div>
@@ -442,6 +470,43 @@
                             </div>
                             <input class="hidden" type="file" id="free_cover_input" name="cover_image" accept="image/*" onchange="previewImage(this, 'free_cover_preview', 'free_cover_placeholder')">
                         </div>
+
+                        <div class="w-full h-px bg-slate-100 my-6"></div>
+
+                        <div class="text-center">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="block text-sm font-bold text-slate-700 text-left flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+                                    </svg>
+                                    İşletme Galerisi
+                                </label>
+                                <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">{{ isletme.gallery_images.count }} / 5</span>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-3" id="gallery_grid_free">
+                                {% for foto in isletme.gallery_images.all %}
+                                    <div class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+                                        <img src="{{ foto.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        <a href="{% url 'galeri_resim_sil' foto.id %}" class="absolute inset-0 bg-red-900/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300">
+                                            <svg class="w-8 h-8 text-white hover:scale-125 transition-transform drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+
+                                {% if isletme.gallery_images.count < 5 %}
+                                    <label id="gallery_upload_label_free" class="aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-indigo-500 hover:bg-indigo-50 flex flex-col items-center justify-center cursor-pointer transition-all group shadow-inner">
+                                        <div class="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-indigo-100 text-slate-400 group-hover:text-indigo-600 flex items-center justify-center transition-colors mb-2">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 text-center px-2">Çoklu Seçim<br>Yapabilirsiniz</span>
+                                        <input type="file" name="gallery_images" multiple accept="image/*" class="hidden" onchange="previewGalleryImages(this, 'gallery_grid_free', 'gallery_upload_label_free', {{ isletme.gallery_images.count }})">
+                                    </label>
+                                {% endif %}
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-3 text-left">Müşterileriniz bu fotoğrafları vitrin sayfanızda büyük bir galeri olarak görecektir.</p>
+                        </div>
                     </div>
 
                     <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/30 hover:-translate-y-1 transition-all duration-300 text-lg">
@@ -451,9 +516,6 @@
             </div>
         </form>
 
-        <!-- ========================================== -->
-        <!-- 🔥 TEHLİKELİ BÖLGE (FREE İÇİN) 🔥 -->
-        <!-- ========================================== -->
         <div class="mt-12 pt-8 border-t border-rose-100">
             <div class="bg-rose-50 border border-rose-100 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div>
@@ -468,9 +530,6 @@
 
     {% endif %}
 
-    <!-- ========================================== -->
-    <!-- 🔥 HESAP SİLME ONAY MODALI (ORTAK) 🔥 -->
-    <!-- ========================================== -->
     <div id="deleteAccountModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
         <div class="{% if isletme.is_premium %}bg-slate-900 border-slate-700{% else %}bg-white border-slate-200{% endif %} border rounded-3xl max-w-md w-full p-8 shadow-2xl transform scale-95 transition-transform duration-300 relative text-center">
 
@@ -502,7 +561,6 @@
         </div>
     </div>
 
-    <!-- 🔥 JAVASCRIPT'İ İÇERİ ALDIK! BURADAN KAÇAMAZ 🔥 -->
     <script>
         // 1. ZEKİ IŞINLANMA ALGORİTMASI (CSS TUZAĞINI BOZAR)
         document.addEventListener("DOMContentLoaded", function() {
@@ -530,6 +588,45 @@
             }
         }
 
+        // YENİ: ÇOKLU GALERİ ÖNİZLEME MOTORU
+        function previewGalleryImages(input, gridId, labelId, currentCount) {
+            const grid = document.getElementById(gridId);
+            const label = document.getElementById(labelId);
+
+            // Varsa önceki geçici (kaydedilmemiş) önizlemeleri temizle
+            grid.querySelectorAll('.temp-gallery-preview').forEach(el => el.remove());
+
+            if (input.files && input.files.length > 0) {
+                const maxAllowed = 5 - currentCount;
+                let files = Array.from(input.files);
+
+                // Adam 5'ten fazla resim seçerse uyar ve fazlasını kırp
+                if (files.length > maxAllowed) {
+                    alert(`En fazla 5 fotoğraf yükleyebilirsiniz. Sadece ilk ${maxAllowed} fotoğraf eklenecektir.`);
+                    files = files.slice(0, maxAllowed);
+                }
+
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Yeni bir <div> oluştur
+                        const previewDiv = document.createElement('div');
+                        // Fiyakalı yeşil bir "Bekliyor" tasarımı veriyoruz
+                        previewDiv.className = 'temp-gallery-preview relative aspect-square rounded-xl overflow-hidden border-2 border-emerald-500 shadow-lg opacity-80 animate-pulse';
+                        previewDiv.innerHTML = `
+                            <img src="${e.target.result}" class="w-full h-full object-cover grayscale-[30%]">
+                            <div class="absolute inset-0 bg-emerald-900/40 flex items-center justify-center backdrop-blur-[1px]">
+                                <span class="bg-emerald-500 text-white text-[9px] font-bold px-2 py-1 rounded shadow-sm">⏳ Kaydet'e Basın</span>
+                            </div>
+                        `;
+                        // Fotoğrafı "+" butonunun (label'ın) hemen önüne yerleştir
+                        grid.insertBefore(previewDiv, label);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
         // 3. MODAL AÇMA / KAPAMA
         function openDeleteModal() {
             const modal = document.getElementById('deleteAccountModal');
@@ -552,7 +649,6 @@
         }
     </script>
 
-    <!-- İL İLÇE AKILLI SEÇİM JS -->
     <script src="{% static 'core/il_ilce.js' %}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {

@@ -3,107 +3,117 @@
 {% block title %}İletişim | T-Randevu{% endblock %}
 
 {% block content %}
-<div class="bg-slate-50 min-h-screen pb-20">
-    <!-- Üst Başlık Alanı -->
-    <div class="bg-slate-900 pt-16 pb-32 border-b border-slate-800 relative overflow-hidden">
+<div class="bg-slate-50 min-h-screen pb-24 font-sans">
+
+    <div class="bg-slate-950 pt-36 pb-36 border-b border-slate-800 relative overflow-hidden">
+
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="w-[400px] h-[400px] bg-indigo-600/20 rounded-full blur-[100px] animate-pulse"></div>
+            <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] animate-blob"></div>
+            <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[80px] animate-blob animation-delay-2000"></div>
         </div>
 
-        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-sm font-bold mb-6 backdrop-blur-sm">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10 animate-[fadeSlideUp_0.8s_ease-out_forwards]">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-emerald-300 text-xs font-bold mb-6 backdrop-blur-md shadow-lg shadow-emerald-500/10">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
                 Destek Ekibimiz Çevrimiçi
             </div>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight drop-shadow-sm">Bize Ulaşın</h1>
-            <p class="text-slate-400 text-lg font-medium leading-relaxed max-w-2xl mx-auto">Soru, görüş veya destek talepleriniz için uzman ekibimiz her zaman yanınızda.</p>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight drop-shadow-lg">
+                Bize Ulaşın
+            </h1>
+            <p class="text-base md:text-xl text-slate-400 font-medium leading-relaxed max-w-2xl mx-auto">
+                Soru, görüş veya destek talepleriniz için uzman ekibimiz her zaman yanınızda. Size en kısa sürede dönüş yapacağız.
+            </p>
         </div>
     </div>
 
-    <div class="max-w-5xl mx-auto px-4 -mt-20 relative z-20">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 -mt-24 relative z-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
 
-            <!-- İletişim Bilgileri Kartı -->
-            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 hover:-translate-y-1 transition-all duration-300 h-full flex flex-col justify-center relative overflow-hidden group">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors duration-500"></div>
+            <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 p-8 md:p-12 hover:-translate-y-1 transition-all duration-500 h-full flex flex-col justify-center relative overflow-hidden group hover:shadow-indigo-500/10">
 
-                <h3 class="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4 relative z-10">İletişim Bilgilerimiz</h3>
+                <div class="absolute -right-10 -top-10 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors duration-500 pointer-events-none"></div>
+
+                <h3 class="text-2xl font-black text-slate-900 mb-8 border-b border-slate-100 pb-5 relative z-10">İletişim Bilgilerimiz</h3>
 
                 <div class="space-y-8 relative z-10">
-                    <div class="flex items-center gap-5 group/item">
-                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-indigo-50 text-indigo-600 group-hover/item:bg-indigo-600 group-hover/item:text-white transition-colors shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+
+                    <div class="flex items-center gap-5 group/item cursor-pointer" onclick="window.location.href='mailto:info@trandevu.com'">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-indigo-50 text-indigo-600 border border-indigo-100/50 group-hover/item:bg-indigo-600 group-hover/item:text-white transition-all duration-300 shadow-inner group-hover/item:shadow-lg group-hover/item:-translate-y-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
                         </div>
                         <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">E-Posta Desteği</p>
-                            <a href="mailto:info@trandevu.com" class="text-slate-800 text-lg font-bold hover:text-indigo-600 transition-colors">info@trandevu.com</a>
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">E-Posta Desteği</p>
+                            <p class="text-slate-800 text-lg font-bold group-hover/item:text-indigo-600 transition-colors">info@trandevu.com</p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-5 group/item">
-                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-emerald-50 text-emerald-600 group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.896-1.596-5.25-3.95-6.847-6.847l1.293-.97c.362-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-emerald-50 text-emerald-600 border border-emerald-100/50 group-hover/item:bg-emerald-600 group-hover/item:text-white transition-all duration-300 shadow-inner group-hover/item:shadow-lg group-hover/item:-translate-y-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.896-1.596-5.25-3.95-6.847-6.847l1.293-.97c.362-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
                         </div>
                         <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Müşteri Hizmetleri</p>
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Müşteri Hizmetleri</p>
                             <p class="text-slate-800 text-lg font-bold">0850 123 45 67</p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-5 group/item">
-                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-blue-50 text-blue-500 group-hover/item:bg-blue-500 group-hover/item:text-white transition-colors shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-amber-50 text-amber-600 border border-amber-100/50 group-hover/item:bg-amber-500 group-hover/item:text-white transition-all duration-300 shadow-inner group-hover/item:shadow-lg group-hover/item:-translate-y-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
                         </div>
                         <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Sosyal Medya</p>
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Merkez Ofis</p>
+                            <p class="text-slate-800 font-medium text-sm">Bilişim Vadisi, Teknoloji Mah. No:1, <br> Gebze / Kocaeli</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-5 group/item pt-2">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-blue-50 text-blue-500 border border-blue-100/50 group-hover/item:bg-blue-500 group-hover/item:text-white transition-all duration-300 shadow-inner group-hover/item:shadow-lg group-hover/item:-translate-y-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Sosyal Medya</p>
                             <div class="flex gap-4">
-                                <a href="https://www.instagram.com/_tolgacan_kaya_/" class="text-slate-400 hover:text-pink-600 transition-colors" title="Instagram">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                                <a href="https://www.instagram.com/_tolgacan_kaya_/" target="_blank" class="text-slate-400 hover:text-pink-600 transition-colors transform hover:scale-110" title="Instagram">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                                 </a>
-                                <a href="#" class="text-slate-400 hover:text-blue-600 transition-colors" title="Facebook">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
+                                <a href="#" class="text-slate-400 hover:text-blue-600 transition-colors transform hover:scale-110" title="Facebook">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
                                 </a>
-                                <a href="#" class="text-slate-400 hover:text-slate-900 transition-colors" title="X (Twitter)">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                                <a href="#" class="text-slate-400 hover:text-slate-900 transition-colors transform hover:scale-110" title="X (Twitter)">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-5 group/item">
-                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-amber-50 text-amber-600 group-hover/item:bg-amber-500 group-hover/item:text-white transition-colors shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                        </div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Merkez Ofis</p>
-                            <p class="text-slate-800 font-medium">Bilişim Vadisi, Teknoloji Mah. No:1, İstanbul</p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- İletişim Formu Kartı -->
-            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 hover:-translate-y-1 transition-all duration-300">
-                <h3 class="text-2xl font-bold text-slate-900 mb-6">Mesaj Gönderin</h3>
+            <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 p-8 md:p-12 hover:-translate-y-1 transition-all duration-500 group">
+                <h3 class="text-2xl font-black text-slate-900 mb-8">Bize Mesaj Gönderin</h3>
 
                 <form method="POST" class="space-y-5" id="contactForm">
                     {% csrf_token %}
+
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Adınız Soyadınız</label>
-                        <input type="text" name="fullname" required placeholder="Örn: Ahmet Yılmaz" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all font-medium placeholder-slate-400">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">E-Posta Adresiniz</label>
-                        <input type="email" name="email" required placeholder="Örn: ahmet@mail.com" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all font-medium placeholder-slate-400">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Mesajınız</label>
-                        <textarea name="message" required rows="4" placeholder="Size nasıl yardımcı olabiliriz?" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all font-medium resize-none placeholder-slate-400"></textarea>
+                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Adınız Soyadınız</label>
+                        <input type="text" name="fullname" required placeholder="Örn: Ahmet Yılmaz" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl px-4 py-3.5 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium placeholder-slate-400">
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-lg rounded-xl shadow-lg shadow-indigo-600/30 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                        <span id="btnText">Gönder</span>
-                        <svg id="btnIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">E-Posta Adresiniz</label>
+                        <input type="email" name="email" required placeholder="Örn: ahmet@mail.com" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl px-4 py-3.5 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium placeholder-slate-400">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Mesajınız</label>
+                        <textarea name="message" required rows="4" placeholder="Size nasıl yardımcı olabiliriz?" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl px-4 py-3.5 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium resize-none placeholder-slate-400"></textarea>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full mt-2 py-4 bg-slate-900 hover:bg-indigo-600 text-white font-black text-sm rounded-2xl shadow-lg shadow-indigo-600/10 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 group-hover:shadow-indigo-600/30">
+                        <span id="btnText">Mesajı Gönder</span>
+                        <svg id="btnIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
                     </button>
                 </form>
             </div>
@@ -112,21 +122,20 @@
     </div>
 </div>
 
-<!-- BAŞARILI İŞLEM MODALI (SAYFANIN EN ALTINA SAKLANDI) -->
 <div id="successModal" class="hidden fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-    <div class="bg-white border-slate-200 border w-full max-w-sm rounded-3xl shadow-2xl text-center p-8 transform transition-all scale-95" id="successModalContent">
+    <div class="bg-white border-slate-200 border w-full max-w-sm rounded-[2rem] shadow-2xl text-center p-8 transform transition-all scale-95" id="successModalContent">
 
-        <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-emerald-500/10 mb-6 relative">
-            <div class="absolute inset-0 rounded-full border-4 border-emerald-500/30 animate-ping"></div>
-            <svg class="h-12 w-12 text-emerald-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+        <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-emerald-50 mb-6 relative border border-emerald-100">
+            <div class="absolute inset-0 rounded-full border-4 border-emerald-500/20 animate-ping"></div>
+            <svg class="h-10 w-10 text-emerald-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
         </div>
 
-        <h3 class="text-2xl font-black text-slate-800 mb-2" id="successModalTitle">Harika!</h3>
-        <p class="text-slate-500 font-medium mb-8" id="successModalText">İşlem başarıyla tamamlandı.</p>
+        <h3 class="text-2xl font-black text-slate-900 mb-2" id="successModalTitle">Harika!</h3>
+        <p class="text-slate-500 font-medium mb-8 text-sm" id="successModalText">İşlem başarıyla tamamlandı.</p>
 
-        <button onclick="closeSuccessModal()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-2xl shadow-lg transition-all hover:-translate-y-1">
+        <button onclick="closeSuccessModal()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-black rounded-xl shadow-lg transition-all transform active:scale-95">
             Tamamdır
         </button>
     </div>
@@ -136,7 +145,6 @@
 {% block extra_js %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Form gönderilirken butonu kilitliyoruz (Çifte tıklamayı önlemek için)
         const form = document.getElementById('contactForm');
         form.addEventListener('submit', function() {
             const btn = document.getElementById('submitBtn');
@@ -149,24 +157,17 @@
             btnIcon.classList.add('hidden');
         });
 
-        // Django'dan gelen mesajları dinliyoruz
         {% if messages %}
             {% for message in messages %}
                 {% if message.tags == 'success' %}
-                    // Başarılıysa fiyakalı modalı aç!
-                    showSuccessModal(
-                        "Mesajınız İletildi!",
-                        "{{ message }}"
-                    );
+                    showSuccessModal("Mesajınız İletildi!", "{{ message }}");
                 {% else %}
-                    // Ola ki sunucu hatası olursa (Error) düz alert gösterir
                     alert("{{ message }}");
                 {% endif %}
             {% endfor %}
         {% endif %}
     });
 
-    // Modalı Açan Fonksiyon
     function showSuccessModal(title, text) {
         const modal = document.getElementById('successModal');
         const content = document.getElementById('successModalContent');
@@ -183,7 +184,6 @@
         }, 10);
     }
 
-    // Modalı Kapatan Fonksiyon
     function closeSuccessModal() {
         const modal = document.getElementById('successModal');
         const content = document.getElementById('successModalContent');
@@ -197,4 +197,18 @@
         }, 300);
     }
 </script>
+<style>
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes blob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(20px, -30px) scale(1.1); }
+        66% { transform: translate(-10px, 10px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-blob { animation: blob 10s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+</style>
 {% endblock %}

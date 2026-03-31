@@ -4,93 +4,125 @@
 
 {% block extra_css %}
 <style>
-    @keyframes fadeUpStagger {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-card {
+    /* Canlı arama scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #6366f1; }
+
+    /* Scroll Reveal Animasyon Sınıfları */
+    .reveal-card {
         opacity: 0;
-        animation: fadeUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        transform: translateY(40px);
+        transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-card.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Arama Kutusu Özel Gölge */
+    .glass-search {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.02);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="bg-slate-50 min-h-screen pb-20">
-    <div class="bg-slate-900 pt-16 pb-32 border-b border-slate-800 relative">
+<div class="bg-slate-50/50 min-h-screen pb-20 font-sans">
+
+    <div class="bg-slate-950 pt-36 pb-36 border-b border-slate-800 relative overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[100px]"></div>
+            <div class="absolute right-0 top-0 w-[300px] h-[300px] bg-rose-500/10 rounded-full blur-[80px]"></div>
+        </div>
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Size En Uygun Hizmeti Bulun</h2>
-            <p class="text-slate-400 text-lg font-medium">Binlerce seçkin işletme arasından arama yapın ve hemen randevu alın.</p>
+            <span class="inline-block py-1 px-3 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-bold tracking-widest uppercase mb-4">
+                Keşfetmeye Başla
+            </span>
+            <h2 class="text-4xl md:text-6xl font-black text-white mb-5 tracking-tight drop-shadow-lg">
+                Size En Uygun <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-sky-400">Hizmeti Bulun</span>
+            </h2>
+            <p class="text-slate-400 text-base md:text-xl font-medium max-w-2xl mx-auto">
+                Binlerce seçkin işletme arasından arama yapın, yorumları okuyun ve saniyeler içinde randevunuzu oluşturun.
+            </p>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-20 mb-16">
-        <form method="GET" action="{% url 'kesfet' %}" class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 md:p-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-30 mb-16">
+        <form method="GET" action="{% url 'kesfet' %}" class="glass-search rounded-[2.5rem] p-6 md:p-10 transition-all hover:shadow-2xl hover:shadow-indigo-500/10">
 
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 mb-6">
-                <div class="md:col-span-3">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ne Arıyorsunuz?</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+                <div class="md:col-span-3 relative">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Ne Arıyorsunuz?</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </span>
-                        <input type="text" name="arama" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 pl-11 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium placeholder-slate-400" placeholder="Kuaför, Masaj..." value="{{ request.GET.arama }}" autocomplete="off">
+                        <input type="text" name="arama" id="canliAramaInput" class="w-full bg-slate-100/50 hover:bg-slate-100 border border-transparent focus:border-indigo-200 focus:bg-white text-slate-900 rounded-2xl px-4 py-3.5 pl-11 outline-none transition-all font-medium placeholder-slate-400" placeholder="İşletme adı veya hizmet..." value="{{ request.GET.arama }}" autocomplete="off">
+                    </div>
+
+                    <div id="aramaSonuclari" class="absolute z-50 w-full mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden opacity-0 invisible transition-all duration-200 transform translate-y-2">
+                        <ul id="sonucListesi" class="max-h-64 overflow-y-auto custom-scrollbar divide-y divide-slate-50"></ul>
                     </div>
                 </div>
 
                 <div class="md:col-span-3">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Şehir</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Şehir</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </span>
-                        <input type="text" name="sehir" id="sehirInput" list="sehir-onerileri" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 pl-11 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium placeholder-slate-400" placeholder="Şehir seçin..." value="{{ request.GET.sehir }}" autocomplete="off">
+                        <input type="text" name="sehir" id="sehirInput" list="sehir-onerileri" class="w-full bg-slate-100/50 hover:bg-slate-100 border border-transparent focus:border-indigo-200 focus:bg-white text-slate-900 rounded-2xl px-4 py-3.5 pl-11 outline-none transition-all font-medium placeholder-slate-400" placeholder="Şehir seçin..." value="{{ request.GET.sehir }}" autocomplete="off">
                         <datalist id="sehir-onerileri"></datalist>
                     </div>
                 </div>
 
                 <div class="md:col-span-3">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">İlçe</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">İlçe</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </span>
-                        <input type="text" name="ilce" id="ilceInput" list="ilce-onerileri" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 pl-11 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium placeholder-slate-400 disabled:opacity-50 disabled:bg-slate-100" placeholder="Önce şehir seçin..." value="{{ request.GET.ilce }}" autocomplete="off" disabled>
+                        <input type="text" name="ilce" id="ilceInput" list="ilce-onerileri" class="w-full bg-slate-100/50 hover:bg-slate-100 border border-transparent focus:border-indigo-200 focus:bg-white text-slate-900 rounded-2xl px-4 py-3.5 pl-11 outline-none transition-all font-medium placeholder-slate-400 disabled:opacity-50" placeholder="Önce şehir seçin..." value="{{ request.GET.ilce }}" autocomplete="off" disabled>
                         <datalist id="ilce-onerileri"></datalist>
                     </div>
                 </div>
 
                 <div class="md:col-span-3">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kategori</label>
-                    <div class="relative">
-                        <select class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium appearance-none cursor-pointer" name="kategori">
-                            <option value="">Tümü</option>
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Kategori</label>
+                    <div class="relative group">
+                        <select class="w-full bg-slate-100/50 hover:bg-slate-100 border border-transparent focus:border-indigo-200 focus:bg-white text-slate-900 rounded-2xl px-4 py-3.5 outline-none transition-all font-medium appearance-none cursor-pointer" name="kategori">
+                            <option value="">Tüm Kategoriler</option>
                             {% for kategori in kategoriler %}
                                 <option value="{{ kategori.id }}" {% if request.GET.kategori == kategori.id|stringformat:"s" %}selected{% endif %}>{{ kategori.name }}</option>
                             {% endfor %}
                         </select>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-indigo-500 transition-colors">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                         </svg>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-100">
-
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-5 pt-6 mt-2 border-t border-slate-100/50">
                 <label class="relative inline-flex items-center cursor-pointer group">
                     <input type="checkbox" name="is_premium" value="1" class="sr-only peer" {% if request.GET.is_premium %}checked{% endif %}>
-                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-400"></div>
-                    <span class="ml-3 text-sm font-extrabold text-slate-600 uppercase tracking-wider flex items-center gap-1.5 transition-colors group-hover:text-slate-900">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-amber-400 drop-shadow-sm">
+                    <div class="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-amber-400 peer-checked:to-yellow-500 shadow-inner"></div>
+                    <span class="ml-3 text-sm font-bold text-slate-600 flex items-center gap-1.5 transition-colors group-hover:text-slate-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-amber-500 drop-shadow-sm">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                         </svg>
-                        Sadece Premium İşletmeler
+                        Sadece Premiumlar
                     </span>
                 </label>
 
-                <button type="submit" class="w-full sm:w-auto px-10 py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-xl shadow-lg shadow-slate-900/20 hover:-translate-y-0.5 transition-all duration-300">
-                    İşletmeleri Bul
+                <button type="submit" class="w-full sm:w-auto px-10 py-3.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/30 hover:-translate-y-0.5 hover:shadow-indigo-500/50 transition-all duration-300 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                    Sonuçları Getir
                 </button>
             </div>
 
@@ -98,154 +130,159 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
-            <h4 class="text-2xl font-extrabold text-slate-900">Arama Sonuçları</h4>
-            <span class="px-4 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-100 font-bold rounded-lg text-sm shadow-sm">{{ toplam_sonuc }} İşletme Bulundu</span>
+        <div class="flex justify-between items-center mb-8 border-b border-slate-200/60 pb-4">
+            <h4 class="text-2xl font-black text-slate-900">Arama Sonuçları</h4>
+            <span class="px-4 py-1.5 bg-white text-indigo-600 border border-indigo-100 font-bold rounded-xl text-xs sm:text-sm shadow-sm">{{ toplam_sonuc }} İşletme Bulundu</span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
             {% for isletme in page_obj %}
 
-            <!-- 3 FARKLI İŞLETME TÜRÜ İÇİN DİNAMİK KART TASARIMI -->
-            <div class="animate-card bg-white rounded-3xl overflow-hidden flex flex-col relative transition-all duration-300 hover:-translate-y-1 group
+            <div class="reveal-card bg-white rounded-[2rem] overflow-hidden flex flex-col relative group
                 {% if isletme.is_premium and isletme.ortalama_puan >= 4.5 %}
-                    border-2 border-amber-400 shadow-xl shadow-amber-500/20
+                    border-2 border-amber-300 shadow-lg shadow-amber-500/10 hover:shadow-xl hover:shadow-amber-500/20 hover:-translate-y-2
                 {% elif isletme.is_premium %}
-                    border-2 border-slate-800 shadow-lg shadow-slate-800/10
+                    border-2 border-slate-900 shadow-md hover:shadow-xl hover:shadow-slate-900/10 hover:-translate-y-2
                 {% elif isletme.ortalama_puan >= 4.5 %}
-                    border-2 border-rose-200 shadow-lg shadow-rose-500/10
+                    border border-rose-200 shadow-md hover:shadow-xl hover:shadow-rose-500/10 hover:-translate-y-2
                 {% else %}
-                    border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-slate-200/50
-                {% endif %}"
-                 style="animation-delay: calc({{ forloop.counter0 }} * 0.1s);">
+                    border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200 hover:-translate-y-2
+                {% endif %}">
 
-                <div class="relative h-48 w-full">
+                <div class="relative h-44 w-full overflow-hidden">
 
-                    <!-- KART TÜRÜNE GÖRE ROZETLER -->
-                    {% if isletme.is_premium and isletme.ortalama_puan >= 4.5 %}
-                        <div class="absolute top-4 left-4 z-10 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 px-3 py-1.5 rounded-full text-xs font-black shadow-lg border border-amber-300 flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2L9 7 3 5l2 9h14l2-9-6 2-3-5z" /></svg>
-                            ELİT İŞLETME
-                        </div>
-                    {% elif isletme.is_premium %}
-                        <div class="absolute top-4 left-4 z-10 bg-slate-900 text-amber-400 px-3 py-1.5 rounded-full text-xs font-black shadow-lg border border-slate-700 flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
-                            ÖNE ÇIKAN
-                        </div>
-                    {% elif isletme.ortalama_puan >= 4.5 %}
-                        <div class="absolute top-4 left-4 z-10 bg-gradient-to-r from-rose-500 to-red-600 text-white px-3 py-1.5 rounded-full text-xs font-black shadow-lg border border-rose-400 flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.866 8.21 8.21 0 003 2.48z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z" /></svg>
-                            POPÜLER
-                        </div>
-                    {% endif %}
+                    <div class="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
+                        {% if isletme.is_premium and isletme.ortalama_puan >= 4.5 %}
+                            <div class="bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 px-3 py-1.5 rounded-full text-[10px] font-black shadow-lg border border-amber-300 flex items-center gap-1 backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2L9 7 3 5l2 9h14l2-9-6 2-3-5z" /></svg>
+                                ELİT
+                            </div>
+                        {% elif isletme.is_premium %}
+                            <div class="bg-slate-900/90 backdrop-blur-sm text-amber-400 px-3 py-1.5 rounded-full text-[10px] font-black shadow-lg border border-slate-700 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
+                                ÖNE ÇIKAN
+                            </div>
+                        {% elif isletme.ortalama_puan >= 4.5 %}
+                            <div class="bg-gradient-to-r from-rose-500/90 to-red-600/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-[10px] font-black shadow-lg border border-rose-400 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.866 8.21 8.21 0 003 2.48z" /></svg>
+                                POPÜLER
+                            </div>
+                        {% endif %}
+
+                        {% if isletme.is_yeni %}
+                            <div class="bg-teal-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-[10px] font-black shadow-lg border border-teal-400 flex items-center gap-1 animate-pulse">
+                                YENİ
+                            </div>
+                        {% endif %}
+                    </div>
 
                     {% if isletme.ortalama_puan > 0 %}
-                    <div class="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur text-slate-900 px-2.5 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1">
+                    <div class="absolute top-3 right-3 z-10 bg-white/95 backdrop-blur-md text-slate-900 px-2.5 py-1.5 rounded-xl text-[11px] font-bold shadow-lg flex items-center gap-1">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 text-amber-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
                         {{ isletme.ortalama_puan|floatformat:1 }}
                     </div>
                     {% endif %}
 
                     {% if isletme.cover_image %}
-                        <img src="{{ isletme.cover_image.url }}" class="w-full h-full object-cover">
+                        <img src="{{ isletme.cover_image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
                     {% else %}
-                        <div class="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 opacity-50"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg>
+                        <div class="w-full h-full bg-slate-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-700 ease-out">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-slate-300"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
                         </div>
                     {% endif %}
 
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent"></div>
                 </div>
 
-                <div class="px-6 pb-6 pt-12 flex-1 relative flex flex-col bg-white">
-                    <div class="absolute -top-10 right-6">
+                <div class="px-5 pb-6 pt-8 flex-1 relative flex flex-col bg-white">
+                    <div class="absolute -top-10 right-5">
                         {% if isletme.logo %}
-                            <img src="{{ isletme.logo.url }}" class="w-20 h-20 rounded-full border-4 border-white bg-white shadow-md object-cover">
+                            <img src="{{ isletme.logo.url }}" class="w-20 h-20 rounded-[1.25rem] border-4 border-white bg-white shadow-xl object-cover transform rotate-3 group-hover:rotate-0 transition-transform duration-300">
                         {% else %}
-                            <div class="w-20 h-20 rounded-full border-4 border-white bg-indigo-600 text-white shadow-md flex items-center justify-center text-3xl font-extrabold">
+                            <div class="w-20 h-20 rounded-[1.25rem] border-4 border-white bg-gradient-to-br from-indigo-500 to-sky-500 text-white shadow-xl flex items-center justify-center text-3xl font-black transform rotate-3 group-hover:rotate-0 transition-transform duration-300">
                                 {{ isletme.name|make_list|first|upper }}
                             </div>
                         {% endif %}
                     </div>
 
                     {% if isletme.category %}
-                        <span class="inline-block px-2.5 py-1 bg-slate-100 text-slate-600 font-bold text-xs rounded-md mb-3 self-start border border-slate-200">{{ isletme.category.name }}</span>
+                        <span class="inline-block text-[10px] font-extrabold text-indigo-600 uppercase tracking-widest mb-1.5">{{ isletme.category.name }}</span>
                     {% endif %}
 
-                    <h5 class="text-xl font-extrabold text-slate-900 mb-2 truncate pr-4">{{ isletme.name }}</h5>
+                    <h5 class="text-xl font-black text-slate-900 mb-2 pr-2 line-clamp-1 group-hover:text-indigo-600 transition-colors">{{ isletme.name }}</h5>
 
-                    <div class="space-y-2 mb-4">
-                        <p class="text-sm font-bold text-indigo-600 flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                            <span>{{ isletme.city|default:"Konum Yok" }} {% if isletme.district %}- {{ isletme.district }}{% endif %}</span>
+                    <div class="flex items-center gap-4 mb-4">
+                        <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                            <span class="truncate max-w-[100px]">{{ isletme.city|default:"Konum Yok" }}</span>
                         </p>
-                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-slate-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                        <p class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             {{ isletme.opening_time|time:"H:i" }} - {{ isletme.closing_time|time:"H:i" }}
-                        </div>
+                        </p>
                     </div>
 
-                    <p class="text-slate-500 text-sm leading-relaxed line-clamp-2 mb-4 flex-1 font-medium">
-                        {{ isletme.description|default:"Bu işletme için açıklama girilmemiş." }}
+                    <p class="text-slate-500 text-sm leading-relaxed line-clamp-2 mb-6 flex-1 font-medium">
+                        {{ isletme.description|default:"Bu işletme için açıklama girilmemiş. Profilini ziyaret ederek daha fazla bilgi edinebilirsiniz." }}
                     </p>
 
-                    <!-- 🔥 YENİ: BAŞLANGIÇ FİYATI PAZARLAMA ETİKETİ 🔥 -->
                     {% if isletme.min_price %}
-                    <div class="flex items-center justify-between mb-5 bg-emerald-50 border border-emerald-100/50 px-3.5 py-2 rounded-xl">
-                        <span class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-wider flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.375c0 .621-.504 1.125-1.125 1.125H2.25m17.25-12.5c.621 0 1.125.504 1.125 1.125V3.75M20.25 12.5h.375c.621 0 1.125.504 1.125 1.125v.375c0 .621-.504 1.125-1.125 1.125H20.25M3.75 19.5h-.375c-.621 0-1.125-.504-1.125-1.125v-.375c0-.621.504-1.125 1.125-1.125H3.75M12 11.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
+                    <div class="flex items-center justify-between mb-5 bg-emerald-50 border border-emerald-100/50 px-3 py-1.5 rounded-lg group-hover:bg-emerald-100/50 transition-colors">
+                        <span class="text-[9px] font-extrabold text-emerald-600 uppercase tracking-wider flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.375c0 .621-.504 1.125-1.125 1.125H2.25m17.25-12.5c.621 0 1.125.504 1.125 1.125V3.75M20.25 12.5h.375c.621 0 1.125.504 1.125 1.125v.375c0 .621-.504 1.125-1.125 1.125H20.25M3.75 19.5h-.375c-.621 0-1.125-.504-1.125-1.125v-.375c0-.621.504-1.125 1.125-1.125H3.75M12 11.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
                             Hizmetler
                         </span>
                         <div class="text-right">
-                            <span class="font-black text-emerald-600 text-lg">{{ isletme.min_price }} ₺</span>
-                            <span class="text-[10px] font-bold text-emerald-500 block -mt-1">'den başlayan</span>
+                            <span class="font-black text-emerald-600 text-base">{{ isletme.min_price }} ₺</span>
+                            <span class="text-[9px] font-bold text-emerald-500 block -mt-1">'den başlayan</span>
                         </div>
                     </div>
                     {% else %}
-                    <!-- Hizmeti olmayan yeni işletmelerde tasarımın çökmemesi için şeffaf yer tutucu -->
-                    <div class="mb-5 h-[52px]"></div>
+                    <div class="mb-5 h-[44px]"></div>
                     {% endif %}
 
-                    <!-- URL BUG FIX & CTA TASARIMI -->
-                    <a href="{% url 'isletme_detay' slug=isletme.slug %}" class="block w-full text-center py-3.5 font-extrabold rounded-xl transition-all duration-300
+                    <a href="{% url 'isletme_detay' slug=isletme.slug %}" class="block w-full text-center py-3.5 text-sm font-bold rounded-xl transition-all duration-300
                         {% if isletme.is_premium %}
-                            bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 hover:shadow-lg hover:shadow-amber-500/30 hover:-translate-y-0.5
+                            bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20
                         {% else %}
-                            bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 hover:border-indigo-600
+                            bg-white text-slate-700 border-2 border-slate-200 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50
                         {% endif %}">
-                        Profili İncele & Randevu Al
+                        Profili ve Takvimi İncele
                     </a>
                 </div>
             </div>
 
             {% empty %}
-            <div class="col-span-full py-20 text-center">
-                <div class="inline-block p-10 bg-white border border-slate-200 border-dashed rounded-3xl shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto mb-4 text-slate-300">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                    <h4 class="text-xl font-bold text-slate-800 mb-2">Buralar henüz çok sessiz...</h4>
-                    <p class="text-slate-500 font-medium">Sistemde aradığınız kriterlere uygun işletme bulunamadı.</p>
+            <div class="col-span-full py-24 text-center reveal-card">
+                <div class="inline-flex flex-col items-center p-12 bg-white border border-slate-200 border-dashed rounded-[3rem] shadow-sm">
+                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-slate-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-black text-slate-800 mb-2">Buralar Henüz Sessiz</h4>
+                    <p class="text-slate-500 font-medium">Aradığınız kriterlere uygun bir işletme bulamadık. Lütfen filtreleri değiştirerek tekrar deneyin.</p>
                 </div>
             </div>
             {% endfor %}
         </div>
 
         {% if page_obj.has_other_pages %}
-        <div class="mt-12 flex justify-center">
-            <nav class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-200">
+        <div class="mt-16 flex justify-center">
+            <nav class="inline-flex items-center gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
                 {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="p-2 text-slate-500 hover:text-indigo-600 transition-colors">
+                    <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     </a>
                 {% endif %}
 
-                <span class="px-4 py-2 text-sm font-bold text-slate-700 bg-slate-50 rounded-xl border border-slate-100">
+                <span class="px-5 py-2 text-sm font-bold text-slate-700 bg-slate-50 rounded-xl border border-slate-100">
                     Sayfa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
                 </span>
 
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="p-2 text-slate-500 hover:text-indigo-600 transition-colors">
+                    <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-50 hover:text-indigo-600 transition-colors">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
                 {% endif %}
@@ -259,6 +296,36 @@
 <script src="{% static 'core/il_ilce.js' %}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+
+        // ==========================================
+        // 🔥 SCROLL REVEAL (AŞAĞI İNDİKÇE BELİRME) 🔥
+        // ==========================================
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1 // Kartın %10'u ekrana girdiğinde tetikle
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Stagger efekti (aynı anda giren kartların arka arkaya açılması için gecikme)
+                    setTimeout(() => {
+                        entry.target.classList.add('active');
+                    }, index * 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-card').forEach((el) => {
+            observer.observe(el);
+        });
+
+
+        // ==========================================
+        // İL-İLÇE SEÇİM MANTIĞI
+        // ==========================================
         const sehirInput = document.getElementById("sehirInput");
         const ilceInput = document.getElementById("ilceInput");
         const sehirDatalist = document.getElementById("sehir-onerileri");
@@ -276,7 +343,7 @@
 
             if (ilceler) {
                 ilceInput.disabled = false;
-                ilceInput.classList.remove("opacity-50", "bg-slate-100");
+                ilceInput.classList.remove("opacity-50");
                 ilceInput.placeholder = "İlçe seçin...";
                 ilceler.forEach(ilce => {
                     let option = document.createElement("option");
@@ -285,7 +352,7 @@
                 });
             } else {
                 ilceInput.disabled = true;
-                ilceInput.classList.add("opacity-50", "bg-slate-100");
+                ilceInput.classList.add("opacity-50");
                 ilceInput.value = "";
                 ilceInput.placeholder = "Önce şehir seçin...";
             }
@@ -298,6 +365,71 @@
         sehirInput.addEventListener("input", function() {
             ilceInput.value = "";
             ilceleriDoldur(this.value.trim());
+        });
+
+        // ==========================================
+        // 🔥 AKILLI CANLI ARAMA MOTORU
+        // ==========================================
+        const aramaInput = document.getElementById('canliAramaInput');
+        const sonucKutusu = document.getElementById('aramaSonuclari');
+        const sonucListesi = document.getElementById('sonucListesi');
+        let aramaTimer;
+
+        function aramaYap(kelime) {
+            clearTimeout(aramaTimer);
+            aramaTimer = setTimeout(() => {
+                fetch(`/businesses/api/canli-arama/?q=${encodeURIComponent(kelime)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        sonucListesi.innerHTML = '';
+
+                        if (data.results.length > 0) {
+                            const baslikLi = document.createElement('li');
+                            baslikLi.className = "px-4 py-2.5 bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-wider";
+                            baslikLi.innerText = data.baslik;
+                            sonucListesi.appendChild(baslikLi);
+
+                            data.results.forEach(isletme => {
+                                const li = document.createElement('li');
+
+                                const logoHtml = isletme.logo_url
+                                    ? `<img src="${isletme.logo_url}" class="w-10 h-10 rounded-xl object-cover shadow-sm border border-slate-100">`
+                                    : `<div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg border border-indigo-100 shadow-inner">${isletme.name.charAt(0).toUpperCase()}</div>`;
+
+                                const rozetHtml = isletme.is_premium
+                                    ? `<span class="ml-2 px-1.5 py-0.5 bg-amber-50 text-amber-500 border border-amber-200 text-[8px] font-black rounded uppercase tracking-wider relative -top-0.5">Premium</span>`
+                                    : '';
+
+                                li.innerHTML = `
+                                    <a href="/businesses/isletme/${isletme.slug}/" class="flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors group cursor-pointer border-b border-slate-50 last:border-0">
+                                        ${logoHtml}
+                                        <div>
+                                            <h6 class="font-bold text-slate-800 text-sm group-hover:text-indigo-600 transition-colors flex items-center">${isletme.name} ${rozetHtml}</h6>
+                                            <p class="text-[10px] font-medium text-slate-400 mt-0.5 flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                                                ${isletme.city || 'Konum Yok'} ${isletme.district ? '/ ' + isletme.district : ''}
+                                            </p>
+                                        </div>
+                                    </a>
+                                `;
+                                sonucListesi.appendChild(li);
+                            });
+
+                            sonucKutusu.classList.remove('invisible', 'opacity-0', 'translate-y-2');
+                        } else {
+                            sonucListesi.innerHTML = `<li class="p-5 text-center text-sm text-slate-500 font-medium">"${kelime}" ile eşleşen işletme bulunamadı.</li>`;
+                            sonucKutusu.classList.remove('invisible', 'opacity-0', 'translate-y-2');
+                        }
+                    });
+            }, 200);
+        }
+
+        aramaInput.addEventListener('focus', function() { aramaYap(this.value.trim()); });
+        aramaInput.addEventListener('input', function() { aramaYap(this.value.trim()); });
+        document.addEventListener('click', function(e) {
+            if (!aramaInput.contains(e.target) && !sonucKutusu.contains(e.target)) {
+                sonucKutusu.classList.add('invisible', 'opacity-0', 'translate-y-2');
+            }
         });
     });
 </script>

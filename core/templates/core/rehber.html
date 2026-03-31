@@ -3,26 +3,44 @@
 {% block title %}Kullanım Rehberi | T-Randevu{% endblock %}
 
 {% block content %}
-<div class="bg-slate-50 min-h-screen pb-20">
-    <div class="bg-slate-900 pt-16 pb-32 border-b border-slate-800 relative">
-        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
-            <div class="inline-block px-4 py-1.5 rounded-full bg-indigo-500/20 text-indigo-300 text-sm font-bold border border-indigo-500/30 mb-6">İşletme Sahipleri İçin</div>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">T-Randevu Başlangıç Rehberi</h1>
-            <p class="text-slate-400 text-lg font-medium leading-relaxed">Sistemi en verimli şekilde kullanmanız için bilmeniz gereken her şeyi adım adım anlattık.</p>
+<div class="bg-slate-50 min-h-screen pb-24 font-sans">
+
+    <div class="bg-slate-950 pt-36 pb-36 border-b border-slate-800 relative overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] animate-blob"></div>
+            <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[80px] animate-blob animation-delay-2000"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10 animate-[fadeSlideUp_0.8s_ease-out_forwards]">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-indigo-200 text-xs font-bold mb-6 backdrop-blur-md shadow-lg shadow-indigo-500/10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+                İşletme Sahipleri İçin
+            </div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight drop-shadow-lg">
+                Başlangıç Rehberi
+            </h1>
+            <p class="text-base md:text-xl text-slate-400 font-medium max-w-2xl mx-auto">
+                Sistemi en verimli şekilde kullanmanız ve dijitalleşmenin keyfini çıkarmanız için bilmeniz gereken her şey.
+            </p>
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto px-4 -mt-20 relative z-20 space-y-8">
-        
-        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-center gap-4 border-b border-slate-100 pb-4 mb-6">
-                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 font-black text-xl rounded-xl flex items-center justify-center">1</div>
-                <h3 class="text-2xl font-bold text-slate-900">Ayarları ve Vitrini Tamamlayın</h3>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 -mt-24 relative z-20 space-y-8">
+
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 p-8 md:p-12 hover:-translate-y-1 transition-all duration-500 hover:shadow-indigo-500/5 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-slate-100 pb-5 mb-6">
+                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 font-black text-2xl rounded-2xl flex items-center justify-center shadow-inner border border-indigo-100/50 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shrink-0">1</div>
+                <h3 class="text-2xl font-black text-slate-900 tracking-tight">Ayarları ve Vitrini Tamamlayın</h3>
             </div>
-            <p class="text-slate-600 mb-4 leading-relaxed flex flex-wrap items-center gap-1.5">
+
+            <p class="text-slate-600 mb-6 leading-relaxed font-medium">
                 Müşterilerinizin sizi bulabilmesi için işletme profilinizin kusursuz olması gerekir. Yönetim panelinizdeki
-                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm mx-1">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -30,122 +48,153 @@
                 </strong>
                 sekmesine gidin:
             </p>
-            <ul class="space-y-3 text-slate-600 font-medium pl-4 border-l-2 border-indigo-200">
-                <li class="flex items-start gap-2">
+
+            <ul class="space-y-4 text-slate-600 font-medium pl-4 border-l-4 border-indigo-100 ml-2">
+                <li class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl">
                     <svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                    <span>İşletme logonuzu ve kapak fotoğrafınızı yükleyin.</span>
+                    <span>İşletme logonuzu ve kapak fotoğrafınızı yükleyerek profesyonel bir görünüm sağlayın.</span>
                 </li>
-                <li class="flex items-start gap-2">
+                <li class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl">
                     <svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                    <span>Açılış ve kapanış saatlerinizi sisteme tanıtın (Sistem randevuları buna göre hesaplar).</span>
+                    <span>Açılış ve kapanış saatlerinizi sisteme tanıtın (Yapay zekamız randevuları buna göre optimize eder).</span>
                 </li>
-                <li class="flex items-start gap-2">
+                <li class="flex items-start gap-3 bg-slate-50 p-3 rounded-xl">
                     <svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                    <span>Kapalı olduğunuz günleri (Örn: Pazar) işaretleyin.</span>
+                    <span>Kapalı olduğunuz günleri (Örn: Pazar) işaretleyerek çakışmaları önleyin.</span>
                 </li>
             </ul>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-center gap-4 border-b border-slate-100 pb-4 mb-6">
-                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 font-black text-xl rounded-xl flex items-center justify-center">2</div>
-                <h3 class="text-2xl font-bold text-slate-900">Ekibinizi (Personelleri) Ekleyin</h3>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 p-8 md:p-12 hover:-translate-y-1 transition-all duration-500 hover:shadow-indigo-500/5 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-slate-100 pb-5 mb-6">
+                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 font-black text-2xl rounded-2xl flex items-center justify-center shadow-inner border border-indigo-100/50 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shrink-0">2</div>
+                <h3 class="text-2xl font-black text-slate-900 tracking-tight">Ekibinizi (Personelleri) Ekleyin</h3>
             </div>
-            <p class="text-slate-600 mb-4 leading-relaxed flex flex-wrap items-center gap-1.5">
+
+            <p class="text-slate-600 mb-6 leading-relaxed font-medium">
                 Hizmetleri verecek olan çalışanlarınızı sisteme tanıtmalısınız. Eğer tek başınıza çalışıyorsanız kendi adınızı ekleyebilirsiniz.
-                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm mx-1">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     Personeller
                 </strong>
                 sayfasına gidin:
             </p>
-            <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-sm font-medium mb-4 flex items-start gap-3">
-                <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+
+            <div class="bg-amber-50 border border-amber-200 text-amber-800 p-5 rounded-2xl text-sm font-medium flex items-start gap-4 shadow-sm">
+                <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                </div>
                 <div>
-                    <strong class="block text-amber-900 mb-1">Önemli:</strong>
-                    Güvenlik sebebiyle eklediğiniz personeller sistem yöneticisi tarafından onaylanana kadar müşterileriniz tarafından seçilemez. (Genellikle birkaç saat içinde onaylanır).
+                    <strong class="block text-amber-900 mb-1">Önemli Güvenlik Bildirimi:</strong>
+                    Platform güvenliği sebebiyle eklediğiniz personeller, sistem yöneticilerimiz tarafından doğrulanana (Mavi Tık alana) kadar müşterileriniz tarafından seçilemez. Bu işlem genellikle birkaç saat içinde tamamlanır.
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-center gap-4 border-b border-slate-100 pb-4 mb-6">
-                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 font-black text-xl rounded-xl flex items-center justify-center">3</div>
-                <h3 class="text-2xl font-bold text-slate-900">Hizmetlerinizi ve Fiyatları Belirleyin</h3>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 p-8 md:p-12 hover:-translate-y-1 transition-all duration-500 hover:shadow-indigo-500/5 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-slate-100 pb-5 mb-6">
+                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 font-black text-2xl rounded-2xl flex items-center justify-center shadow-inner border border-indigo-100/50 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shrink-0">3</div>
+                <h3 class="text-2xl font-black text-slate-900 tracking-tight">Hizmetlerinizi ve Fiyatları Belirleyin</h3>
             </div>
-            <p class="text-slate-600 mb-4 leading-relaxed flex flex-wrap items-center gap-1.5">
+
+            <p class="text-slate-600 mb-6 leading-relaxed font-medium">
                 Müşterilerinizin sizden satın alabileceği hizmetleri (Örn: Saç Kesimi, Online Terapi, Temizlik) oluşturun.
-                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm mx-1">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
                     Hizmetler
                 </strong>
                 paneline girin:
             </p>
-            <ul class="space-y-3 text-slate-600 font-medium pl-4 border-l-2 border-indigo-200">
-                <li class="flex items-start"><span class="text-indigo-600 font-extrabold w-20 shrink-0">Adım A:</span> <span>Hizmet adını ve fiyatını yazın.</span></li>
-                <li class="flex items-start"><span class="text-indigo-600 font-extrabold w-20 shrink-0">Adım B:</span> <span>Bu hizmetin işletmede mi yoksa online mı verileceğini seçin.</span></li>
-                <li class="flex items-start"><span class="text-indigo-600 font-extrabold w-20 shrink-0">Adım C:</span> <span>Bu hizmeti hangi personellerin yapabileceğini işaretleyin (Sistemdeki çakışma zekası bunu baz alır).</span></li>
-                <li class="flex items-start"><span class="text-indigo-600 font-extrabold w-20 shrink-0">Adım D:</span> <span>Hizmetin süresini girin (Sistem randevu saat aralıklarını buna göre otomatik böler).</span></li>
-            </ul>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <span class="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black rounded mb-2 uppercase tracking-wider">Adım A</span>
+                    <p class="text-sm text-slate-700 font-medium">Hizmetin adını ve sistem üzerinden tahsil edilecek ücretini yazın.</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <span class="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black rounded mb-2 uppercase tracking-wider">Adım B</span>
+                    <p class="text-sm text-slate-700 font-medium">Bu hizmetin işletmede mi yoksa online mı verileceğini seçin.</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <span class="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black rounded mb-2 uppercase tracking-wider">Adım C</span>
+                    <p class="text-sm text-slate-700 font-medium">Bu hizmeti yapabilecek personelleri işaretleyin (Çakışma zekası bunu baz alır).</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <span class="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black rounded mb-2 uppercase tracking-wider">Adım D</span>
+                    <p class="text-sm text-slate-700 font-medium">Hizmetin süresini girin (Sistem saat aralıklarını otomatik böler).</p>
+                </div>
+            </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- 🔥 YENİ: HESAP SİLME BİLGİLENDİRMESİ 🔥 -->
-        <!-- ========================================== -->
-        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-rose-100 p-8 hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-center gap-4 border-b border-rose-100 pb-4 mb-6">
-                <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-rose-200/40 border border-rose-100 p-8 md:p-12 hover:-translate-y-1 transition-all duration-500 hover:shadow-rose-500/10 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-rose-500 to-red-600"></div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-rose-100 pb-5 mb-6">
+                <div class="w-14 h-14 bg-rose-50 text-rose-600 font-black rounded-2xl flex items-center justify-center shadow-inner border border-rose-100/50 group-hover:bg-rose-500 group-hover:text-white transition-colors duration-300 shrink-0">
+                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
-                <h3 class="text-2xl font-bold text-slate-900">Hesabınızı Kapatma (Tehlikeli Bölge)</h3>
+                <h3 class="text-2xl font-black text-slate-900 tracking-tight">Hesabınızı Kapatma (Tehlikeli Bölge)</h3>
             </div>
-            <p class="text-slate-600 mb-4 leading-relaxed flex flex-wrap items-center gap-1.5">
+
+            <p class="text-slate-600 mb-6 leading-relaxed font-medium">
                 Kontrol tamamen sizde! Eğer platformumuzdan ayrılmak ve tüm verilerinizi sistemden kalıcı olarak silmek isterseniz,
-                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm mx-1">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     İşletme Ayarları
                 </strong>
-                sayfasının en altına inmeniz yeterlidir. Orada bulunan kırmızı <strong class="text-rose-600">Tehlikeli Bölge</strong> üzerinden bu işlemi yapabilirsiniz.
+                sayfasının en altına inmeniz yeterlidir.
             </p>
-            <div class="bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl text-sm font-medium flex items-start gap-3">
-                <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+
+            <div class="bg-rose-50 border border-rose-200 text-rose-800 p-5 rounded-2xl text-sm font-medium flex items-start gap-4 shadow-sm">
+                <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
                 <div>
-                    <strong class="block text-rose-900 mb-1">Unutmayın! İşlem Geri Alınamaz:</strong>
-                    Hesabınızı sildiğinizde; işletme profiliniz, hizmetleriniz, tüm personel kayıtlarınız, müşterileriniz ve geçmiş/gelecek tüm randevularınız veritabanımızdan <strong>kalıcı olarak</strong> silinir. Bu verileri daha sonra geri getirmek teknik olarak mümkün değildir.
+                    <strong class="block text-rose-900 mb-1">İşlem Geri Alınamaz:</strong>
+                    Hesabınızı sildiğinizde; profiliniz, tüm personel kayıtlarınız, müşterileriniz ve geçmiş/gelecek tüm randevularınız veritabanımızdan <strong>kalıcı olarak</strong> silinir.
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 hover:-translate-y-1 transition-all duration-300">
-            <div class="flex items-center gap-4 border-b border-slate-100 pb-4 mb-6">
-                <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-emerald-200/40 border border-emerald-100 p-8 md:p-12 hover:-translate-y-1 transition-all duration-500 hover:shadow-emerald-500/10 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-emerald-100 pb-5 mb-6">
+                <div class="w-14 h-14 bg-emerald-50 text-emerald-500 font-black rounded-2xl flex items-center justify-center shadow-inner border border-emerald-100/50 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 shrink-0">
+                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.45 15.04 15.04 0 01.06-.312m-2.24 2.39a4.499 4.499 0 00-1.757 4.306 4.499 4.499 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
                     </svg>
                 </div>
-                <h3 class="text-2xl font-bold text-slate-900">Randevu Almaya Başlayın!</h3>
+                <h3 class="text-2xl font-black text-slate-900 tracking-tight">Randevu Almaya Başlayın!</h3>
             </div>
-            <p class="text-slate-600 mb-4 leading-relaxed flex flex-wrap items-center gap-1.5">
+
+            <p class="text-slate-600 mb-6 leading-relaxed font-medium">
                 Tebrikler! İşletmeniz artık T-Randevu platformunda yayında. Panelin sol alt kısmındaki
-                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
-                    "Vitrinimi Gör
-                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>"
+                <strong class="inline-flex items-center gap-1 text-slate-800 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm mx-1">
+                    Vitrinimi Gör
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
                 </strong>
                 butonuna tıklayarak size özel oluşturulan linki kopyalayın.
             </p>
-            <p class="text-slate-600 font-medium">Bu linki Instagram profilinize ekleyebilir veya müşterilerinize WhatsApp'tan gönderebilirsiniz. Onlar 7/24 randevu aldıkça sizin panelinize bildirim düşecektir!</p>
-            
-            <div class="mt-8 text-center">
-                <a href="{% url 'dashboard' %}" class="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-extrabold rounded-2xl shadow-xl hover:bg-slate-800 hover:-translate-y-1 transition-all duration-300">
+            <p class="text-slate-500 text-sm font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">
+                Bu linki Instagram profilinize ekleyebilir veya müşterilerinize WhatsApp'tan gönderebilirsiniz. Onlar 7/24 randevu aldıkça sizin panelinize bildirim düşecektir!
+            </p>
+
+            <div class="mt-10 text-center">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center justify-center px-10 py-4 bg-slate-900 text-white text-sm font-black rounded-2xl shadow-xl hover:bg-emerald-500 hover:shadow-emerald-500/30 hover:-translate-y-1 transition-all duration-300">
                     Panele Geri Dön
                 </a>
             </div>
@@ -153,4 +202,19 @@
 
     </div>
 </div>
+
+<style>
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes blob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(20px, -30px) scale(1.1); }
+        66% { transform: translate(-10px, 10px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-blob { animation: blob 10s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+</style>
 {% endblock %}

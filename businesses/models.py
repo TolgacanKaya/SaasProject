@@ -23,6 +23,7 @@ class Business(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Sektör/Kategori")
     name = models.CharField(max_length=200, verbose_name="İşletme Adı")
     slug = models.SlugField(max_length=200, unique=True, blank=True, verbose_name="İşletme Linki")
+    created_at = models.DateTimeField(default=timezone.now, null=True, blank=True, verbose_name="Kayıt Tarihi")
 
     city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Şehir")
     district = models.CharField(max_length=100, blank=True, null=True, verbose_name="İlçe")
@@ -40,6 +41,13 @@ class Business(models.Model):
     google_access_token = models.TextField(blank=True, null=True, verbose_name="Google Geçici Anahtarı")
     google_refresh_token = models.TextField(blank=True, null=True, verbose_name="Google Kalıcı Yenileme Anahtarı")
     google_token_expiry = models.DateTimeField(blank=True, null=True, verbose_name="Anahtar Son Kullanma Tarihi")
+
+    # ==========================================
+    # 🎵 SPOTIFY ENTEGRASYONU
+    # ==========================================
+    spotify_access_token = models.CharField(max_length=500, blank=True, null=True)
+    spotify_refresh_token = models.CharField(max_length=500, blank=True, null=True)
+    spotify_token_expiry = models.DateTimeField(blank=True, null=True)
 
     theme_color = models.CharField(max_length=7, default="#0d6efd", verbose_name="Tema Rengi (Hex)")
 
@@ -175,3 +183,14 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.business.name} - {self.rating} Yıldız"
+
+# ==========================================
+# İŞLETME VİTRİN GALERİSİ (Maksimum 5 Fotoğraf)
+# ==========================================
+class BusinessImage(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='gallery_images')
+    image = models.ImageField(upload_to='isletme_galeri/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.business.name} - Galeri Görseli"

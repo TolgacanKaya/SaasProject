@@ -17,7 +17,8 @@
                         border: '#27272a',
                         accent: '#eab308',
                         'accent-hover': '#ca8a04',
-                        muted: '#a1a1aa'
+                        muted: '#a1a1aa',
+                        spotify: '#1DB954' /* Spotify Yeşili */
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -49,6 +50,31 @@
         }
         .animate-fade-in { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
+        /* ==========================================
+           🔥 DASHBOARD ÖZEL SIRALI ANİMASYONLAR 🔥
+           ========================================== */
+        @keyframes slideFadeRight {
+            0% { opacity: 0; transform: translateX(-40px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideFadeDown {
+            0% { opacity: 0; transform: translateY(-40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideFadeUpStagger {
+            0% { opacity: 0; transform: translateY(50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .dash-anim-left { animation: slideFadeRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .dash-anim-top { animation: slideFadeDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+        .dash-anim-1 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+        .dash-anim-2 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+        .dash-anim-3 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+        .dash-anim-4 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
+        .dash-anim-5 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both; }
+        .dash-anim-6 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both; }
+
         /* WhatsApp Butonu Dalga Efekti */
         @keyframes pulse-ring {
             0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
@@ -65,7 +91,7 @@
             50% { transform: translateY(-25%); }
         }
         .animate-bounce-3 {
-            animation: jump-three-times 0.8s ease-in-out 3; /* Sadece 3 kere çalışır ve durur */
+            animation: jump-three-times 0.8s ease-in-out 3;
         }
 
         /* Scrollbar Gizleme */
@@ -77,17 +103,45 @@
             scrollbar-width: none;
         }
 
+        /* Spotify Çalıyor Ses Dalgaları */
+        .playing-bar {
+            width: 3px;
+            background-color: #1DB954;
+            animation: sound-bounce 1s infinite alternate ease-in-out;
+        }
+        .playing-bar:nth-child(1) { animation-delay: 0.0s; }
+        .playing-bar:nth-child(2) { animation-delay: 0.2s; height: 80%; }
+        .playing-bar:nth-child(3) { animation-delay: 0.4s; height: 60%; }
+        .playing-bar:nth-child(4) { animation-delay: 0.1s; height: 90%; }
+
+        @keyframes sound-bounce {
+            0% { height: 20%; opacity: 0.6; }
+            100% { height: 100%; opacity: 1; }
+        }
+
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .marquee-text {
+            display: inline-block;
+            animation: marquee 10s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
     </style>
 </head>
 
 <body class="bg-background text-white flex h-screen overflow-hidden font-sans antialiased">
 
-    <aside class="w-[280px] bg-background border-r border-border flex flex-col hidden md:flex z-40 relative h-screen">
+    <aside class="w-[280px] bg-background border-r border-border flex flex-col hidden md:flex z-40 relative h-screen {% if request.resolver_match.url_name == 'dashboard' %}dash-anim-left{% endif %}">
 
-        <!-- ÜST VE MENÜ KISMI (Kaydırılabilir ama scrollbar gizli) -->
         <div class="flex-1 overflow-y-auto hide-scrollbar flex flex-col pt-6 pb-2 px-6">
 
-            <!-- Logo Alanı -->
             <div class="flex items-center gap-3 mb-6 shrink-0">
                 <div class="w-10 h-10 rounded-lg bg-accent text-black flex items-center justify-center font-bold text-xl">
                     {{ isletme.name|make_list|first|upper }}
@@ -98,7 +152,6 @@
                 </div>
             </div>
 
-            <!-- VIP Bilgi Alanı -->
             <div class="mb-5 flex flex-col items-start gap-2 shrink-0">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(234,179,8,0.1)]">
                     👑 VİP İŞLETME
@@ -172,6 +225,82 @@
             </nav>
         </div>
 
+        <!-- ========================================== -->
+        <!-- 🎵 SPOTIFY DJ KABİNİ (SOL ALT KÖŞE) 🎵 -->
+        <!-- ========================================== -->
+        <div class="px-4 py-4 border-t border-border bg-background/95 backdrop-blur shrink-0 relative z-20" id="spotifyPlayerContainer">
+            {% if not isletme.spotify_refresh_token %}
+                <!-- Spotify Bağlı Değilse -->
+                <a href="{% url 'spotify_bagla' %}" class="flex items-center justify-between w-full px-4 py-3 bg-[#1DB954]/10 hover:bg-[#1DB954]/20 border border-[#1DB954]/30 rounded-xl transition-all group">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-[#1DB954] group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.54.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-white leading-tight">Müziği Kontrol Et</span>
+                            <span class="text-[10px] text-[#1DB954] font-medium tracking-wide">Spotify Bağla</span>
+                        </div>
+                    </div>
+                </a>
+            {% else %}
+                <!-- Spotify Bağlıysa (Canlı Veri JavaScript ile Doldurulacak) -->
+                <div class="bg-card border border-border rounded-xl p-3 shadow-lg relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#1DB954]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                    <div class="flex items-center gap-3 relative z-10" id="spotifyNowPlaying">
+                        <!-- Albüm Kapağı -->
+                        <div class="w-10 h-10 rounded-lg bg-slate-800 shrink-0 overflow-hidden relative shadow-md" id="spotifyAlbumCover">
+                            <!-- JS buraya resim koyacak -->
+                            <div class="absolute inset-0 flex items-end justify-center gap-[2px] pb-[6px] opacity-0 transition-opacity" id="spotifyBars">
+                                <div class="playing-bar h-1/2"></div>
+                                <div class="playing-bar h-full"></div>
+                                <div class="playing-bar h-3/4"></div>
+                                <div class="playing-bar h-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Şarkı Bilgisi -->
+                        <div class="flex-1 overflow-hidden min-w-0">
+                            <div class="marquee-container w-full h-5">
+                                <h4 class="text-sm font-bold text-white leading-tight truncate" id="spotifyTrackName">Bağlanıyor...</h4>
+                            </div>
+                            <p class="text-[11px] text-gray-400 truncate" id="spotifyArtistName">Lütfen bekleyin</p>
+                        </div>
+
+                        <div class="flex items-center">
+                            <!-- Çalma Listesi Butonu -->
+                            <div class="relative" id="spotifyPlaylistDropdown">
+                                <button onclick="togglePlaylists()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-[#1DB954] text-gray-400 hover:text-white flex items-center justify-center shrink-0 transition-all border border-slate-700 hover:border-[#1DB954] shadow-sm mr-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                                </button>
+
+                                <div id="playlistMenu" class="absolute bottom-full left-0 mb-2 w-56 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl opacity-0 invisible transform translate-y-2 transition-all duration-200 z-50 overflow-hidden">
+                                    <div class="p-2 border-b border-slate-800 bg-slate-800/50">
+                                        <h4 class="text-xs font-bold text-white text-center">Çalma Listelerim</h4>
+                                    </div>
+                                    <div id="playlistContainer" class="max-h-48 overflow-y-auto hide-scrollbar p-1">
+                                        <div class="text-xs text-center text-slate-500 py-4">Yükleniyor...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Durdur / Başlat Butonu -->
+                            <button onclick="toggleSpotifyPlayPause()" id="spotifyPlayPauseBtn" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-[#1DB954] text-gray-400 hover:text-white flex items-center justify-center shrink-0 transition-all border border-slate-700 hover:border-[#1DB954] shadow-sm mr-1" data-playing="false">
+                                <!-- Çal İkonu (Başlangıçta Gizli) -->
+                                <svg class="w-4 h-4" id="playIcon" fill="currentColor" viewBox="0 0 24 24" style="display:none;"><path d="M8 5v14l11-7z"/></svg>
+                                <!-- Durdur İkonu (Başlangıçta Görünür) -->
+                                <svg class="w-4 h-4" id="pauseIcon" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+
+                            <!-- İleri Sar Butonu -->
+                            <button onclick="skipSpotifyTrack()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-[#1DB954] text-gray-400 hover:text-white flex items-center justify-center shrink-0 transition-all border border-slate-700 hover:border-[#1DB954] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1DB954]/50">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <!-- ========================================== -->
+
         <!-- ALT KISIM (Sabit) -->
         <div class="p-6 pt-4 border-t border-border bg-background shrink-0 z-10">
             <a href="{% url 'isletme_detay' slug=isletme.slug %}" target="_blank" class="flex items-center justify-between px-4 py-3 mb-4 rounded-xl border border-accent/50 text-accent hover:bg-accent hover:text-black transition-all duration-300 font-bold shadow-[0_0_15px_rgba(234,179,8,0.15)] hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] group">
@@ -190,122 +319,115 @@
     </aside>
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
-        <header class="h-20 border-b border-border bg-background/80 backdrop-blur-md flex items-center justify-between px-8 z-30 relative">
-            <h2 class="text-xl font-semibold tracking-tight text-white">{% block page_title %}Genel Bakış{% endblock %}</h2>
+    <header class="h-20 border-b border-border bg-background/80 backdrop-blur-md flex items-center justify-between px-8 z-30 relative {% if request.resolver_match.url_name == 'dashboard' %}dash-anim-top{% endif %}">
+        <h2 class="text-xl font-semibold tracking-tight text-white">{% block page_title %}Genel Bakış{% endblock %}</h2>
 
-            <div class="flex items-center gap-6">
+        <div class="flex items-center gap-6">
 
-                <div class="relative" id="notificationDropdown">
-                    <button onclick="toggleNotifications()" class="relative text-gray-400 hover:text-white transition-colors focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+            <div class="relative" id="notificationDropdown">
+                <button onclick="toggleNotifications()" class="relative text-gray-400 hover:text-white transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
 
-                        <span id="notificationBadge" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background hidden animate-pulse"></span>
-                    </button>
+                    <span id="notificationBadge" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background hidden animate-pulse"></span>
+                </button>
 
-                    <div id="notificationMenu" class="absolute right-0 mt-4 w-[350px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible transform scale-95 transition-all duration-200 z-50 overflow-hidden">
+                <div id="notificationMenu" class="absolute right-0 mt-4 w-[350px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible transform scale-95 transition-all duration-200 z-50 overflow-hidden">
 
-                        <!-- YENİ: Başlık ve Okundu Say Butonu -->
-                        <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
-                            <h3 class="font-bold text-white flex items-center gap-2">🔔 Bildirimler</h3>
-                            <button onclick="markAllAsRead()" class="text-[10px] text-indigo-400 hover:text-white font-bold px-2.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/40 rounded-lg transition-colors border border-indigo-500/20">
-                                Tümünü Okundu Say ✔
-                            </button>
+                    <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
+                        <h3 class="font-bold text-white flex items-center gap-2">🔔 Bildirimler</h3>
+                        <button onclick="markAllAsRead()" class="text-[10px] text-indigo-400 hover:text-white font-bold px-2.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/40 rounded-lg transition-colors border border-indigo-500/20">
+                            Tümünü Okundu Say ✔
+                        </button>
+                    </div>
+
+                    <div class="p-2 max-h-[350px] overflow-y-auto hide-scrollbar flex flex-col gap-1.5" id="notificationList">
+
+                        <div class="p-6 text-center text-sm text-slate-500" id="emptyNotification">
+                            Şu an yeni bildiriminiz yok. 🎉
                         </div>
 
-                        <!-- GÜNCELLEME UYGULANAN KISIM -->
-                        <div class="p-2 max-h-[350px] overflow-y-auto hide-scrollbar flex flex-col gap-1.5" id="notificationList">
+                        {% for randevu in isletme.appointments.all|dictsortreversed:"id"|slice:":5" %}
+                            <a href="{% url 'isletme_randevular' %}" data-notif-id="randevu_{{ randevu.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-indigo-500/30">
+                                    📅
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-indigo-300 transition-colors">Yeni Randevu Oluşturuldu!</h4>
+                                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                                        <strong class="text-indigo-400">{{ randevu.customer.first_name|default:"Müşteri" }} {{ randevu.customer.last_name|default:"" }}</strong> adlı kişi randevu oluşturdu.
+                                    </p>
+                                    <span class="text-[10px] text-slate-500 mt-1 block">Tarih: {{ randevu.date_time|date:"d M Y - H:i" }}</span>
+                                </div>
+                            </a>
+                        {% endfor %}
 
-                            <div class="p-6 text-center text-sm text-slate-500" id="emptyNotification">
-                                Şu an yeni bildiriminiz yok. 🎉
-                            </div>
+                        {% for personel in isletme.staff_members.all|dictsortreversed:"id"|slice:":3" %}
+                            {% if personel.is_approved %}
+                            <a href="{% url 'isletme_personeller' %}" data-notif-id="personel_{{ personel.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-emerald-500/30">
+                                    ✅
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-emerald-300 transition-colors">Personel Onaylandı</h4>
+                                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                                        <strong class="text-emerald-400">{{ personel.name }}</strong> adlı uzmanınız sistem tarafından onaylandı.
+                                    </p>
+                                </div>
+                            </a>
+                            {% endif %}
+                        {% endfor %}
 
-                            <!-- 1. DİNAMİK RANDEVU BİLDİRİMLERİ (Kesin Çözüm: appointments) -->
-                            {% for randevu in isletme.appointments.all|dictsortreversed:"id"|slice:":5" %}
-                                <a href="{% url 'isletme_randevular' %}" data-notif-id="randevu_{{ randevu.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
-                                    <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-indigo-500/30">
-                                        📅
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-indigo-300 transition-colors">Yeni Randevu Oluşturuldu!</h4>
-                                        <p class="text-[11px] text-slate-300 leading-relaxed">
-                                            <strong class="text-indigo-400">{{ randevu.customer.first_name|default:"Müşteri" }} {{ randevu.customer.last_name|default:"" }}</strong> adlı kişi randevu oluşturdu.
-                                        </p>
-                                        <span class="text-[10px] text-slate-500 mt-1 block">Tarih: {{ randevu.date_time|date:"d M Y - H:i" }}</span>
-                                    </div>
-                                </a>
-                            {% endfor %}
-
-                            <!-- 2. DİNAMİK PERSONEL BİLDİRİMLERİ (Doğru Anahtar: staff_members) -->
-                            {% for personel in isletme.staff_members.all|dictsortreversed:"id"|slice:":3" %}
-                                {% if personel.is_approved %}
-                                <a href="{% url 'isletme_personeller' %}" data-notif-id="personel_{{ personel.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
-                                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-emerald-500/30">
-                                        ✅
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-emerald-300 transition-colors">Personel Onaylandı</h4>
-                                        <p class="text-[11px] text-slate-300 leading-relaxed">
-                                            <strong class="text-emerald-400">{{ personel.name }}</strong> adlı uzmanınız sistem tarafından onaylandı.
-                                        </p>
-                                    </div>
-                                </a>
-                                {% endif %}
-                            {% endfor %}
-
-                        </div>
                     </div>
-                </div>
-
-                <div class="h-8 w-px bg-border"></div>
-
-                <div class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-9 h-9 rounded-full bg-accent text-black flex items-center justify-center font-bold">
-                        {{ isletme.name|make_list|first|upper }}
-                    </div>
-                    <div class="hidden sm:block text-right">
-                        <div class="text-sm font-semibold text-white group-hover:text-accent transition-colors">{{ isletme.name }}</div>
-                        <div class="text-xs text-gray-400">Premium Plan</div>
-                    </div>
-                    <a href="{% url 'cikis' %}" class="ml-2 text-gray-500 hover:text-red-400 transition-colors" title="Çıkış Yap">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                    </a>
                 </div>
             </div>
-        </header>
 
-        <div class="flex-1 overflow-y-auto p-8 animate-fade-in relative z-20">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="mb-6 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-accent text-sm font-medium flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+            <div class="h-8 w-px bg-border"></div>
 
-            {% block content %}{% endblock %}
+            <div class="flex items-center gap-3 cursor-pointer group">
+                <div class="w-9 h-9 rounded-full bg-accent text-black flex items-center justify-center font-bold">
+                    {{ isletme.name|make_list|first|upper }}
+                </div>
+                <div class="hidden sm:block text-right">
+                    <div class="text-sm font-semibold text-white group-hover:text-accent transition-colors">{{ isletme.name }}</div>
+                    <div class="text-xs text-gray-400">Premium Plan</div>
+                </div>
+                <a href="{% url 'cikis' %}" class="ml-2 text-gray-500 hover:text-red-400 transition-colors" title="Çıkış Yap">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                </a>
+            </div>
         </div>
+    </header>
 
-        <!-- YENİ: PREMIUM WHATSAPP DESTEK BUTONU (GARANTİLİ API LİNKİ) -->
-        <a href="https://api.whatsapp.com/send?phone=905068556816&text=Merhaba%20T-Randevu%20Destek%20Ekibi,%20{{ isletme.name|urlencode }}%20işletmesi%20olarak%20VIP%20desteğe%20ihtiyacım%20var."
-           target="_blank"
-           rel="noopener noreferrer"
-           class="fixed bottom-8 right-8 z-[9999] flex items-center justify-center w-14 h-14 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all duration-300 wa-pulse group"
-           title="T-Randevu VIP Destek Hattı">
+        <div class="flex-1 overflow-y-auto p-8 {% if request.resolver_match.url_name != 'dashboard' %}animate-fade-in{% endif %} relative z-20">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-accent text-sm font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-            <!-- WhatsApp İkonu -->
-            <svg class="w-8 h-8 relative z-10" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
-            </svg>
+        {% block content %}{% endblock %}
+    </div>
 
-            <!-- Hover Anında Çıkan Mesaj -->
-            <span class="absolute right-16 px-4 py-2 bg-slate-800 text-white text-sm font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-xl border border-slate-700">
-                VIP Canlı Destek
-                <div class="absolute w-2 h-2 bg-slate-800 border-r border-b border-slate-700 transform rotate-45 top-1/2 -mt-1 -right-1"></div>
-            </span>
-        </a>
+    <a href="https://api.whatsapp.com/send?phone=905068556816&text=Merhaba%20T-Randevu%20Destek%20Ekibi,%20{{ isletme.name|urlencode }}%20işletmesi%20olarak%20VIP%20desteğe%20ihtiyacım%20var."
+       target="_blank"
+       rel="noopener noreferrer"
+       class="fixed bottom-8 right-8 z-[9999] flex items-center justify-center w-14 h-14 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all duration-300 wa-pulse group"
+       title="T-Randevu VIP Destek Hattı">
 
-    </main>
+        <svg class="w-8 h-8 relative z-10" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+        </svg>
+
+        <span class="absolute right-16 px-4 py-2 bg-slate-800 text-white text-sm font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-xl border border-slate-700">
+            VIP Canlı Destek
+            <div class="absolute w-2 h-2 bg-slate-800 border-r border-b border-slate-700 transform rotate-45 top-1/2 -mt-1 -right-1"></div>
+        </span>
+    </a>
+
+</main>
 
     {% block extra_js %}{% endblock %}
 
@@ -478,6 +600,158 @@
             // Hayalet Sistemi Başlat (Her 15 saniyede bir sessizce güncelle)
             setInterval(checkRealTimeNotifications, 15000);
         });
+
+        // ==========================================
+        // 🎵 SPOTIFY CANLI VERİ (AJAX) 🎵
+        // ==========================================
+        {% if isletme.spotify_access_token %}
+        function updateSpotifyPlayer() {
+            fetch('{% url "spotify_current_track" %}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'playing') {
+                        document.getElementById('spotifyTrackName').innerText = data.track_name;
+                        document.getElementById('spotifyArtistName').innerText = data.artist_name;
+
+                        const coverDiv = document.getElementById('spotifyAlbumCover');
+                        coverDiv.style.backgroundImage = `url(${data.album_cover})`;
+                        coverDiv.style.backgroundSize = 'cover';
+                        coverDiv.style.backgroundPosition = 'center';
+
+                        if (data.is_playing) {
+                            document.getElementById('spotifyBars').style.opacity = '1';
+                            document.getElementById('spotifyPlayPauseBtn').setAttribute('data-playing', 'true');
+                            document.getElementById('playIcon').style.display = 'none';
+                            document.getElementById('pauseIcon').style.display = 'block';
+                        } else {
+                            document.getElementById('spotifyBars').style.opacity = '0';
+                            document.getElementById('spotifyPlayPauseBtn').setAttribute('data-playing', 'false');
+                            document.getElementById('playIcon').style.display = 'block';
+                            document.getElementById('pauseIcon').style.display = 'none';
+                        }
+                    } else {
+                        document.getElementById('spotifyTrackName').innerText = 'Müzik Çalmıyor';
+                        document.getElementById('spotifyArtistName').innerText = 'Spotify açıp oynatın';
+                        document.getElementById('spotifyBars').style.opacity = '0';
+                        document.getElementById('spotifyAlbumCover').style.backgroundImage = 'none';
+                    }
+                })
+                .catch(error => console.error('Spotify güncellenemedi:', error));
+        }
+
+        function skipSpotifyTrack() {
+            // Tıklanınca bekleme hissi vermemek için butona basılma efekti yapabiliriz
+            document.getElementById('spotifyTrackName').innerText = 'Geçiliyor...';
+
+            fetch('{% url "spotify_skip_track" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Şarkı atlandı, yeni şarkıyı çekmek için 1 saniye bekle
+                    setTimeout(updateSpotifyPlayer, 1000);
+                }
+            });
+        }
+
+        // YENİ: Playlist Menüsünü Aç/Kapat ve Listeleri Çek
+        function togglePlaylists() {
+            const menu = document.getElementById('playlistMenu');
+            menu.classList.toggle('invisible');
+            menu.classList.toggle('opacity-0');
+            menu.classList.toggle('translate-y-2');
+
+            if (!menu.classList.contains('invisible') && document.getElementById('playlistContainer').innerHTML.includes('Yükleniyor')) {
+                // Menü ilk açıldığında listeleri API'den çek
+                fetch('{% url "spotify_get_playlists" %}')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            let html = '';
+                            data.playlists.forEach(p => {
+                                html += `
+                                <button onclick="playPlaylist('${p.uri}')" class="w-full flex items-center gap-2 p-2 hover:bg-slate-800 rounded-lg transition-colors text-left group">
+                                    <img src="${p.image || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded bg-slate-800 object-cover shrink-0">
+                                    <span class="text-xs text-slate-300 group-hover:text-white truncate">${p.name}</span>
+                                </button>`;
+                            });
+                            document.getElementById('playlistContainer').innerHTML = html || '<div class="text-xs text-center py-2 text-slate-500">Liste bulunamadı</div>';
+                        }
+                    });
+            }
+        }
+
+        // YENİ: Tıklanan Listeyi Spotify'da Çalmaya Başlat
+        function playPlaylist(uri) {
+            document.getElementById('spotifyTrackName').innerText = 'Liste başlatılıyor...';
+            togglePlaylists(); // Menüyü kapat
+
+            fetch('{% url "spotify_play_playlist" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ uri: uri })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'no_device') {
+                    alert(data.message); // Cihaz kapalıysa uyar
+                } else {
+                    setTimeout(updateSpotifyPlayer, 1500); // 1.5 saniye sonra ekranı güncelle
+                }
+            });
+        }
+
+        // Her 8 saniyede bir şarkıyı arka planda sessizce kontrol et
+        setInterval(updateSpotifyPlayer, 8000);
+        // Sayfa ilk yüklendiğinde anında kontrol et
+        updateSpotifyPlayer();
+        {% endif %}
+
+        // YENİ: Müziği Durdur veya Başlat
+        function toggleSpotifyPlayPause() {
+            const btn = document.getElementById('spotifyPlayPauseBtn');
+            const isPlaying = btn.getAttribute('data-playing') === 'true';
+            const action = isPlaying ? 'pause' : 'play';
+
+            // Kullanıcıya bekleme hissi vermemek için ikonu ve dalgaları anında değiştir
+            if (action === 'pause') {
+                document.getElementById('spotifyBars').style.opacity = '0';
+                btn.setAttribute('data-playing', 'false');
+                document.getElementById('playIcon').style.display = 'block';
+                document.getElementById('pauseIcon').style.display = 'none';
+            } else {
+                document.getElementById('spotifyBars').style.opacity = '1';
+                btn.setAttribute('data-playing', 'true');
+                document.getElementById('playIcon').style.display = 'none';
+                document.getElementById('pauseIcon').style.display = 'block';
+            }
+
+            // Spotify'a komutu gönder
+            fetch('{% url "spotify_toggle_playback" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: action })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'no_device') {
+                    alert(data.message);
+                    updateSpotifyPlayer(); // Hata varsa eski haline döndür
+                }
+            });
+        }
+
     </script>
 </body>
 </html>
