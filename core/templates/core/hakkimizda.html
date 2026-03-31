@@ -1,92 +1,147 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Hakkımızda | T-Randevu{% endblock %}
 
 {% block content %}
-<div class="bg-slate-50 min-h-screen pb-20">
-    <!-- HERO BÖLÜMÜ -->
-    <div class="bg-slate-900 pt-16 pb-32 border-b border-slate-800 relative overflow-hidden">
-        <!-- Arka Plan Işıkları -->
+<div class="bg-slate-50 min-h-screen pb-24 font-sans">
+    <div class="bg-slate-950 pt-36 pb-36 border-b border-slate-800 relative overflow-hidden">
+
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] animate-pulse"></div>
+            <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] animate-blob"></div>
+            <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[80px] animate-blob animation-delay-2000"></div>
         </div>
 
-        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-sm font-bold mb-6 backdrop-blur-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-indigo-400">
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10 animate-[fadeSlideUp_0.8s_ease-out_forwards]">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-indigo-200 text-xs font-bold mb-6 backdrop-blur-md shadow-lg shadow-indigo-500/10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
                 </svg>
                 Hikayemiz
             </div>
-            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight drop-shadow-sm">Biz Kimiz?</h1>
-            <p class="text-slate-400 text-lg md:text-xl font-medium leading-relaxed max-w-3xl mx-auto">T-Randevu, hizmet veren işletmeler ile müşterileri en hızlı, adil ve modern şekilde buluşturan yeni nesil bir SaaS platformudur.</p>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight drop-shadow-lg">
+                Biz Kimiz?
+            </h1>
+            <p class="text-base md:text-xl text-slate-400 font-medium leading-relaxed max-w-3xl mx-auto">
+                T-Randevu, hizmet veren işletmeler ile müşterileri en hızlı, adil ve modern şekilde buluşturan yeni nesil bir SaaS platformudur.
+            </p>
         </div>
     </div>
 
-    <!-- ANA İÇERİK KARTI -->
-    <div class="max-w-5xl mx-auto px-4 -mt-20 relative z-20">
-        <div class="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 p-8 md:p-12 mb-10 transition-all duration-300 relative overflow-hidden group">
-            <!-- Kart İçi Zarif Işık Hüzmesi -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 -mt-24 relative z-20">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 p-8 md:p-14 mb-10 transition-all duration-500 relative overflow-hidden group hover:shadow-indigo-500/5">
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors duration-700 pointer-events-none"></div>
 
-            <!-- Misyonumuz -->
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-blue-500 to-sky-400"></div>
+
             <div class="relative z-10 mb-16">
-                <h3 class="text-2xl font-extrabold text-slate-900 mb-6 border-b border-slate-100 pb-4 flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6 text-indigo-600">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" />
-                    </svg>
+                <h3 class="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100/50 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" />
+                        </svg>
+                    </div>
                     Misyonumuz
                 </h3>
-                <p class="text-slate-600 leading-relaxed font-medium text-lg">
+                <p class="text-slate-600 leading-relaxed font-medium text-lg pl-14">
                     Küçük ve orta ölçekli işletmelerin dijitalleşmesini sağlamak, onları eski usul defter-kalem randevu takibinden kurtarıp <strong class="text-indigo-600">profesyonel bir vitrine</strong> kavuşturmaktır. Müşteriler için ise; en iyi hizmeti saniyeler içinde bulup, <strong class="text-slate-800">7/24 randevu</strong> alabilecekleri güvenilir bir köprü olmaktır.
                 </p>
             </div>
 
-            <!-- Neden T-Randevu? -->
             <div class="relative z-10">
-                <h3 class="text-2xl font-extrabold text-slate-900 mb-6 border-b border-slate-100 pb-4 flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6 text-emerald-500">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-                    </svg>
+                <h3 class="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100/50 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                        </svg>
+                    </div>
                     Neden T-Randevu?
                 </h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                    <!-- Kutu 1 -->
-                    <div class="bg-indigo-50/50 p-8 rounded-2xl border border-indigo-100 hover:bg-indigo-50 hover:border-indigo-200 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group/card">
-                        <div class="w-14 h-14 bg-white rounded-xl shadow-sm border border-indigo-100 flex items-center justify-center text-indigo-600 mb-5 group-hover/card:scale-110 group-hover/card:bg-indigo-600 group-hover/card:text-white transition-all duration-300">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-indigo-50/50 p-8 rounded-[2rem] border border-indigo-100 hover:bg-indigo-50 hover:border-indigo-200 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group/card">
+                        <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-indigo-100 flex items-center justify-center text-indigo-600 mb-6 group-hover/card:scale-110 group-hover/card:bg-indigo-600 group-hover/card:text-white transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                             </svg>
                         </div>
-                        <h5 class="text-xl font-extrabold text-slate-900 mb-2">Hızlı ve Kesintisiz</h5>
-                        <p class="text-sm text-slate-500 font-medium leading-relaxed">Gelişmiş bulut altyapımızla randevularınız hiçbir zaman kaybolmaz, sistem asla yavaşlamaz.</p>
+                        <h5 class="text-xl font-black text-slate-900 mb-3">Hızlı ve Kesintisiz</h5>
+                        <p class="text-sm text-slate-500 font-medium leading-relaxed">
+                            Gelişmiş bulut altyapımızla randevularınız hiçbir zaman kaybolmaz, sistem asla yavaşlamaz.
+                        </p>
                     </div>
 
-                    <!-- Kutu 2 -->
-                    <div class="bg-emerald-50/50 p-8 rounded-2xl border border-emerald-100 hover:bg-emerald-50 hover:border-emerald-200 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group/card">
-                        <div class="w-14 h-14 bg-white rounded-xl shadow-sm border border-emerald-100 flex items-center justify-center text-emerald-600 mb-5 group-hover/card:scale-110 group-hover/card:bg-emerald-600 group-hover/card:text-white transition-all duration-300">
+                    <div class="bg-emerald-50/50 p-8 rounded-[2rem] border border-emerald-100 hover:bg-emerald-50 hover:border-emerald-200 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group/card">
+                        <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-emerald-100 flex items-center justify-center text-emerald-600 mb-6 group-hover/card:scale-110 group-hover/card:bg-emerald-600 group-hover/card:text-white transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.312 3 .52M6.75 4.97C5.74 5.113 4.74 5.282 3.75 5.49m15 0a48.536 48.536 0 00-15 0m15 0v11.251c0 1.053-.872 1.942-1.921 2.106a48.175 48.175 0 01-10.658 0c-1.05-.164-1.921-1.053-1.921-2.106V5.49" />
                             </svg>
                         </div>
-                        <h5 class="text-xl font-extrabold text-slate-900 mb-2">Adil Sıralama</h5>
-                        <p class="text-sm text-slate-500 font-medium leading-relaxed">Sadece parayı veren değil, işini en iyi yapan kaliteli işletmeler de üst sıralarda yer alır.</p>
+                        <h5 class="text-xl font-black text-slate-900 mb-3">Adil Sıralama</h5>
+                        <p class="text-sm text-slate-500 font-medium leading-relaxed">
+                            Sadece parayı veren değil, işini en iyi yapan kaliteli işletmeler de üst sıralarda yer alır.
+                        </p>
                     </div>
 
-                    <!-- Kutu 3 -->
-                    <div class="bg-amber-50/50 p-8 rounded-2xl border border-amber-100 hover:bg-amber-50 hover:border-amber-200 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group/card">
-                        <div class="w-14 h-14 bg-white rounded-xl shadow-sm border border-amber-100 flex items-center justify-center text-amber-600 mb-5 group-hover/card:scale-110 group-hover/card:bg-amber-500 group-hover/card:text-white transition-all duration-300">
+                    <div class="bg-amber-50/50 p-8 rounded-[2rem] border border-amber-100 hover:bg-amber-50 hover:border-amber-200 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group/card">
+                        <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-amber-100 flex items-center justify-center text-amber-600 mb-6 group-hover/card:scale-110 group-hover/card:bg-amber-500 group-hover/card:text-white transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25l4.1-4.1a1.125 1.125 0 011.59 0l2.1 2.1a1.125 1.125 0 010 1.59l-4.04 4.04zm11.85-5.15a1.125 1.125 0 00-1.59 0l-2.1-2.1a1.125 1.125 0 000-1.59l4.1-4.1a3.75 3.75 0 015.304 0l.5.5a3.75 3.75 0 010 5.304l-4.1 4.1zm-8.5-8.5l2.1 2.1" />
                             </svg>
                         </div>
-                        <h5 class="text-xl font-extrabold text-slate-900 mb-2">Özel Markalaşma</h5>
-                        <p class="text-sm text-slate-500 font-medium leading-relaxed">Markanızı T-Randevu ile büyüterek daha geniş kitlelere yelken açın ve vitrininizi oluşturun.</p>
+                        <h5 class="text-xl font-black text-slate-900 mb-3">Özel Markalaşma</h5>
+                        <p class="text-sm text-slate-500 font-medium leading-relaxed">
+                            Markanızı T-Randevu ile büyüterek daha geniş kitlelere yelken açın ve vitrininizi oluşturun.
+                        </p>
                     </div>
                 </div>
             </div>
+
+            <div class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 p-8 bg-slate-50 border border-slate-100 rounded-[2rem]">
+
+                <div class="flex -space-x-4">
+                    {% if vip_isletmeler %}
+                        {% for vip in vip_isletmeler %}
+                            {% if vip.logo %}
+                                <img class="w-14 h-14 rounded-full border-4 border-white object-cover shadow-md hover:scale-110 hover:z-10 transition-transform cursor-pointer" src="{{ vip.logo.url }}" alt="{{ vip.name }}" title="{{ vip.name }}">
+                            {% else %}
+                                <div class="w-14 h-14 rounded-full border-4 border-white bg-gradient-to-br from-indigo-500 to-sky-500 text-white shadow-md flex items-center justify-center text-lg font-black hover:scale-110 hover:z-10 transition-transform cursor-pointer" title="{{ vip.name }}">
+                                    {{ vip.name|make_list|first|upper }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img class="w-14 h-14 rounded-full border-4 border-white object-cover shadow-sm" src="https://i.pravatar.cc/150?img=11" alt="İşletme">
+                        <img class="w-14 h-14 rounded-full border-4 border-white object-cover shadow-sm" src="https://i.pravatar.cc/150?img=32" alt="İşletme">
+                        <img class="w-14 h-14 rounded-full border-4 border-white object-cover shadow-sm" src="https://i.pravatar.cc/150?img=12" alt="İşletme">
+                    {% endif %}
+                </div>
+
+                <div class="text-center sm:text-left">
+                    <h4 class="text-slate-900 font-black text-lg">Aramıza Katılın</h4>
+                    <p class="text-slate-500 text-sm font-medium mt-1">Yüzlerce elit işletmenin arasına adınızı yazdırın.</p>
+                </div>
+                <a href="{% url 'kayit' %}" class="px-7 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-500/25 sm:ml-auto w-full sm:w-auto text-center transform active:scale-95">
+                    İşletme Ekle
+                </a>
+            </div>
+
         </div>
     </div>
 </div>
+
+<style>
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes blob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(20px, -30px) scale(1.1); }
+        66% { transform: translate(-10px, 10px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-blob { animation: blob 10s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+</style>
 {% endblock %}

@@ -18,7 +18,7 @@ from django.utils.dateparse import parse_datetime
 from businesses.models import Category
 from django.core.paginator import Paginator
 from appointments.models import Appointment
-from .models import Business, Customer, Service, Review, Staff, Coupon  # YENİLER EKLENDİ
+from .models import Business, Customer, Service, Review, Staff, Coupon, BusinessImage  # YENİLER EKLENDİ
 from django.db.models import Avg, Sum, Count
 from .tasks import send_review_email_task
 from django.views.decorators.cache import never_cache
@@ -26,7 +26,11 @@ from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-
+import requests
+import urllib.parse
+import string
+import random
+import base64
 
 def isletme_detay(request, slug):
     isletme = get_object_or_404(Business, slug=slug)
@@ -34,12 +38,22 @@ def isletme_detay(request, slug):
 
     # HTML'e tüm personeli gönderiyoruz (Gizlemiyoruz, orada soluk göstereceğiz)
     personeller = isletme.staff_members.all()
+    aktif_personeller = personeller.filter(is_active=True, is_approved=True)
 
     if request.method == "POST":
         if not isletme.is_premium:
-            mevcut_randevu_sayisi = isletme.appointments.count()
+            su_an = timezone.now()
+
+            # YENİ: Sadece bu ayki ve İPTAL EDİLMEMİŞ (Aktif/Tamamlanmış) randevuları say!
+            mevcut_randevu_sayisi = isletme.appointments.filter(
+                date_time__year=su_an.year,
+                date_time__month=su_an.month,
+                status__in=['pending', 'approved', 'confirmed', 'completed']
+            ).count()
+
             if mevcut_randevu_sayisi >= 20:
-                messages.error(request, "❌ Üzgünüz, bu işletme aylık ücretsiz randevu kotasını doldurmuştur.")
+                messages.error(request,
+                               "❌ Üzgünüz, bu işletme aylık ücretsiz randevu kotasını doldurmuştur. Sınırları kaldırmak için Premium'a geçebilirsiniz!")
                 return redirect("isletme_detay", slug=slug)
 
         service_id = request.POST.get("service_id")
@@ -216,12 +230,12 @@ def isletme_detay(request, slug):
         {
             "isletme": isletme,
             "hizmetler": hizmetler,
-            "personeller": personeller,  # Tüm personeller HTML'e gönderildi
+            "personeller": personeller,
+            "aktif_personeller": aktif_personeller,
             "yorumlar": yorumlar,
             "ortalama_puan": round(ortalama_puan, 1),
         },
     )
-
 
 # ==========================================
 # 1. RANDEVU ÖZETİ VE İYZİCO FORM OLUŞTURMA
@@ -344,40 +358,38 @@ def randevu_odeme_sonuc(request, randevu_id):
 
         if result_data.get('paymentStatus') == 'SUCCESS':
             randevu.is_paid = True
-
-            # ==========================================
-            # YENİ MANTIK: Otomatik onaylama, patronun onayına sun! (PENDING)
-            # ==========================================
             randevu.status = 'pending'
-
             randevu.iyzico_transaction_id = result_data.get('paymentId')
 
+            # KUPON KONTROLÜ SADECE 1 KEZ YAPILMALI
             if randevu.coupon_used:
                 randevu.coupon_used.times_used += 1
                 randevu.coupon_used.save()
 
             randevu.save()
 
-            if randevu.coupon_used:
-                randevu.coupon_used.times_used += 1
-                randevu.coupon_used.save()
-
-            randevu.save()  # <-- MEVCUT KOD BURADA
-
             # ==========================================
-            # 🔥 SİHİRLİ DOKUNUŞ: GOOGLE TAKVİME GÖNDER!
+            # 🔥 SİHİRLİ DOKUNUŞ: DEĞERLENDİRME MAİLİ GÖNDER!
             # ==========================================
-
-
             if randevu.customer.email:
-                send_review_email_task.apply_async(args=[randevu.id, request.get_host()], countdown=10)
+                sure_tipi = randevu.service.duration_type
+                sure_degeri = randevu.service.duration or 0
 
-            if randevu.customer.email:
-                send_review_email_task.apply_async(args=[randevu.id, request.get_host()], countdown=10)
+                # Mailin ne zaman atılacağını hesaplıyoruz
+                if sure_tipi == 'minutes':
+                    mail_gonderim_zamani = randevu.date_time + timedelta(minutes=sure_degeri)
+                elif sure_tipi == 'hours':
+                    mail_gonderim_zamani = randevu.date_time + timedelta(hours=sure_degeri)
+                else:
+                    mail_gonderim_zamani = randevu.date_time + timedelta(hours=1)
 
-            # YENİ MESAJ
-            messages.success(request,
-                             "✅ Ödemeniz başarıyla alındı. İşletme tarafından onaylanmak üzere randevu talebiniz iletilmiştir.")
+                # countdown yerine "eta" kullanarak tam o dakikada çalışmasını sağlıyoruz
+                send_review_email_task.apply_async(
+                    args=[randevu.id, request.get_host()],
+                    eta=mail_gonderim_zamani
+                )
+
+            messages.success(request, "✅ Ödemeniz başarıyla alındı. İşletme tarafından onaylanmak üzere randevu talebiniz iletilmiştir.")
         else:
             messages.error(request, "❌ Ödeme başarısız oldu. Lütfen tekrar deneyin.")
             return redirect('randevu_odeme_ozeti', randevu_id=randevu.id)
@@ -490,6 +502,21 @@ def isletme_ayarlar(request):
             isletme.logo = request.FILES.get("logo")
         if request.FILES.get("cover_image"):
             isletme.cover_image = request.FILES.get("cover_image")
+
+        # ==========================================
+        # 🔥 YENİ: ÇOKLU GALERİ FOTOĞRAFI YÜKLEME 🔥
+        # ==========================================
+        galeri_dosyalari = request.FILES.getlist('gallery_images')
+        mevcut_resim_sayisi = isletme.gallery_images.count()
+
+        for dosya in galeri_dosyalari:
+            # Sadece 5 fotoğrafa kadar izin ver
+            if mevcut_resim_sayisi < 5:
+                BusinessImage.objects.create(business=isletme, image=dosya)
+                mevcut_resim_sayisi += 1
+            else:
+                messages.warning(request, "En fazla 5 adet galeri görseli yükleyebilirsiniz. Diğerleri yoksayıldı.")
+                break
 
         # YENİ: İzin günlerini HTML'den liste olarak alıp veritabanına string ("0,6" gibi) kaydet
         kapali_gunler_listesi = request.POST.getlist("closed_days")
@@ -1191,3 +1218,307 @@ def randevuyu_takvime_ekle(randevu):
     except Exception as e:
         print(f"Google Takvime Eklerken Hata Çıktı: {e}")
         return False
+
+    # ==========================================
+    # 🎵 SPOTIFY ENTEGRASYON KÖPRÜSÜ
+    # ==========================================
+
+@login_required(login_url="/hesap/giris/")
+def spotify_bagla(request):
+    isletme = get_object_or_404(Business, owner=request.user)
+
+    # 🔥 İŞTE SENİN İSTEDİĞİN GÜVENLİK DUVARI: SADECE PREMIUM!
+    if not isletme.is_premium:
+        messages.error(request, "❌ DJ Kabini sadece Premium işletmelere özeldir!")
+        return redirect('isletme_ayarlar')
+
+    # Rastgele bir güvenlik anahtarı oluşturup hafızaya atıyoruz (CSRF koruması)
+    state = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+    request.session['spotify_auth_state'] = state
+
+    # Spotify'dan efsanevi DJ yetkilerini (ve çalma listesi okuma iznini) istiyoruz
+    scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative'
+    redirect_uri = request.build_absolute_uri('/businesses/spotify/callback/')
+
+    # Spotify'ın kapısına yönlendirme parametreleri
+    params = {
+        'response_type': 'code',
+        'client_id': settings.SPOTIFY_CLIENT_ID,
+        'scope': scope,
+        'redirect_uri': redirect_uri,
+        'state': state
+    }
+
+    url = f"https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}"
+    return redirect(url)
+
+@login_required(login_url="/hesap/giris/")
+def spotify_callback(request):
+    isletme = get_object_or_404(Business, owner=request.user)
+
+    state = request.GET.get('state')
+    saved_state = request.session.get('spotify_auth_state')
+
+    # Güvenlik kontrolü: Giden adamla dönen adam aynı mı?
+    if state is None or state != saved_state:
+        messages.error(request, "Spotify güvenlik doğrulaması başarısız oldu. Lütfen tekrar deneyin.")
+        return redirect('isletme_ayarlar')
+
+    code = request.GET.get('code')
+    redirect_uri = request.build_absolute_uri('/businesses/spotify/callback/')
+
+    # Client ID ve Secret'ı birleştirip şifreliyoruz (Spotify böyle istiyor)
+    auth_str = f"{settings.SPOTIFY_CLIENT_ID}:{settings.SPOTIFY_CLIENT_SECRET}"
+    b64_auth_str = base64.b64encode(auth_str.encode()).decode()
+
+    headers = {
+        'Authorization': f'Basic {b64_auth_str}',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': redirect_uri
+    }
+
+    # Spotify'a kodu verip "Bana Asıl Anahtarları Ver" diyoruz
+    response = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
+
+    if response.status_code == 200:
+        token_data = response.json()
+
+        # Anahtarları veritabanına mühürle!
+        isletme.spotify_access_token = token_data.get('access_token')
+        if token_data.get('refresh_token'):
+            isletme.spotify_refresh_token = token_data.get('refresh_token')
+
+        # Token süresi genelde 1 saattir (3600 saniye)
+        expires_in = token_data.get('expires_in', 3600)
+        isletme.spotify_token_expiry = timezone.now() + timezone.timedelta(seconds=expires_in)
+        isletme.save()
+
+        # Güvenlik hafızasını temizle
+        if 'spotify_auth_state' in request.session:
+            del request.session['spotify_auth_state']
+
+            messages.success(request, "🎧 Şov başlıyor! Spotify hesabınız DJ Kabinine başarıyla bağlandı.")
+        else:
+            messages.error(request, "Spotify bağlantısı kurulamadı. Ayarlarınızı kontrol edin.")
+
+        return redirect('isletme_ayarlar')
+
+
+def refresh_spotify_token(isletme):
+    """ Spotify token süresi (1 saat) dolduğunda arka planda sessizce yeniler """
+    if not isletme.spotify_refresh_token:
+        return False
+
+    auth_str = f"{settings.SPOTIFY_CLIENT_ID}:{settings.SPOTIFY_CLIENT_SECRET}"
+    b64_auth_str = base64.b64encode(auth_str.encode()).decode()
+
+    headers = {'Authorization': f'Basic {b64_auth_str}'}
+    data = {'grant_type': 'refresh_token', 'refresh_token': isletme.spotify_refresh_token}
+
+    response = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
+    if response.status_code == 200:
+        token_data = response.json()
+        isletme.spotify_access_token = token_data.get('access_token')
+        if token_data.get('refresh_token'):
+            isletme.spotify_refresh_token = token_data.get('refresh_token')
+        isletme.save()
+        return True
+    return False
+
+
+@login_required(login_url="/hesap/giris/")
+def spotify_current_track(request):
+    """ O an çalan şarkıyı JSON olarak Dashboard'a gönderir """
+    isletme = get_object_or_404(Business, owner=request.user)
+    if not isletme.spotify_access_token:
+        return JsonResponse({'status': 'not_connected'})
+
+    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+    response = requests.get('https://api.spotify.com/v1/me/player/currently-playing', headers=headers)
+
+    # Token eskidiyse yenile ve tekrar dene
+    if response.status_code == 401:
+        if refresh_spotify_token(isletme):
+            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+            response = requests.get('https://api.spotify.com/v1/me/player/currently-playing', headers=headers)
+
+    if response.status_code == 200:
+        data = response.json()
+        if data and data.get('item'):
+            return JsonResponse({
+                'status': 'playing',
+                'track_name': data['item']['name'],
+                'artist_name': ', '.join([artist['name'] for artist in data['item']['artists']]),
+                'album_cover': data['item']['album']['images'][0]['url'] if data['item']['album']['images'] else '',
+                'is_playing': data.get('is_playing', False)
+            })
+    return JsonResponse({'status': 'not_playing'})
+
+
+@login_required(login_url="/hesap/giris/")
+def spotify_skip_track(request):
+    """ Sonraki şarkıya geçme emri gönderir """
+    isletme = get_object_or_404(Business, owner=request.user)
+    if not isletme.spotify_access_token:
+        return JsonResponse({'status': 'error'})
+
+    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+    response = requests.post('https://api.spotify.com/v1/me/player/next', headers=headers)
+
+    if response.status_code == 401:
+        if refresh_spotify_token(isletme):
+            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+            response = requests.post('https://api.spotify.com/v1/me/player/next', headers=headers)
+
+    # 204 No Content başarılı demek
+    if response.status_code == 204 or response.status_code == 200:
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'})
+
+
+import json
+
+
+@login_required(login_url="/hesap/giris/")
+def spotify_get_playlists(request):
+    """ Patronun kendi Spotify çalma listelerini getirir """
+    isletme = get_object_or_404(Business, owner=request.user)
+    if not isletme.spotify_access_token:
+        return JsonResponse({'status': 'error'})
+
+    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+    response = requests.get('https://api.spotify.com/v1/me/playlists?limit=10', headers=headers)
+
+    if response.status_code == 401:
+        if refresh_spotify_token(isletme):
+            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+            response = requests.get('https://api.spotify.com/v1/me/playlists?limit=10', headers=headers)
+
+    if response.status_code == 200:
+        playlists = response.json().get('items', [])
+        # Sadece işimize yarayan kısımları (isim, resim ve uri) alıyoruz
+        temiz_listeler = []
+        for p in playlists:
+            if p:  # Bazen boş gelebilir
+                temiz_listeler.append({
+                    'name': p.get('name'),
+                    'uri': p.get('uri'),
+                    'image': p['images'][0]['url'] if p.get('images') else ''
+                })
+        return JsonResponse({'status': 'success', 'playlists': temiz_listeler})
+    return JsonResponse({'status': 'error'})
+
+
+@login_required(login_url="/hesap/giris/")
+def spotify_play_playlist(request):
+    """ Seçilen playlisti çalmaya başlatır """
+    if request.method == 'POST':
+        isletme = get_object_or_404(Business, owner=request.user)
+        try:
+            data = json.loads(request.body)
+            playlist_uri = data.get('uri')
+
+            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+            # Çal komutu (PUT isteği atıyoruz)
+            response = requests.put('https://api.spotify.com/v1/me/player/play', headers=headers,
+                                    json={'context_uri': playlist_uri})
+
+            if response.status_code == 401:
+                if refresh_spotify_token(isletme):
+                    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+                    response = requests.put('https://api.spotify.com/v1/me/player/play', headers=headers,
+                                            json={'context_uri': playlist_uri})
+
+            # Spotify cihaz bulamazsa 404 döner, cihaz aktifse 204 döner
+            if response.status_code == 204 or response.status_code == 200:
+                return JsonResponse({'status': 'success'})
+            elif response.status_code == 404:
+                return JsonResponse({'status': 'no_device',
+                                     'message': 'Lütfen Spotify uygulamasını açın ve bir şarkı başlatın (Aktif cihaz bulunamadı).'})
+            else:
+                return JsonResponse({'status': 'error'})
+        except Exception as e:
+            print("Çalma hatası:", e)
+            return JsonResponse({'status': 'error'})
+    return JsonResponse({'status': 'invalid'})
+
+
+@login_required(login_url="/hesap/giris/")
+def spotify_toggle_playback(request):
+    """ Şarkıyı durdurur (pause) veya başlatır (play) """
+    if request.method == 'POST':
+        isletme = get_object_or_404(Business, owner=request.user)
+        if not isletme.spotify_access_token:
+            return JsonResponse({'status': 'error'})
+
+        try:
+            data = json.loads(request.body)
+            action = data.get('action')  # 'play' veya 'pause' gelecek
+
+            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+            url = f'https://api.spotify.com/v1/me/player/{action}'
+
+            # Play/Pause işlemleri PUT isteği ile yapılır
+            response = requests.put(url, headers=headers)
+
+            if response.status_code == 401:
+                if refresh_spotify_token(isletme):
+                    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
+                    response = requests.put(url, headers=headers)
+
+            if response.status_code == 204 or response.status_code == 200:
+                return JsonResponse({'status': 'success', 'action': action})
+            elif response.status_code == 404:
+                return JsonResponse({'status': 'no_device', 'message': 'Aktif Spotify cihazı bulunamadı.'})
+            else:
+                return JsonResponse({'status': 'error'})
+        except Exception as e:
+            return JsonResponse({'status': 'error'})
+    return JsonResponse({'status': 'invalid'})
+
+@login_required(login_url="/hesap/giris/")
+def galeri_resim_sil(request, id):
+    resim = get_object_or_404(BusinessImage, id=id, business__owner=request.user)
+    resim.delete()
+    messages.error(request, "🗑️ Görsel galeriden silindi.")
+    return redirect("isletme_ayarlar")
+
+# ==========================================
+# CANLI ARAMA (LIVE SEARCH) API
+# ==========================================
+# ==========================================
+# CANLI ARAMA VE ÖNERİ API (SIFIRINCI HARF ZEKASI)
+# ==========================================
+from django.http import JsonResponse
+
+def canli_arama_api(request):
+    aranan = request.GET.get('q', '').strip()
+    sonuclar = []
+
+    if len(aranan) == 0:
+        # 1. SENARYO: Kutuya tıkladı ama harfe basmadı!
+        # Taktik: Sadece Premium olan en iyi 5 işletmeyi "Önerilenler" olarak getir.
+        isletmeler = Business.objects.filter(is_premium=True).order_by('-id')[:5]
+        baslik = "🌟 ÖNERİLEN İŞLETMELER"
+    else:
+        # 2. SENARYO: Harfe basmaya başladı! (1. harften itibaren)
+        # Taktik: Paralı parasız ayrımı yapma, isminde o harfler geçen ilk 5'i getir.
+        isletmeler = Business.objects.filter(name__icontains=aranan)[:5]
+        baslik = "🔍 ARAMA SONUÇLARI"
+
+    for isletme in isletmeler:
+        sonuclar.append({
+            'name': isletme.name,
+            'slug': isletme.slug,
+            'city': isletme.city or '',
+            'district': isletme.district or '',
+            'logo_url': isletme.logo.url if isletme.logo else '',
+            'is_premium': isletme.is_premium  # Ekranda premium rozeti basmak için
+        })
+
+    return JsonResponse({'results': sonuclar, 'baslik': baslik})

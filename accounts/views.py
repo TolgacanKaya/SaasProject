@@ -44,6 +44,12 @@ def isletme_kayit(request):
 
     kategoriler = Category.objects.all()
 
+    # ==========================================
+    # 🔥 EKLENEN KISIM: VİP İŞLETMELERİ ÇEKİYORUZ 🔥
+    # ==========================================
+    # Sadece Premium olan ilk 5 işletmeyi alıyoruz
+    vip_isletmeler = Business.objects.filter(is_premium=True).order_by('-created_at')[:5]
+
     if request.method == 'POST':
         dukkan_adi = request.POST.get('business_name')
         kategori_id = request.POST.get('category')
@@ -114,4 +120,12 @@ def isletme_kayit(request):
             messages.success(request, '🎉 Hoş geldin! İşletmeni başarıyla dijitale taşıdın.')
             return redirect('dashboard')
 
-    return render(request, 'accounts/kayit.html', {'kategoriler': kategoriler})
+    # ==========================================
+    # 🔥 EKLENEN KISIM: VİP İŞLETMELERİ HTML'E YOLLUYORUZ 🔥
+    # ==========================================
+    context = {
+        'kategoriler': kategoriler,
+        'vip_isletmeler': vip_isletmeler,
+    }
+
+    return render(request, 'accounts/kayit.html', context)

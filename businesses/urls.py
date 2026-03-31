@@ -43,6 +43,22 @@ urlpatterns = [
     path('google/login/', views.google_takvim_bagla, name='google_takvim_bagla'),
     path('google/callback/', views.google_takvim_callback, name='google_takvim_callback'),
 
+    path('spotify/login/', views.spotify_bagla, name='spotify_bagla'),
+    path('spotify/callback/', views.spotify_callback, name='spotify_callback'),
+
+    path('spotify/current-track/', views.spotify_current_track, name='spotify_current_track'),
+    path('spotify/skip-track/', views.spotify_skip_track, name='spotify_skip_track'),
+
+    path('spotify/playlists/', views.spotify_get_playlists, name='spotify_get_playlists'),
+    path('spotify/play-playlist/', views.spotify_play_playlist, name='spotify_play_playlist'),
+
+    path('spotify/toggle-playback/', views.spotify_toggle_playback, name='spotify_toggle_playback'),
+
+    # Mevcut yollarının arasına şu satırı ekle:
+    path('api/canli-arama/', views.canli_arama_api, name='canli_arama_api'),
+
+    path('ayarlar/galeri-sil/<int:id>/', views.galeri_resim_sil, name='galeri_resim_sil'),
+
     # DİKKAT: Slug her zaman en altta olmalıdır!
     path('<slug:slug>/', views.isletme_detay, name='isletme_detay'),
 ]
