@@ -1,50 +1,189 @@
 import os
-from datetime import timedelta, datetime
+from datetime import timedelta
 import csv
-import iyzipay
-import json
-import google.oauth2.credentials
-from decimal import Decimal  # EKLENDİ: Decimal kullanımı için gerekli kütüphane
-from django.views.decorators.csrf import csrf_exempt
+from decimal import Decimal
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
-from django.http import JsonResponse
-from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect, render
+from core.decorators import ratelimit
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from businesses.models import Category
 from django.core.paginator import Paginator
-from appointments.models import Appointment
-from .models import Business, Customer, Service, Review, Staff, Coupon, BusinessImage  # YENİLER EKLENDİ
-from django.db.models import Avg, Sum, Count
-from .tasks import send_review_email_task
-from django.views.decorators.cache import never_cache
-from google_auth_oauthlib.flow import Flow
-from googleapiclient.discovery import build
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
+from django.db.models import Avg, Sum, Count, F, When, Value, FloatField, BooleanField, Case
+from django.db.models.functions import Coalesce
+from django.db import transaction
+from django.core.cache import cache
+from django.urls import reverse
 import requests
 import urllib.parse
 import string
 import random
 import base64
+import json
+import qrcode
+from io import BytesIO
+from businesses.models import Category
+from appointments.models import Appointment
+from .models import Business, Customer, Service, Staff, Coupon, BusinessImage, Expense, Review, GlobalBlacklist, AuditLog
+from pos.models import Adisyon, AdisyonItem  # 🔥 YENİ EKLENDİ
 
+
+# ==========================================
+# 🔥 BEYİN: AKTİF İŞLETME BULUCU (MULTITENANT) 🔥
+# ==========================================
+def get_aktif_isletme(request):
+    """
+    Kullanıcının o an hangi dükkanda işlem yaptığını hafızadan (session) okur.
+    Eğer hafıza boşsa veya güvenlik ihlali varsa otomatik olarak ilk dükkana fırlatır.
+    """
+    aktif_id = request.session.get('aktif_isletme_id')
+    isletme = None
+
+    kullanici_isletmeleri = Business.objects.filter(owner=request.user).order_by('id')
+    ilk_isletme = kullanici_isletmeleri.first()
+
+    if aktif_id:
+        isletme = kullanici_isletmeleri.filter(id=aktif_id).first()
+
+        # =========================================================
+        # 🔥 YENİ: OTO-TAMİR ZEKASI (AUTO-HEAL) 🔥
+        # Patronun herhangi bir şubesi premiumsa, sistem diğerlerini de otomatik eşitler!
+        # =========================================================
+        has_premium = kullanici_isletmeleri.filter(is_premium=True).exists()
+
+        if has_premium and not isletme.is_premium:
+            # Bug yakalandı! Patron premium ama bu şubeye yansımamış. Şak diye düzelt!
+            referans_sube = kullanici_isletmeleri.filter(is_premium=True).first()
+            isletme.is_premium = True
+            isletme.premium_end_date = referans_sube.premium_end_date
+            isletme.is_active = True  # Vitrine geri koy!
+            isletme.save()
+
+        # 🔥 GÜVENLİK 2: Oto-tamire rağmen hala Premium değilse (Demek ki adam tamamen Free planda)
+        if not isletme.is_premium and isletme.id != ilk_isletme.id:
+            # Zorla ana şubeye fırlat
+            request.session['aktif_isletme_id'] = ilk_isletme.id
+            return ilk_isletme
+
+        return isletme
+
+    # Eğer session'da id yoksa ilk dükkanı ver
+    if ilk_isletme:
+        ilk_isletme.check_premium_status()
+        request.session['aktif_isletme_id'] = ilk_isletme.id
+        return ilk_isletme
+
+    return None
+
+
+# ==========================================
+# ÇOKLU İŞLETME SEÇİM EKRANI
+# ==========================================
+@login_required(login_url="/hesap/giris/")
+def isletme_sec(request):
+    # Patronun tüm işletmelerini bul (id'ye göre sırala ki ilk açtığı en üstte olsun)
+    isletmeler = Business.objects.filter(owner=request.user).order_by('id')
+
+    if isletmeler.count() == 0:
+        return redirect('kayit')
+
+    # 🔥 GÜVENLİK DUVARI: Patronun aktif bir Premium şubesi var mı?
+    has_premium = isletmeler.filter(is_premium=True).exists()
+    ilk_isletme = isletmeler.first()
+
+    # POST isteği geldiyse (Şubeye giriş yapmaya çalışıyorsa)
+    if request.method == 'POST':
+        try:
+            secilen_id = int(request.POST.get('isletme_id', 0))
+        except (ValueError, TypeError):
+            messages.error(request, "Geçersiz işletme seçimi!")
+            return redirect('isletme_sec')
+
+        # 🔥 EĞER PREMİUM DEĞİLSE VE SEÇTİĞİ ŞUBE İLK (ANA) ŞUBESİ DEĞİLSE ENGELLE!
+        if not has_premium and secilen_id != ilk_isletme.id:
+            messages.error(request,
+                           "🔒 Ücretsiz planda sadece ana şubenizi yönetebilirsiniz. Diğer şubeleriniz dondurulmuştur.")
+            return redirect('isletme_sec')
+
+        secilen_isletme = isletmeler.filter(id=secilen_id).first()
+        if secilen_isletme:
+            request.session['aktif_isletme_id'] = secilen_id
+            
+            # 🔥 PREMIUM ÖZEL: Karşılama Modalı Tetikleyici
+            if secilen_isletme.is_premium:
+                request.session['show_premium_welcome'] = secilen_isletme.name
+                
+            messages.success(request, f"{secilen_isletme.name} paneline geçiş yapıldı.")
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Geçersiz işletme seçimi!")
+
+    return render(request, 'businesses/isletme_sec.html', {
+        'isletmeler': isletmeler,
+        'has_premium': has_premium,
+        'ilk_isletme': ilk_isletme
+    })
+
+@login_required(login_url="/hesap/giris/")
+def yeni_sube_ekle(request):
+    user_businesses = Business.objects.filter(owner=request.user)
+
+    # GÜVENLİK DUVARI: Zaten premium olmayan biri buraya URL ile girmeye çalışırsa engelle
+    if not user_businesses.filter(is_premium=True).exists():
+        messages.error(request, "Yeni şube eklemek için Premium aboneliğe sahip olmalısınız.")
+        return redirect('dashboard')
+
+    # GÜVENLİK DUVARI 2: 3'ten fazla işletme açamaz
+    if user_businesses.count() >= 3:
+        messages.error(request, "Maksimum şube limitine (3) ulaştınız.")
+        return redirect('dashboard')
+
+    if request.method == "POST":
+        sube_adi = request.POST.get('name')
+        if sube_adi:
+            # Yeni dükkanı oluştur
+            yeni_isletme = Business.objects.create(
+                owner=request.user,
+                name=sube_adi,
+                is_premium=True,  # Patron Premium ise yeni şubesi de Premium başlasın
+                premium_end_date=user_businesses.first().premium_end_date  # Süreyi ana hesaptan kopyala
+            )
+            # Tarayıcı hafızasını hemen yeni dükkana geçir ve ayarlara yönlendir
+            request.session['aktif_isletme_id'] = yeni_isletme.id
+            messages.success(request,
+                             f"Tebrikler! '{sube_adi}' başarıyla oluşturuldu. Şimdi detaylarını ayarlayabilirsiniz.")
+            return redirect('isletme_ayarlar')
+
+    return render(request, 'businesses/yeni_sube_ekle.html')
+
+
+# ==========================================
+# İŞLETME VİTRİNİ (MÜŞTERİ EKRANI)
+# ==========================================
+@ratelimit(key='ip', rate='20/m')
 def isletme_detay(request, slug):
+    # Vitrin ekranında aktif işletme mantığı çalışmaz, çünkü bu sayfaya müşteriler URL (slug) ile girer!
     isletme = get_object_or_404(Business, slug=slug)
     hizmetler = isletme.services.all()
 
-    # HTML'e tüm personeli gönderiyoruz (Gizlemiyoruz, orada soluk göstereceğiz)
     personeller = isletme.staff_members.all()
     aktif_personeller = personeller.filter(is_active=True, is_approved=True)
 
     if request.method == "POST":
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.POST.get('is_ajax') == 'true'
+
+        def handle_error(msg):
+            if is_ajax:
+                return JsonResponse({"status": "error", "message": msg})
+            messages.error(request, msg)
+            return redirect("isletme_detay", slug=slug)
+
         if not isletme.is_premium:
             su_an = timezone.now()
-
-            # YENİ: Sadece bu ayki ve İPTAL EDİLMEMİŞ (Aktif/Tamamlanmış) randevuları say!
             mevcut_randevu_sayisi = isletme.appointments.filter(
                 date_time__year=su_an.year,
                 date_time__month=su_an.month,
@@ -52,30 +191,39 @@ def isletme_detay(request, slug):
             ).count()
 
             if mevcut_randevu_sayisi >= 20:
-                messages.error(request,
-                               "❌ Üzgünüz, bu işletme aylık ücretsiz randevu kotasını doldurmuştur. Sınırları kaldırmak için Premium'a geçebilirsiniz!")
-                return redirect("isletme_detay", slug=slug)
+                return handle_error("❌ Üzgünüz, bu işletme aylık ücretsiz randevu kotasını doldurmuştur. Sınırları kaldırmak için Premium'a geçebilirsiniz!")
 
         service_id = request.POST.get("service_id")
         staff_id = request.POST.get("staff_id")
 
-        # ==========================================
-        # GÜVENLİK KALKANI: F12 ile Hacklemeyi Engeller!
-        # ==========================================
         if staff_id:
             secilen_personel = personeller.filter(id=staff_id).first()
             if not secilen_personel or not secilen_personel.is_active or not secilen_personel.is_approved:
-                messages.error(request,
-                               "❌ Seçtiğiniz personel şu anda hizmet vermemektedir (İzinde veya Onay Bekliyor).")
-                return redirect("isletme_detay", slug=slug)
-        # ==========================================
+                return handle_error("❌ Seçtiğiniz personel şu anda hizmet vermemektedir.")
 
         date_str = request.POST.get("date")
         time_str = request.POST.get("time")
-        first_name = request.POST.get("first_name")
-        last_name = request.POST.get("last_name")
-        phone = request.POST.get("phone")
-        email = request.POST.get("email")
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        phone_raw = request.POST.get("phone", "").strip()
+        email = request.POST.get("email", "").strip()
+
+        if not first_name or not last_name:
+            return handle_error("❌ Lütfen adınızı ve soyadınızı eksiksiz giriniz.")
+
+        from core.utils import normalize_phone_number
+        phone_clean = normalize_phone_number(phone_raw)
+
+        if not phone_clean or len(phone_clean) < 10:
+            return handle_error("❌ Lütfen geçerli bir telefon numarası giriniz (Örn: 0555 555 55 55).")
+
+        # 🔥 KARA LİSTE (BLACKLIST) GÜVENLİK DUVARI 🔥
+        # 1. Global Ban (Tüm Platformdan Engelleme)
+        if GlobalBlacklist.objects.filter(phone=phone_clean).exists():
+            return handle_error("❌ Girdiğiniz telefon numarası sistem genelinde engellenmiştir. Randevu oluşturamazsınız.")
+        # 2. Local Ban (Sadece bu İşletmeden Engelleme)
+        if Customer.objects.filter(business=isletme, phone=phone_clean, is_blocked=True).exists():
+            return handle_error("❌ Bu telefon numarasıyla randevu oluşturulması durdurulmuştur. Lütfen dükkanla doğrudan iletişime geçiniz.")
 
         gelen_adres = request.POST.get("customer_address", "")
         gelen_uygulama = request.POST.get("online_app", "")
@@ -89,117 +237,118 @@ def isletme_detay(request, slug):
         randevu_zamani_ham = parse_datetime(tarih_saat_metni)
 
         if not randevu_zamani_ham:
-            messages.error(request, "❌ Geçersiz tarih veya saat formatı.")
-            return redirect("isletme_detay", slug=slug)
+            return handle_error("❌ Geçersiz tarih veya saat formatı.")
 
         randevu_zamani = timezone.make_aware(randevu_zamani_ham) if timezone.is_naive(
             randevu_zamani_ham) else randevu_zamani_ham
 
         if randevu_zamani < timezone.now():
-            messages.error(request, "❌ Geçmiş bir tarihe veya saate randevu alamazsınız.")
-            return redirect("isletme_detay", slug=slug)
+            return handle_error("❌ Geçmiş bir tarihe veya saate randevu alamazsınız.")
 
-        alti_ay_sonrasi = timezone.now() + timedelta(days=180)
-        if randevu_zamani > alti_ay_sonrasi:
-            messages.error(request, "❌ En fazla 6 ay (180 gün) sonrası için randevu alabilirsiniz.")
-            return redirect("isletme_detay", slug=slug)
+        if randevu_zamani > timezone.now() + timedelta(days=180):
+            return handle_error("❌ En fazla 6 ay (180 gün) sonrası için randevu alabilirsiniz.")
 
-        # ==========================================
-        # ZEKİ KALKAN: "KAPANIŞ SAATİ BUG'I" FIXLENDİ!
-        # ==========================================
         sure_dk = 60
         if secilen_hizmet.duration:
             if secilen_hizmet.duration_type == "minutes":
                 sure_dk = secilen_hizmet.duration
             elif secilen_hizmet.duration_type == "hours":
                 sure_dk = secilen_hizmet.duration * 60
+            else:
+                # Gün, Hafta, Ay gibi süreç bazlı hizmetler için sadece 1 saatlik başlangıç kilitlenir.
+                sure_dk = 60
+
+        # 🔥 KRİTİK: Eğer hizmet süresi dükkanın günlük çalışma saatinden fazlaysa (Örn: 27 Saat Damat Tıraşı),
+        # Doğrulama sırasında bu süreyi 60 dakikaya indiriyoruz ki sistem kapanış saati hatası vermesin.
+        isletme_gunluk_sure_dk = (isletme.closing_time.hour * 60 + isletme.closing_time.minute) - (isletme.opening_time.hour * 60 + isletme.opening_time.minute)
+        if sure_dk > isletme_gunluk_sure_dk:
+            sure_dk = 60
 
         yeni_randevu_bitis_zamani = randevu_zamani + timedelta(minutes=sure_dk)
         yeni_randevu_bitis_saati = yeni_randevu_bitis_zamani.time()
         randevu_saati = randevu_zamani.time()
 
-        # Açılış saatinden önce mi başlıyor?
         if randevu_saati < isletme.opening_time:
-            messages.error(request, f"❌ İşletmemiz {isletme.opening_time.strftime('%H:%M')} saatinde açılmaktadır.")
-            return redirect("isletme_detay", slug=slug)
+            return handle_error(f"❌ İşletmemiz {isletme.opening_time.strftime('%H:%M')} saatinde açılmaktadır.")
 
-        # Kapanış saatini geçiyor mu? (BUG BURADA ÇÖZÜLDÜ)
-        # Bitiş saati kapanış saatinden büyükse VEYA bitiş saati ertesi güne sarkmışsa (00:30 gibi) hata ver.
-        if yeni_randevu_bitis_saati > isletme.closing_time or yeni_randevu_bitis_zamani.date() > randevu_zamani.date():
-            messages.error(request,
-                           f"❌ Seçtiğiniz hizmet {sure_dk} dakika sürmektedir. İşletmemiz {isletme.closing_time.strftime('%H:%M')} saatinde kapandığı için bu saate randevu alınamaz.")
-            return redirect("isletme_detay", slug=slug)
-        # ==========================================
+        if yeni_rep_bitis_saati := yeni_randevu_bitis_saati > isletme.closing_time or yeni_randevu_bitis_zamani.date() > randevu_zamani.date():
+            return handle_error(f"❌ İşletmemiz kapanış saatini geçeceği için bu saate randevu alınamaz.")
 
-        # ==========================================
-        # ZEKİ ÇAKIŞMA KONTROLÜ (GÜVENLİK) - GÜNCELLENDİ
-        # ==========================================
         yetkili_personeller = secilen_hizmet.staffs.filter(is_active=True, is_approved=True)
-        toplam_yetkili_sayisi = yetkili_personeller.count()
-        if toplam_yetkili_sayisi == 0:
-            toplam_yetkili_sayisi = 1
+        toplam_yetkili_sayisi = yetkili_personeller.count() or 1
 
-        o_gunun_randevulari = isletme.appointments.filter(
-            date_time__date=randevu_zamani.date(),
-            status__in=["pending", "approved", "confirmed"],
-        )
+        with transaction.atomic():
+            o_gunun_randevulari = isletme.appointments.select_for_update().filter(
+                date_time__date=randevu_zamani.date(),
+                status__in=["pending", "approved", "confirmed"],
+            )
 
-        cakisma_var = False
+            cakisma_var = False
 
-        if staff_id:
-            # Personel seçildiyse sadece ona bak
-            for r in o_gunun_randevulari.filter(staff_id=staff_id):
-                r_sure_dk = 60
-                if r.service and r.service.duration:
-                    if r.service.duration_type == "minutes":
-                        r_sure_dk = r.service.duration
-                    elif r.service.duration_type == "hours":
-                        r_sure_dk = r.service.duration * 60
-                r_bitis = r.date_time + timedelta(minutes=r_sure_dk)
+            if staff_id:
+                for r in o_gunun_randevulari.filter(staff_id=staff_id):
+                    r_sure_dk = 60
+                    if r.service and r.service.duration:
+                        if r.service.duration_type == "minutes":
+                            r_sure_dk = r.service.duration
+                        elif r.service.duration_type == "hours":
+                            r_sure_dk = r.service.duration * 60
+                        
+                        if r_sure_dk > isletme_gunluk_sure_dk:
+                            r_sure_dk = 60
 
-                if randevu_zamani < r_bitis and yeni_randevu_bitis_zamani > r.date_time:
-                    cakisma_var = True
-                    break
-        else:
-            # "FARK ETMEZ" seçildiyse Kapasiteye Bak
-            mesgul_personel_sayisi = 0
-            for r in o_gunun_randevulari:
-                r_sure_dk = 60
-                if r.service and r.service.duration:
-                    if r.service.duration_type == "minutes":
-                        r_sure_dk = r.service.duration
-                    elif r.service.duration_type == "hours":
-                        r_sure_dk = r.service.duration * 60
-                r_bitis = r.date_time + timedelta(minutes=r_sure_dk)
+                    r_bitis = r.date_time + timedelta(minutes=r_sure_dk)
 
-                if randevu_zamani < r_bitis and yeni_randevu_bitis_zamani > r.date_time:
-                    if r.staff:
-                        if yetkili_personeller.filter(id=r.staff.id).exists():
-                            mesgul_personel_sayisi += 1
-                    else:
-                        mesgul_personel_sayisi = toplam_yetkili_sayisi
+                    if randevu_zamani < r_bitis and yeni_randevu_bitis_zamani > r.date_time:
+                        cakisma_var = True
                         break
+            else:
+                mesgul_personel_sayisi = 0
+                for r in o_gunun_randevulari:
+                    r_sure_dk = 60
+                    if r.service and r.service.duration:
+                        if r.service.duration_type == "minutes":
+                            r_sure_dk = r.service.duration
+                        elif r.service.duration_type == "hours":
+                            r_sure_dk = r.service.duration * 60
+                        
+                        if r_sure_dk > isletme_gunluk_sure_dk:
+                            r_sure_dk = 60
 
-            if mesgul_personel_sayisi >= toplam_yetkili_sayisi:
-                cakisma_var = True
+                    r_bitis = r.date_time + timedelta(minutes=r_sure_dk)
 
-        if cakisma_var:
-            mesaj = "❌ Seçtiğiniz personelin " if staff_id else "❌ İşletmenin "
-            messages.error(request, f"{mesaj}bu saat aralığı tamamen dolu. Lütfen farklı bir saat seçiniz.")
-            return redirect("isletme_detay", slug=slug)
-        # ==========================================
+                    if randevu_zamani < r_bitis and yeni_randevu_bitis_zamani > r.date_time:
+                        if r.staff:
+                            if yetkili_personeller.filter(id=r.staff.id).exists():
+                                mesgul_personel_sayisi += 1
+                        else:
+                            mesgul_personel_sayisi = toplam_yetkili_sayisi
+                            break
 
-        # TÜM KONTROLLER GEÇİLDİ. RANDEVUYU VERİTABANINA KAYDET (Henüz onaysız/ödenmemiş)
-        musteri, created = Customer.objects.get_or_create(
-            business=isletme, phone=phone,
-            defaults={"first_name": first_name, "last_name": last_name, "email": email},
-        )
-        if not created and email and not musteri.email:
-            musteri.email = email
-            musteri.save()
+                if mesgul_personel_sayisi >= toplam_yetkili_sayisi:
+                    cakisma_var = True
 
-        # Başlangıçta 5 TL sistem komisyonunu ve Toplam Tutarı işleyelim
-        toplam_tutar = secilen_hizmet.price + Decimal('5.00')  # YENİ: Toplam çekilecek tutar
+            if cakisma_var:
+                mesaj = "❌ Seçtiğiniz personelin " if staff_id else "❌ İşletmenin "
+                return handle_error(f"{mesaj}bu saat aralığı tamamen dolu. Lütfen farklı bir saat seçiniz.")
+
+            # 🔥 RATE LIMIT: Aynı numaradan üst üste randevu bombardımanını engelle
+            cache_key = f"rl_booking_{phone_clean}"
+            if cache.get(cache_key):
+                return handle_error("❌ Çok hızlı randevu talebi gönderdiniz. Lütfen 1 dakika sonra tekrar deneyin.")
+            cache.set(cache_key, "locked", 60)
+
+            musteri, created = Customer.get_or_create_customer(
+                business=isletme, phone=phone_clean,
+                first_name=first_name, last_name=last_name, email=email
+            )
+
+        # 🔥 DİNAMİK KOMİSYON HESAPLAMASI 🔥
+        # İşletmenin oranını kullan, yoksa varsayılan %5
+        oran = isletme.commission_rate / Decimal('100.0') if isletme.commission_rate else Decimal('0.05')
+        islem_bedeli = (secilen_hizmet.discounted_price * oran).quantize(Decimal('0.01'))
+        
+        toplam_tutar = secilen_hizmet.discounted_price + islem_bedeli
 
         yeni_randevu = Appointment.objects.create(
             business=isletme,
@@ -207,20 +356,25 @@ def isletme_detay(request, slug):
             service=secilen_hizmet,
             staff_id=staff_id if staff_id else None,
             date_time=randevu_zamani,
-            status="pending",
+            status="payment_pending",
             customer_address=gelen_adres,
             online_app=gelen_uygulama,
             online_link=gelen_link,
             customer_note=gelen_not,
             chosen_location=secilen_konum,
-            platform_fee_paid=Decimal('5.00'),
-            final_service_price=secilen_hizmet.price,
-            total_online_charged=toplam_tutar,  # YENİ EKLENDİ
+            platform_fee_paid=islem_bedeli,
+            final_service_price=secilen_hizmet.discounted_price,
+            total_online_charged=toplam_tutar,
             is_paid=False
         )
 
-        # MÜŞTERİYİ ARTIK DİREKT ÖDEME (ONAY) SAYFASINA YÖNLENDİRİYORUZ
-        return redirect("randevu_odeme_ozeti", randevu_id=yeni_randevu.id)
+        if is_ajax:
+            return JsonResponse({
+                "status": "success",
+                "payment_url": reverse("randevu_odeme_ozeti", kwargs={"token": yeni_randevu.cancel_token}) + "?embed=true"
+            })
+
+        return redirect("randevu_odeme_ozeti", token=yeni_randevu.cancel_token)
 
     yorumlar = isletme.reviews.all().order_by('-created_at')
     ortalama_puan = yorumlar.aggregate(Avg('rating'))['rating__avg'] or 0
@@ -237,177 +391,55 @@ def isletme_detay(request, slug):
         },
     )
 
-# ==========================================
-# 1. RANDEVU ÖZETİ VE İYZİCO FORM OLUŞTURMA
-# ==========================================
-def randevu_odeme_ozeti(request, randevu_id):
-    randevu = get_object_or_404(Appointment, id=randevu_id)
+def isletme_yorumlar(request, slug):
+    """İşletmenin tüm değerlendirmelerini ve yorumlarını listeleyen sayfa"""
+    isletme = get_object_or_404(Business, slug=slug)
+    yorumlar = isletme.reviews.all().order_by('-created_at')
+    ortalama_puan = yorumlar.aggregate(Avg('rating'))['rating__avg'] or 0
 
-    if randevu.is_paid:
-        return redirect("isletme_detay", slug=randevu.business.slug)
+    return render(
+        request, "businesses/yorumlar.html",
+        {
+            "isletme": isletme,
+            "yorumlar": yorumlar,
+            "ortalama_puan": round(ortalama_puan, 1),
+        },
+    )
 
-    # 1. KUPON UYGULAMA MANTIĞI
+def booking_wizard(request, slug):
+    """Fresha tarzı rezervasyon sihirbazı ekranı"""
+    isletme = get_object_or_404(Business, slug=slug)
+    hizmetler = isletme.services.all()
+    personeller = isletme.staff_members.all()
+    aktif_personeller = personeller.filter(is_active=True, is_approved=True)
+
+    # Form gönderimi yapıldığında mevcut güvenli POST mantığını (isletme_detay) kullan
     if request.method == "POST":
-        kupon_kodu = request.POST.get('coupon_code')
-        if kupon_kodu:
-            kupon = Coupon.objects.filter(business=randevu.business, code__iexact=kupon_kodu, is_active=True).first()
-            if kupon and kupon.is_valid():
-                randevu.coupon_used = kupon
-                if kupon.discount_type == 'percentage':
-                    indirim = (randevu.service.price * kupon.discount_value) / 100
-                    randevu.final_service_price = randevu.service.price - indirim
-                else:
-                    randevu.final_service_price = randevu.service.price - kupon.discount_value
+        return isletme_detay(request, slug)
 
-                if randevu.final_service_price < 0:
-                    randevu.final_service_price = Decimal('0.00')
-
-                # YENİ: Toplam ödenecek tutarı (İndirimli Hizmet + 5 TL) güncelle!
-                randevu.total_online_charged = randevu.final_service_price + randevu.platform_fee_paid
-                randevu.save()
-
-                messages.success(request, f"🎉 '{kupon.code}' kuponu uygulandı!")
-            else:
-                messages.error(request, "❌ Geçersiz veya süresi dolmuş kupon kodu.")
-            return redirect('randevu_odeme_ozeti', randevu_id=randevu.id)
-
-    # 2. İYZİCO CHECKOUT FORM (TÜM PARAYI ÇEKİYORUZ)
-    options = {
-        'api_key': os.getenv('IYZICO_API_KEY', 'SENIN_API_KEY'),
-        'secret_key': os.getenv('IYZICO_SECRET_KEY', 'SENIN_SECRET_KEY'),
-        'base_url': 'sandbox-api.iyzipay.com'
-    }
-
-    req = {
-        'locale': 'tr',
-        'conversationId': str(randevu.id),
-        'price': str(randevu.total_online_charged),  # YENİ: Sadece 5 TL değil, tamamı!
-        'paidPrice': str(randevu.total_online_charged),  # YENİ: Tamamı!
-        'currency': 'TRY',
-        'basketId': f"RN-{randevu.id}",
-        'paymentGroup': 'LISTING',
-        'callbackUrl': request.build_absolute_uri(f'/dashboard/randevu/odeme-sonuc/{randevu.id}/'),
-        'enabledInstallments': ['1'],
-        'buyer': {
-            'id': str(randevu.customer.id),
-            'name': randevu.customer.first_name,
-            'surname': randevu.customer.last_name,
-            'gsmNumber': randevu.customer.phone or '+905555555555',
-            'email': randevu.customer.email or 'musteri@trandevu.com',
-            'identityNumber': '11111111111',
-            'registrationAddress': randevu.customer_address or 'Adres Belirtilmedi',
-            'ip': request.META.get('REMOTE_ADDR', '85.34.78.112'),
-            'city': randevu.business.city or 'Istanbul',
-            'country': 'Turkey',
+    return render(
+        request, "businesses/booking_wizard.html",
+        {
+            "isletme": isletme,
+            "hizmetler": hizmetler,
+            "aktif_personeller": aktif_personeller,
         },
-        'shippingAddress': {
-            'contactName': f"{randevu.customer.first_name} {randevu.customer.last_name}",
-            'city': randevu.business.city or 'Istanbul',
-            'country': 'Turkey',
-            'address': randevu.customer_address or 'Adres Belirtilmedi',
-        },
-        'billingAddress': {
-            'contactName': f"{randevu.customer.first_name} {randevu.customer.last_name}",
-            'city': randevu.business.city or 'Istanbul',
-            'country': 'Turkey',
-            'address': randevu.customer_address or 'Adres Belirtilmedi',
-        },
-        'basketItems': [
-            {
-                'id': str(randevu.service.id),
-                'name': f"{randevu.service.name} ve İşlem Bedeli",
-                'category1': 'Randevu',
-                'itemType': 'VIRTUAL',
-                'price': str(randevu.total_online_charged)  # İyzico hata vermesin diye tek kalem yaptık
-            }
-        ]
-    }
-
-    checkout_form_initialize = iyzipay.CheckoutFormInitialize().create(req, options)
-    checkout_form_content = checkout_form_initialize.read().decode('utf-8')
-    form_data = json.loads(checkout_form_content)
-
-    iyzico_html = form_data.get('checkoutFormContent',
-                                '<p class="text-red-500">İyzico formu yüklenemedi. API ayarlarınızı kontrol edin.</p>')
-
-    return render(request, "businesses/randevu_odeme.html", {
-        "randevu": randevu,
-        "iyzico_html": iyzico_html
-    })
+    )
 
 
 # ==========================================
-# 2. İYZİCO'NUN GERİ DÖNECEĞİ SONUÇ FONKSİYONU
+# İŞLETME YÖNETİM SAYFALARI (DASHBOARD & AYARLAR)
 # ==========================================
-@csrf_exempt
-def randevu_odeme_sonuc(request, randevu_id):
-    randevu = get_object_or_404(Appointment, id=randevu_id)
-
-    if request.method == 'POST':
-        token = request.POST.get('token')
-
-        options = {
-            'api_key': os.getenv('IYZICO_API_KEY'),
-            'secret_key': os.getenv('IYZICO_SECRET_KEY'),
-            'base_url': 'sandbox-api.iyzipay.com'
-        }
-
-        req = {'locale': 'tr', 'token': token}
-        checkout_form_result = iyzipay.CheckoutForm().retrieve(req, options)
-        result_data = json.loads(checkout_form_result.read().decode('utf-8'))
-
-        if result_data.get('paymentStatus') == 'SUCCESS':
-            randevu.is_paid = True
-            randevu.status = 'pending'
-            randevu.iyzico_transaction_id = result_data.get('paymentId')
-
-            # KUPON KONTROLÜ SADECE 1 KEZ YAPILMALI
-            if randevu.coupon_used:
-                randevu.coupon_used.times_used += 1
-                randevu.coupon_used.save()
-
-            randevu.save()
-
-            # ==========================================
-            # 🔥 SİHİRLİ DOKUNUŞ: DEĞERLENDİRME MAİLİ GÖNDER!
-            # ==========================================
-            if randevu.customer.email:
-                sure_tipi = randevu.service.duration_type
-                sure_degeri = randevu.service.duration or 0
-
-                # Mailin ne zaman atılacağını hesaplıyoruz
-                if sure_tipi == 'minutes':
-                    mail_gonderim_zamani = randevu.date_time + timedelta(minutes=sure_degeri)
-                elif sure_tipi == 'hours':
-                    mail_gonderim_zamani = randevu.date_time + timedelta(hours=sure_degeri)
-                else:
-                    mail_gonderim_zamani = randevu.date_time + timedelta(hours=1)
-
-                # countdown yerine "eta" kullanarak tam o dakikada çalışmasını sağlıyoruz
-                send_review_email_task.apply_async(
-                    args=[randevu.id, request.get_host()],
-                    eta=mail_gonderim_zamani
-                )
-
-            messages.success(request, "✅ Ödemeniz başarıyla alındı. İşletme tarafından onaylanmak üzere randevu talebiniz iletilmiştir.")
-        else:
-            messages.error(request, "❌ Ödeme başarısız oldu. Lütfen tekrar deneyin.")
-            return redirect('randevu_odeme_ozeti', randevu_id=randevu.id)
-
-    return redirect("isletme_detay", slug=randevu.business.slug)
-
-
 @login_required(login_url="/hesap/giris/")
 def dashboard(request):
-    isletme = Business.objects.filter(owner=request.user).first()
+    isletme = get_aktif_isletme(request)
     if not isletme:
         return redirect("kayit")
 
     now = timezone.now()
 
-    # 1. YAKLAŞAN RANDEVULAR TABLOSU İÇİN FİLTRE
     randevular_list = isletme.appointments.filter(
-        status__in=['pending', 'approved', 'confirmed'],
+        status__in=['pending', 'approved', 'confirmed'],  # payment_pending BURADA YOK!
         date_time__gte=now
     ).order_by("date_time")
 
@@ -415,30 +447,32 @@ def dashboard(request):
     page = request.GET.get('page')
     randevular = paginator.get_page(page)
 
-    # 2. AYLIK OLASI KAZANÇ (Tamamlanmış 'completed' işlemleri de sayıyoruz!)
-    aylik_kazanc = isletme.appointments.filter(
-        status__in=['pending', 'approved', 'confirmed', 'completed'],
+    # 1. Randevulardan (Online) Gelen Ana Kazanç
+    aylik_online_kazanc = isletme.appointments.filter(
+        status__in=['approved', 'confirmed', 'completed'],
         date_time__year=now.year,
         date_time__month=now.month
-    ).aggregate(toplam=Sum('final_service_price'))['toplam'] or 0
+    ).aggregate(toplam=Sum('final_service_price'))['toplam'] or Decimal('0.00')
 
-    # 3. TOPLAM RANDEVU
+    # 2. Adisyonlardan (Kasadan) Gelen Ekstra Kazanç 🔥
+    # YENİ KOD: Performans için total_price_cache kullanıldı
+    aylik_ekstra_kazanc = AdisyonItem.objects.filter(
+        adisyon__business=isletme,
+        adisyon__status='closed',
+        adisyon__closed_at__year=now.year,
+        adisyon__closed_at__month=now.month
+    ).aggregate(genel_toplam=Sum('total_price_cache'))['genel_toplam'] or Decimal('0.00')
+
+    aylik_kazanc = aylik_online_kazanc + aylik_ekstra_kazanc
+
     toplam_randevu_sayisi = isletme.appointments.count()
-
-    # 4. AKTİF UZMANLAR
     aktif_personel_sayisi = isletme.staff_members.filter(is_active=True, is_approved=True).count()
 
-    # ==========================================
-    # YENİ: GRAFİK İÇİN SON 7 GÜNÜN VERİLERİ (CHART.JS)
-    # ==========================================
     bugun = now.date()
     son_7_gun_tarihleri = [bugun - timedelta(days=i) for i in range(6, -1, -1)]
-
-    # Ekranda görünecek etiketler (Örn: 15 Mar, 16 Mar)
     grafik_etiketleri = [gun.strftime("%d %b") for gun in son_7_gun_tarihleri]
     grafik_verileri = []
 
-    # Her gün için başarılı randevuları say
     for gun in son_7_gun_tarihleri:
         sayi = isletme.appointments.filter(
             date_time__date=gun,
@@ -455,22 +489,69 @@ def dashboard(request):
         "aylik_kazanc": aylik_kazanc,
         "aktif_personel_sayisi": aktif_personel_sayisi,
         "simdi": now,
-        # JSON'a çevirip HTML'e yolluyoruz ki Javascript bunu okuyabilsin
         "grafik_etiketleri": json.dumps(grafik_etiketleri),
         "grafik_verileri": json.dumps(grafik_verileri),
+        "show_premium_welcome": request.session.pop('show_premium_welcome', None),
     }
 
     return render(request, "businesses/dashboard.html", context)
 
 
+def geocode_address(address_text, city_name="", district_name=""):
+    import urllib.request
+    import json
+    import urllib.parse
+    
+    query_parts = []
+    if address_text and address_text.strip():
+        query_parts.append(address_text.strip())
+    if district_name and district_name.strip():
+        query_parts.append(district_name.strip())
+    if city_name and city_name.strip():
+        query_parts.append(city_name.strip())
+        
+    query_parts.append("Turkey")
+    query = ", ".join(query_parts)
+    
+    try:
+        url = "https://nominatim.openstreetmap.org/search?q=" + urllib.parse.quote(query) + "&format=json&limit=1"
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'T-Randevu-SaaS-App-Agent'}
+        )
+        with urllib.request.urlopen(req, timeout=3) as response:
+            data = json.loads(response.read().decode())
+            if data:
+                return float(data[0]['lat']), float(data[0]['lon'])
+    except Exception:
+        pass
+        
+    # Fallback to city/district if full address fails
+    if city_name and city_name.strip():
+        try:
+            city_query = f"{district_name} {city_name} Turkey".strip()
+            url = "https://nominatim.openstreetmap.org/search?q=" + urllib.parse.quote(city_query) + "&format=json&limit=1"
+            req = urllib.request.Request(
+                url, 
+                headers={'User-Agent': 'T-Randevu-SaaS-App-Agent'}
+            )
+            with urllib.request.urlopen(req, timeout=3) as response:
+                data = json.loads(response.read().decode())
+                if data:
+                    return float(data[0]['lat']), float(data[0]['lon'])
+        except Exception:
+            pass
+            
+    return None, None
+
+@ratelimit(key='ip', rate='10/m')
 @login_required(login_url="/hesap/giris/")
 def isletme_ayarlar(request):
-    isletme = Business.objects.filter(owner=request.user).first()
+    isletme = get_aktif_isletme(request)
     if not isletme:
         return redirect("kayit")
 
     kategoriler = Category.objects.all()
-
     time_choices = []
     for h in range(24):
         for m in (0, 15, 30, 45):
@@ -498,19 +579,55 @@ def isletme_ayarlar(request):
         if kapanis:
             isletme.closing_time = kapanis
 
-        if request.FILES.get("logo"):
-            isletme.logo = request.FILES.get("logo")
-        if request.FILES.get("cover_image"):
-            isletme.cover_image = request.FILES.get("cover_image")
+        # 🔥 IYZICO PAZARYERİ BİLGİLERİ
+        isletme.iban = request.POST.get("iban", isletme.iban)
+        isletme.tax_number = request.POST.get("tax_number", isletme.tax_number)
+        isletme.tax_office = request.POST.get("tax_office", isletme.tax_office)
+        isletme.sub_merchant_type = request.POST.get("sub_merchant_type", isletme.sub_merchant_type)
+        
+        commission = request.POST.get("commission_rate")
+        if commission:
+            isletme.commission_rate = Decimal(str(commission).replace(',', '.'))
 
-        # ==========================================
-        # 🔥 YENİ: ÇOKLU GALERİ FOTOĞRAFI YÜKLEME 🔥
-        # ==========================================
+
+
+        if request.FILES.get("logo"):
+            logo = request.FILES.get("logo")
+            # 🔥 GÜVENLİK: Dosya Boyutu (Max 2MB) ve Uzantı Kontrolü
+            if logo.size > 2 * 1024 * 1024:
+                messages.error(request, "❌ Logo boyutu 2MB'den büyük olamaz.")
+                return redirect("isletme_ayarlar")
+            
+            allowed_exts = ['.jpg', '.jpeg', '.png', '.webp']
+            ext = os.path.splitext(logo.name)[1].lower()
+            if ext not in allowed_exts:
+                messages.error(request, f"❌ Geçersiz dosya formatı ({ext}). Sadece JPG, PNG ve WEBP kabul edilir.")
+                return redirect("isletme_ayarlar")
+            
+            isletme.logo = logo
+
+        if request.FILES.get("cover_image"):
+            cover = request.FILES.get("cover_image")
+            if cover.size > 5 * 1024 * 1024: # Kapak resmi 5MB olabilir
+                messages.error(request, "❌ Kapak resmi boyutu 5MB'den büyük olamaz.")
+                return redirect("isletme_ayarlar")
+            
+            isletme.cover_image = cover
+
         galeri_dosyalari = request.FILES.getlist('gallery_images')
         mevcut_resim_sayisi = isletme.gallery_images.count()
 
         for dosya in galeri_dosyalari:
-            # Sadece 5 fotoğrafa kadar izin ver
+            # 🔥 GÜVENLİK: Galeri görselleri için de aynı kontrol
+            if dosya.size > 3 * 1024 * 1024:
+                messages.warning(request, f"⚠️ '{dosya.name}' dosyası çok büyük (Max 3MB). Yoksayıldı.")
+                continue
+
+            ext = os.path.splitext(dosya.name)[1].lower()
+            if ext not in ['.jpg', '.jpeg', '.png', '.webp']:
+                messages.warning(request, f"⚠️ '{dosya.name}' geçersiz format. Yoksayıldı.")
+                continue
+
             if mevcut_resim_sayisi < 5:
                 BusinessImage.objects.create(business=isletme, image=dosya)
                 mevcut_resim_sayisi += 1
@@ -518,45 +635,93 @@ def isletme_ayarlar(request):
                 messages.warning(request, "En fazla 5 adet galeri görseli yükleyebilirsiniz. Diğerleri yoksayıldı.")
                 break
 
-        # YENİ: İzin günlerini HTML'den liste olarak alıp veritabanına string ("0,6" gibi) kaydet
         kapali_gunler_listesi = request.POST.getlist("closed_days")
         isletme.closed_days = ",".join(kapali_gunler_listesi)
 
+        # 🔥 Dinamik coğrafi konum geocode güncelleme
+        lat, lng = geocode_address(isletme.address, isletme.city, isletme.district)
+        isletme.latitude = lat
+        isletme.longitude = lng
+
         isletme.save()
+
+        # 🔥 AUDIT LOG: Ayar değişikliğini kaydet
+        AuditLog.objects.create(
+            business=isletme,
+            user=request.user,
+            action='update',
+            model_name='Business',
+            details=f"İşletme ayarları güncellendi: {isletme.name}",
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+
         messages.success(request, "✅ Ayarlar güncellendi.")
         return redirect("isletme_ayarlar")
 
-    return render(
-        request,
-        "businesses/isletme_ayarlar.html",
-        {
-            "isletme": isletme,
-            "time_choices": time_choices,
-            "kategoriler": kategoriler,
-        },
-    )
+    return render(request, "businesses/isletme_ayarlar.html", {
+        "isletme": isletme,
+        "time_choices": time_choices,
+        "kategoriler": kategoriler,
+    })
+
+
+
+@login_required(login_url="/hesap/giris/")
+def isletme_hizli_kayit(request):
+    """Jüri sunumu için işletmeyi anında Iyzico'ya bağlar."""
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+    
+    from payments.sub_merchant_helper import create_iyzico_sub_merchant
+    
+    # 🧪 JÜRİ ÖZEL: Kusursuz Sandbox Verileri
+    isletme.iban = "TR560006100000000000012345"
+    isletme.tax_number = "11111111111"
+    isletme.tax_office = "Bogazici VD"
+    isletme.sub_merchant_type = "PERSONAL"
+    isletme.save()
+    
+    success, result = create_iyzico_sub_merchant(isletme)
+    
+    if success:
+        messages.success(request, f"🚀 Harika! '{isletme.name}' saniyeler içinde Iyzico'ya bağlandı. Artık randevu ödemelerini otomatik olarak alabilirsin!")
+    else:
+        messages.error(request, f"❌ Bağlantı sırasında bir aksilik oldu: {result}")
+        
+    return redirect("isletme_ayarlar")
 
 
 @login_required(login_url="/hesap/giris/")
 def isletme_musteriler(request):
-    isletme = Business.objects.filter(owner=request.user).first()
+    isletme = get_aktif_isletme(request)
     if not isletme:
         return redirect("kayit")
 
     musteriler = isletme.customers.all().order_by("-id")
-    return render(
-        request,
-        "businesses/isletme_musteriler.html",
-        {
-            "isletme": isletme,
-            "musteriler": musteriler,
-        },
-    )
+    return render(request, "businesses/isletme_musteriler.html", {"isletme": isletme, "musteriler": musteriler})
+
+
+@login_required(login_url="/hesap/giris/")
+def musteri_engelle(request, id):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect("kayit")
+
+    musteri = get_object_or_404(Customer, id=id, business=isletme)
+    musteri.is_blocked = not musteri.is_blocked
+    musteri.save()
+
+    if musteri.is_blocked:
+        messages.success(request, f"🔒 {musteri.first_name} {musteri.last_name} engellendi! Bu telefon numarasıyla artık yeni randevu alınamaz.")
+    else:
+        messages.success(request, f"🔓 {musteri.first_name} {musteri.last_name} üzerindeki engel kaldırıldı.")
+
+    return redirect("isletme_musteriler")
 
 
 @login_required(login_url="/hesap/giris/")
 def isletme_hizmetler(request):
-    isletme = Business.objects.filter(owner=request.user).first()
+    isletme = get_aktif_isletme(request)
     if not isletme:
         return redirect("kayit")
 
@@ -565,29 +730,57 @@ def isletme_hizmetler(request):
         fiyat = request.POST.get("price")
         sure_deger = request.POST.get("duration_value")
         sure_birim = request.POST.get("duration_unit", "minutes")
-
-        # YENİ: Hangi personeller seçildi? (HTML'den name="staffs" olarak çoklu gelecek)
         secilen_personeller = request.POST.getlist("staffs")
-
         in_store_check = request.POST.get("is_in_store") == "on"
         at_home_check = request.POST.get("is_at_home") == "on"
         online_check = request.POST.get("is_online") == "on"
+        campaign_type = request.POST.get("campaign_type", "none")
+        campaign_value = request.POST.get("campaign_value", 0)
+
+        # 🔥 YENİ: FORMADAN GELEN TALİMATI ÇEK
+        booking_instruction = request.POST.get("booking_instruction", "")
 
         if hizmet_adi and fiyat:
             duration_int = int(sure_deger) if sure_deger else None
+            
+            # 🔥 SIKI DURASYON KONTROLLERİ 🔥
+            isletme_gunluk_sure_dk = (isletme.closing_time.hour * 60 + isletme.closing_time.minute) - (isletme.opening_time.hour * 60 + isletme.opening_time.minute)
+            
+            # 1. Dakika Bazlı Kontrol (15 ve katları)
+            if sure_birim == "minutes" and duration_int:
+                if duration_int < 15 or duration_int % 15 != 0:
+                    messages.error(request, "❌ Hizmet süresi en az 15 dakika ve 15'in katları olmalıdır (Örn: 15, 30, 45, 60...).")
+                    return redirect("isletme_hizmetler")
+            
+            # 2. Mesai Saati Sınırı (Dakika ve Saat için geçerli)
+            hesaplanan_sure = duration_int if sure_birim == "minutes" else (duration_int * 60 if sure_birim == "hours" else 0)
+            if hesaplanan_sure > isletme_gunluk_sure_dk:
+                messages.error(request, f"❌ Girdiğiniz süre ({hesaplanan_sure} dk), günlük mesai saatinizi ({isletme_gunluk_sure_dk} dk) aşıyor. Lütfen daha kısa bir süre girin veya 'Gün/Hafta' birimini seçin.")
+                return redirect("isletme_hizmetler")
+
+            # Decimal Temizliği ve Doğrulama
+            from decimal import Decimal
+            try:
+                clean_price = Decimal(str(fiyat).replace(',', '.'))
+                clean_campaign_val = Decimal(str(campaign_value).replace(',', '.'))
+            except (TypeError, ValueError, ArithmeticError):
+                messages.error(request, "❌ Geçersiz fiyat veya kampanya değeri!")
+                return redirect("isletme_hizmetler")
 
             yeni_hizmet = Service.objects.create(
                 business=isletme,
                 name=hizmet_adi,
-                price=fiyat,
+                price=clean_price,
                 duration=duration_int,
                 duration_type=sure_birim,
                 is_in_store=in_store_check,
                 is_at_home=at_home_check,
-                is_online=online_check
+                is_online=online_check,
+                campaign_type=campaign_type,
+                campaign_value=campaign_value,
+                booking_instruction=booking_instruction  # 🔥 YENİ: VERİTABANINA YAZ
             )
 
-            # YENİ: Personelleri hizmete bağla
             if secilen_personeller:
                 yeni_hizmet.staffs.set(secilen_personeller)
 
@@ -595,197 +788,18 @@ def isletme_hizmetler(request):
             return redirect("isletme_hizmetler")
 
     hizmetler = isletme.services.all().order_by("-id")
-    personeller = isletme.staff_members.filter(is_active=True)  # Ekleme formu için gönderiyoruz
+    personeller = isletme.staff_members.filter(is_active=True)
 
-    return render(
-        request,
-        "businesses/isletme_hizmetler.html",
-        {
-            "isletme": isletme,
-            "hizmetler": hizmetler,
-            "personeller": personeller,  # HTML'e gönder
-        },
-    )
-
-
-@login_required(login_url="/hesap/giris/")
-def hizmet_sil(request, id):
-    hizmet = get_object_or_404(Service, id=id, business__owner=request.user)
-    hizmet.delete()
-    messages.error(request, "🗑️ Hizmet vitrinden kaldırıldı.")
-    return redirect("isletme_hizmetler")
-
-
-# ==========================================
-# YENİ: İŞLETME PERSONEL YÖNETİMİ
-# ==========================================
-@login_required(login_url="/hesap/giris/")
-def isletme_personeller(request):
-    isletme = Business.objects.filter(owner=request.user).first()
-    if not isletme:
-        return redirect("kayit")
-
-    if request.method == "POST":
-        # Ücretsiz plan sınırı (Max 2 personel)
-        if not isletme.is_premium and isletme.staff_members.count() >= 2:
-            messages.error(request,
-                           "Ücretsiz planda en fazla 2 personel ekleyebilirsiniz. Sınırları kaldırmak için Premium'a geçin!")
-            return redirect("isletme_personeller")
-
-        isim = request.POST.get("name")
-        unvan = request.POST.get("title")
-        foto = request.FILES.get("photo")
-
-        if isim:
-            Staff.objects.create(business=isletme, name=isim, title=unvan, photo=foto)
-            messages.success(request, "Personel eklendi.")
-            return redirect("isletme_personeller")
-
-    personeller = isletme.staff_members.all().order_by("-id")
-    return render(request, "businesses/isletme_personeller.html", {"isletme": isletme, "personeller": personeller})
-
-
-@login_required(login_url="/hesap/giris/")
-def personel_sil(request, id):
-    personel = get_object_or_404(Staff, id=id, business__owner=request.user)
-    personel.delete()
-    messages.error(request, "Personel silindi.")
-    return redirect("isletme_personeller")
-
-
-# ==========================================
-# YENİ: İŞLETME KUPON YÖNETİMİ
-# ==========================================
-@login_required(login_url="/hesap/giris/")
-def isletme_kuponlar(request):
-    isletme = Business.objects.filter(owner=request.user).first()
-    if not isletme:
-        return redirect("kayit")
-
-    if request.method == "POST":
-        kod = request.POST.get("code")
-        tip = request.POST.get("discount_type")
-        deger = request.POST.get("discount_value")
-        limit = request.POST.get("usage_limit", 0)
-        bitis_str = request.POST.get("valid_until")
-
-        if kod and deger and bitis_str:
-            bitis_zamani = parse_datetime(f"{bitis_str}T23:59:59")
-            bitis_zamani = timezone.make_aware(bitis_zamani) if timezone.is_naive(bitis_zamani) else bitis_zamani
-
-            Coupon.objects.create(
-                business=isletme,
-                code=kod.upper(),
-                discount_type=tip,
-                discount_value=deger,
-                usage_limit=limit,
-                valid_until=bitis_zamani
-            )
-            messages.success(request, "Kupon başarıyla oluşturuldu!")
-            return redirect("isletme_kuponlar")
-
-    kuponlar = isletme.coupons.all().order_by("-id")
-    return render(request, "businesses/isletme_kuponlar.html", {"isletme": isletme, "kuponlar": kuponlar})
-
-
-@login_required(login_url="/hesap/giris/")
-def kupon_sil(request, id):
-    kupon = get_object_or_404(Coupon, id=id, business__owner=request.user)
-    kupon.delete()
-    messages.error(request, "Kupon silindi.")
-    return redirect("isletme_kuponlar")
-
-
-@login_required(login_url="/hesap/giris/")
-def isletme_abonelik(request):
-    isletme = Business.objects.filter(owner=request.user).first()
-    if not isletme:
-        return redirect("kayit")
-
-    return render(
-        request,
-        "businesses/isletme_abonelik.html",
-        {"isletme": isletme},
-    )
-
-
-@login_required(login_url="/hesap/giris/")
-def pro_yap(request):
-    isletme = Business.objects.filter(owner=request.user).first()
-
-    if isletme:
-        isletme.is_premium = True
-        isletme.save()
-        messages.success(request, "🎉 Tebrikler! Pro Plan aktifleştirildi!")
-
-    return redirect("dashboard")
-
-
-@login_required(login_url="/hesap/giris/")
-def musterileri_indir_csv(request):
-    isletme = get_object_or_404(Business, owner=request.user)
-    musteriler = isletme.customers.all()
-
-    # CSV Yanıtı Oluşturma
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{isletme.slug}_musteri_listesi.csv"'
-    response.write(u'\ufeff'.encode('utf8'))  # Türkçe karakter desteği için BOM
-
-    writer = csv.writer(response)
-    writer.writerow(['Ad', 'Soyad', 'Telefon', 'Toplam Randevu'])
-
-    for m in musteriler:
-        writer.writerow([m.first_name, m.last_name, m.phone, m.appointments.count()])
-
-    return response
-
-
-@never_cache
-def degerlendirme_yap(request, token):
-    # UUID token'a göre randevuyu bul
-    randevu = get_object_or_404(Appointment, review_token=token)
-
-    # Eğer randevu iptal edilmişse veya zaten değerlendirilmişse YENİ SAYFAYA AT
-    if randevu.is_reviewed:
-        # İŞTE BURASI DÜZELDİ: hata.html yerine islem_tamam.html oldu
-        return render(request, 'businesses/islem_tamam.html', {'randevu': randevu})
-
-    if request.method == 'POST':
-        puan = request.POST.get('rating')
-        yorum = request.POST.get('comment')
-
-        if puan:
-            Review.objects.create(
-                business=randevu.business,
-                appointment=randevu,
-                rating=int(puan),
-                comment=yorum
-            )
-            # Randevuyu değerlendirildi olarak işaretle ki link tek kullanımlık olsun
-            randevu.is_reviewed = True
-            randevu.save()
-
-            messages.success(request, 'Değerlendirmeniz için teşekkür ederiz!')
-            return redirect('isletme_detay', slug=randevu.business.slug)
-
-    return render(request, 'businesses/degerlendirme_yap.html', {'randevu': randevu})
-
-
-@login_required(login_url="/hesap/giris/")
-def personel_durum_degistir(request, id):
-    personel = get_object_or_404(Staff, id=id, business__owner=request.user)
-    # Mevcut durumun tam tersine çevir (True ise False, False ise True yap)
-    personel.is_active = not personel.is_active
-    personel.save()
-
-    durum_mesaji = "Aktif (Müşteriler seçebilir)" if personel.is_active else "Pasif (İzinde - Listede gizlendi)"
-    messages.success(request, f"ℹ️ {personel.name} durumu güncellendi: {durum_mesaji}")
-    return redirect("isletme_personeller")
+    return render(request, "businesses/isletme_hizmetler.html", {
+        "isletme": isletme,
+        "hizmetler": hizmetler,
+        "personeller": personeller,
+    })
 
 
 @login_required(login_url="/hesap/giris/")
 def hizmet_duzenle(request, id):
-    isletme = Business.objects.filter(owner=request.user).first()
+    isletme = get_aktif_isletme(request)
     if not isletme:
         return redirect("kayit")
 
@@ -797,19 +811,48 @@ def hizmet_duzenle(request, id):
         hizmet.price = request.POST.get("price")
 
         sure_deger = request.POST.get("duration_value")
-        hizmet.duration = int(sure_deger) if sure_deger else None
-        hizmet.duration_type = request.POST.get("duration_unit", "minutes")
+        temp_duration = int(sure_deger) if sure_deger else None
+        temp_unit = request.POST.get("duration_unit", "minutes")
+
+        # 🔥 SIKI DURASYON KONTROLLERİ (DÜZENLEME) 🔥
+        isletme_gunluk_sure_dk = (isletme.closing_time.hour * 60 + isletme.closing_time.minute) - (isletme.opening_time.hour * 60 + isletme.opening_time.minute)
+        
+        if temp_unit == "minutes" and temp_duration:
+            if temp_duration < 15 or temp_duration % 15 != 0:
+                messages.error(request, "❌ Hizmet süresi en az 15 dakika ve 15'in katları olmalıdır.")
+                return redirect("hizmet_duzenle", id=id)
+
+        hesaplanan_sure = temp_duration if temp_unit == "minutes" else (temp_duration * 60 if temp_unit == "hours" else 0)
+        if hesaplanan_sure > isletme_gunluk_sure_dk:
+            messages.error(request, f"❌ Hizmet süresi günlük mesaiyi ({isletme_gunluk_sure_dk} dk) aşamaz.")
+            return redirect("hizmet_duzenle", id=id)
+
+        hizmet.duration = temp_duration
+        hizmet.duration_type = temp_unit
 
         hizmet.is_in_store = request.POST.get("is_in_store") == "on"
         hizmet.is_at_home = request.POST.get("is_at_home") == "on"
         hizmet.is_online = request.POST.get("is_online") == "on"
 
-        # Personel güncelleme (Seçilenleri ata, seçilmeyenleri kopar)
+        hizmet.name = request.POST.get("name")
+        
+        try:
+            hizmet.price = Decimal(str(request.POST.get("price")).replace(',', '.'))
+            hizmet.campaign_value = Decimal(str(request.POST.get("campaign_value", 0)).replace(',', '.'))
+        except (TypeError, ValueError, ArithmeticError):
+            messages.error(request, "❌ Geçersiz fiyat veya kampanya değeri!")
+            return redirect("hizmet_duzenle", id=id)
+
+        hizmet.campaign_type = request.POST.get("campaign_type", "none")
+
+        # 🔥 YENİ: DÜZENLEME EKRANINDAN GELEN TALİMATI GÜNCELLE
+        hizmet.booking_instruction = request.POST.get("booking_instruction", "")
+
         secilen_personeller = request.POST.getlist("staffs")
         if secilen_personeller:
             hizmet.staffs.set(secilen_personeller)
         else:
-            hizmet.staffs.clear()  # Hiç kimse seçilmediyse hepsini temizle
+            hizmet.staffs.clear()
 
         hizmet.save()
         messages.success(request, "✅ Hizmet başarıyla güncellendi!")
@@ -822,452 +865,477 @@ def hizmet_duzenle(request, id):
     })
 
 
-def get_available_times(request, slug):
-    isletme = get_object_or_404(Business, slug=slug)
+@require_POST
+@login_required(login_url="/hesap/giris/")
+def hizmet_sil(request, id):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
 
-    date_str = request.GET.get('date')
-    service_id = request.GET.get('service_id')
-    staff_id = request.GET.get('staff_id')
+    hizmet = get_object_or_404(Service, id=id, business=isletme)
 
-    if not date_str or not service_id:
-        return JsonResponse({'error': 'Eksik parametre'}, status=400)
-
-    try:
-        secilen_tarih = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        return JsonResponse({'error': 'Geçersiz tarih'}, status=400)
-
-    # ==========================================
-    # YENİ: İŞLETME TATİL GÜNÜ KONTROLÜ
-    # JavaScript takvimine uyumlu gün: (0=Pazar, 1=Pzt, ..., 6=Cmt)
-    # Python isoweekday() 1=Pzt, 7=Pazar döner. Bu yüzden ufak bir çevirme yapıyoruz.
-    # ==========================================
-    js_gun_kodu = str(secilen_tarih.isoweekday() % 7)
-
-    if isletme.closed_days and js_gun_kodu in isletme.closed_days.split(','):
-        return JsonResponse({'slots': [], 'error': 'İşletme bu tarihte (izin günü) kapalıdır.'})
-
-    secilen_hizmet = get_object_or_404(Service, id=service_id, business=isletme)
-
-    sure_dk = 60
-    if secilen_hizmet.duration:
-        if secilen_hizmet.duration_type == "minutes":
-            sure_dk = secilen_hizmet.duration
-        elif secilen_hizmet.duration_type == "hours":
-            sure_dk = secilen_hizmet.duration * 60
-
-    acilis = isletme.opening_time
-    kapanis = isletme.closing_time
-
-    # ==========================================
-    # YENİ ZEKİ MANTIK: KAPASİTE (HAVUZ) HESAPLAMA
-    # ==========================================
-    yetkili_personeller = secilen_hizmet.staffs.filter(is_active=True, is_approved=True)
-    toplam_yetkili_sayisi = yetkili_personeller.count()
-
-    # Eğer hizmete atanmış özel personel yoksa, dükkanı tek bir "slot" (Kapasite=1) say.
-    if toplam_yetkili_sayisi == 0:
-        toplam_yetkili_sayisi = 1
-
-    gunluk_randevular = isletme.appointments.filter(
-        date_time__date=secilen_tarih,
-        status__in=['pending', 'approved', 'confirmed']
+    # 🔥 GÜVENLİK DUVARI: Bu hizmete ait gelecekte bekleyen randevu var mı?
+    gelecek_randevular = Appointment.objects.filter(
+        service=hizmet,
+        date_time__gt=timezone.now(),
+        status__in=['payment_pending', 'pending', 'approved', 'confirmed']
     )
 
-    slots = []
-    suanki_zaman = datetime.combine(secilen_tarih, acilis)
-    kapanis_zamani = datetime.combine(secilen_tarih, kapanis)
-    now = timezone.now()
+    if gelecek_randevular.exists():
+        messages.error(request, f"🚨 DİKKAT: '{hizmet.name}' hizmetine ait gelecekte {gelecek_randevular.count()} adet randevu bulunuyor. Önce bu randevuları iptal etmelisiniz!")
+        return redirect("isletme_hizmetler")
 
-    while suanki_zaman + timedelta(minutes=sure_dk) <= kapanis_zamani:
-        slot_baslangic = suanki_zaman
-        slot_bitis = suanki_zaman + timedelta(minutes=sure_dk)
+    hizmet.delete()
+    messages.error(request, "🗑️ Hizmet vitrinden başarıyla kaldırıldı.")
+    return redirect("isletme_hizmetler")
 
-        is_available = True
 
-        aware_slot_baslangic = timezone.make_aware(slot_baslangic) if timezone.is_naive(
-            slot_baslangic) else slot_baslangic
-        if aware_slot_baslangic < now:
-            is_available = False
+@login_required(login_url="/hesap/giris/")
+def isletme_personeller(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect("kayit")
 
-        if is_available:
-            if staff_id:
-                # DURUM 1: Belirli bir personel seçildiyse (Sadece onun takvimine bak)
-                for r in gunluk_randevular.filter(staff_id=staff_id):
-                    r_sure = 60
-                    if r.service and r.service.duration:
-                        if r.service.duration_type == "minutes":
-                            r_sure = r.service.duration
-                        elif r.service.duration_type == "hours":
-                            r_sure = r.service.duration * 60
+    if request.method == "POST":
+        action = request.POST.get("action")
 
-                    r_baslangic = timezone.localtime(r.date_time).replace(tzinfo=None)
-                    r_bitis = r_baslangic + timedelta(minutes=r_sure)
+        # 🔥 1. PERSONEL DÜZENLEME (EDIT) MODU
+        if action == "edit_staff":
+            staff_id = request.POST.get("staff_id")
+            # Sadece bu işletmeye ait personeli bul (Güvenlik Koruması)
+            personel = get_object_or_404(Staff, id=staff_id, business=isletme)
 
-                    if slot_baslangic < r_bitis and slot_bitis > r_baslangic:
-                        is_available = False
-                        break
-            else:
-                # DURUM 2: "FARK ETMEZ" Seçildiyse (Kapasite Kontrolü)
-                mesgul_personel_sayisi = 0
+            # Formdan gelen yeni verileri al
+            yeni_isim = request.POST.get("name")
+            yeni_unvan = request.POST.get("title")
 
-                for r in gunluk_randevular:
-                    r_sure = 60
-                    if r.service and r.service.duration:
-                        if r.service.duration_type == "minutes":
-                            r_sure = r.service.duration
-                        elif r.service.duration_type == "hours":
-                            r_sure = r.service.duration * 60
+            if yeni_isim:
+                personel.name = yeni_isim
+            if yeni_unvan is not None:  # Boş bırakılırsa unvanı silmeye izin ver
+                personel.title = yeni_unvan
 
-                    r_baslangic = timezone.localtime(r.date_time).replace(tzinfo=None)
-                    r_bitis = r_baslangic + timedelta(minutes=r_sure)
+            # Eğer yeni bir fotoğraf seçildiyse onu da kaydet
+            if 'photo' in request.FILES:
+                personel.photo = request.FILES['photo']
 
-                    # Bu randevu o saat dilimiyle çakışıyorsa:
-                    if slot_baslangic < r_bitis and slot_bitis > r_baslangic:
-                        if r.staff:
-                            # Randevudaki personel, bu hizmeti verebilenlerden biriyse sayacı 1 artır
-                            if yetkili_personeller.filter(id=r.staff.id).exists():
-                                mesgul_personel_sayisi += 1
-                        else:
-                            # Randevunun personeli yoksa (genel randevuysa), tüm dükkanı kaplıyor demektir
-                            mesgul_personel_sayisi = toplam_yetkili_sayisi
-                            break
+            personel.save()
+            messages.success(request, f"✏️ {personel.name} adlı personelin bilgileri başarıyla güncellendi!")
+            return redirect("isletme_personeller")
 
-                # Eğer o saatte hizmet verebilecek TÜM personeller meşgulse saat tamamen kapanır!
-                if mesgul_personel_sayisi >= toplam_yetkili_sayisi:
-                    is_available = False
+        # 🔥 2. YENİ PERSONEL EKLEME MODU
+        else:
+            # Sınır kontrolü SADECE yeni ekleme yaparken çalışmalı!
+            if not isletme.is_premium and isletme.staff_members.count() >= 2:
+                messages.error(request,
+                               "Ücretsiz planda en fazla 2 personel ekleyebilirsiniz. Sınırları kaldırmak için Premium'a geçin!")
+                return redirect("isletme_personeller")
 
-        slots.append({
-            'time': slot_baslangic.strftime('%H:%M'),
-            'available': is_available
-        })
+            isim = request.POST.get("name")
+            unvan = request.POST.get("title")
+            foto = request.FILES.get("photo")
 
-        suanki_zaman += timedelta(minutes=10)
+            if isim:
+                Staff.objects.create(business=isletme, name=isim, title=unvan, photo=foto)
+                messages.success(request, "🎉 Yeni personel başarıyla eklendi.")
+                return redirect("isletme_personeller")
 
-    return JsonResponse({'slots': slots})
+    # Sayfa ilk açıldığında listeyi gönder
+    personeller = isletme.staff_members.all().order_by("-id")
+    return render(request, "businesses/isletme_personeller.html", {"isletme": isletme, "personeller": personeller})
+
+
+@login_required(login_url="/hesap/giris/")
+def personel_durum_degistir(request, id):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+
+    personel = get_object_or_404(Staff, id=id, business=isletme)
+
+    # 🔥 GÜVENLİK DUVARI: Personeli aktif etmeye çalışıyor ama Premium DEĞİLSE!
+    if not personel.is_active and not isletme.is_premium:
+        aktif_personel_sayisi = isletme.staff_members.filter(is_active=True).count()
+        if aktif_personel_sayisi >= 2:
+            messages.error(request, "🚨 Ücretsiz planda en fazla 2 personeli aktif tutabilirsiniz. Lütfen Premium'a geçin!")
+            return redirect("isletme_personeller")
+
+    personel.is_active = not personel.is_active
+    personel.save()
+
+    durum_mesaji = "Aktif (Müşteriler seçebilir)" if personel.is_active else "Pasif (İzinde - Listede gizlendi)"
+    messages.success(request, f"ℹ️ {personel.name} durumu güncellendi: {durum_mesaji}")
+    return redirect("isletme_personeller")
+
+
+@require_POST
+@login_required(login_url="/hesap/giris/")
+def personel_sil(request, id):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+
+    personel = get_object_or_404(Staff, id=id, business=isletme)
+
+    # 🔥 GÜVENLİK DUVARI: Gelecekte bekleyen randevusu var mı?
+    gelecek_randevular = Appointment.objects.filter(
+        staff=personel,
+        date_time__gt=timezone.now(),
+        status__in=['payment_pending', 'pending', 'approved', 'confirmed']
+    )
+
+    if gelecek_randevular.exists():
+        # SİLME İŞLEMİNİ BLOKE ET, HTML'E SİNYAL GÖNDER (MODAL AÇILSIN)
+        randevu_sayisi = gelecek_randevular.count()
+        return redirect(f"{reverse('isletme_personeller')}?error=randevu_var&name={personel.name}&count={randevu_sayisi}")
+
+    personel.delete()
+    messages.error(request, "🗑️ Personel sistemden kalıcı olarak silindi.")
+    return redirect("isletme_personeller")
+
+
+@login_required(login_url="/hesap/giris/")
+def isletme_kuponlar(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect("kayit")
+
+    if request.method == "POST":
+        kod = request.POST.get("code")
+        tip = request.POST.get("discount_type")
+        deger = request.POST.get("discount_value")
+        limit = request.POST.get("usage_limit", 0)
+        is_public = request.POST.get("is_public") == "on"
+        bitis_str = request.POST.get("valid_until")
+
+        if kod and deger and bitis_str:
+            bitis_zamani = parse_datetime(f"{bitis_str}T23:59:59")
+            bitis_zamani = timezone.make_aware(bitis_zamani) if timezone.is_naive(bitis_zamani) else bitis_zamani
+
+            Coupon.objects.create(
+                business=isletme,
+                code=kod.upper(),
+                discount_type=tip,
+                discount_value=deger,
+                usage_limit=limit,
+                is_public=is_public,
+                valid_until=bitis_zamani
+            )
+            messages.success(request, "Kupon başarıyla oluşturuldu!")
+            return redirect("isletme_kuponlar")
+
+    kuponlar = isletme.coupons.all().order_by("-id")
+    return render(request, "businesses/isletme_kuponlar.html", {"isletme": isletme, "kuponlar": kuponlar})
+
+
+@require_POST
+@login_required(login_url="/hesap/giris/")
+def kupon_sil(request, id):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+
+    kupon = get_object_or_404(Coupon, id=id, business=isletme)
+    kupon.delete()
+    messages.error(request, "Kupon silindi.")
+    return redirect("isletme_kuponlar")
+
+
+@login_required(login_url="/hesap/giris/")
+def isletme_abonelik(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect("kayit")
+
+    return render(request, "businesses/isletme_abonelik.html", {"isletme": isletme})
+
+
+@login_required(login_url="/hesap/giris/")
+def pro_yap(request):
+    # 🔥 GÜVENLİK: Bu endpoint sadece geliştirme ortamında çalışır!
+    from django.conf import settings as app_settings
+    if not app_settings.DEBUG:
+        messages.error(request, "❌ Bu işlem sadece geliştirme ortamında kullanılabilir.")
+        return redirect('dashboard')
+
+    isletme = get_aktif_isletme(request)
+    if isletme:
+        # 1. Ana İşletmeyi Premium yap ve süreyi uzat (Örn: 30 gün)
+        isletme.is_premium = True
+        # Eğer iyzico vs. gerçek entegrasyon varsa süreyi oradan alırsın, şimdilik manuel 30 gün veriyoruz:
+        isletme.premium_end_date = timezone.now() + timedelta(days=30)
+        isletme.save()
+
+        # 2. 🔥 SİHİRLİ DOKUNUŞ: KEPENKLERİ GERİ KALDIR! 🔥
+        # Patronun sahip olduğu TÜM şubeleri bul, hem premium yap hem de vitrine geri koy!
+        tum_subeler = Business.objects.filter(owner=request.user)
+        for sube in tum_subeler:
+            sube.is_premium = True
+            sube.premium_end_date = isletme.premium_end_date
+            sube.is_active = True  # İŞTE KEŞFET'E GERİ DÖŞÜREN KOD!
+            sube.save()
+
+        messages.success(request,
+                         "🎉 Tebrikler! Pro Plan aktifleştirildi. Tüm şubelerinizin kepenkleri açıldı ve vitrine geri döndü!")
+
+    return redirect("dashboard")
+
+
+@login_required(login_url="/hesap/giris/")
+def musterileri_indir_csv(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect("kayit")
+
+    musteriler = isletme.customers.all()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{isletme.slug}_musteri_listesi.csv"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response)
+    writer.writerow(['Ad', 'Soyad', 'Telefon', 'Toplam Randevu'])
+
+    for m in musteriler:
+        writer.writerow([m.first_name, m.last_name, m.phone, m.valid_appointments_count])
+
+    return response
 
 
 @login_required(login_url="/hesap/giris/")
 def isletme_analiz(request):
-    isletme = Business.objects.filter(owner=request.user).first()
-
+    isletme = get_aktif_isletme(request)
     if not isletme:
         return redirect("kayit")
 
+    is_premium_teaser = False
     if not isletme.is_premium:
-        messages.error(request, "Bu özellik sadece Premium işletmelere özeldir.")
-        return redirect("dashboard")
+        is_premium_teaser = True
+        hizmet_isimleri = ["Saç Kesimi", "Sakal Tıraşı", "Cilt Bakımı", "Fön & Tarama", "Saç Boyama"]
+        hizmet_sayilari = [45, 30, 20, 15, 10]
+        ciro_isimleri = ["Saç Kesimi", "Saç Boyama", "Cilt Bakımı", "Sakal Tıraşı", "Fön & Tarama"]
+        ciro_tutarlari = [13500.0, 9000.0, 6000.0, 3000.0, 1500.0]
+        urun_isimleri = ["Saç Waxı", "Saç Kremi", "Sakal Yağı", "Argan Şampuanı", "Cilt Maskesi"]
+        urun_tutarlari = [4500.0, 3200.0, 2100.0, 1800.0, 950.0]
+        personel_performans = [
+            {"staff__name": "Ahmet Yılmaz", "islem_sayisi": 55, "getiri": 18500.0},
+            {"staff__name": "Mehmet Can", "islem_sayisi": 42, "getiri": 12400.0},
+            {"staff__name": "Selin Kaya", "islem_sayisi": 35, "getiri": 10500.0},
+        ]
+        basari_orani = 96
+        iptal_orani = 4
+        
+        context = {
+            'isletme': isletme,
+            'is_premium_teaser': is_premium_teaser,
+            'basari_orani': basari_orani,
+            'iptal_orani': iptal_orani,
+            'personel_performans': personel_performans,
+            'hizmet_isimleri_json': json.dumps(hizmet_isimleri),
+            'hizmet_sayilari_json': json.dumps(hizmet_sayilari),
+            'ciro_isimleri_json': json.dumps(ciro_isimleri),
+            'ciro_tutarlari_json': json.dumps(ciro_tutarlari),
+            'urun_isimleri_json': json.dumps(urun_isimleri),
+            'urun_tutarlari_json': json.dumps(urun_tutarlari),
+        }
+        return render(request, "businesses/isletme_analiz.html", context)
 
-    # ==========================================
-    # 1. HİZMET POPÜLERLİĞİ (Hangi hizmet kaç kere alındı?)
-    # ==========================================
     hizmet_dagilimi = isletme.appointments.filter(
         status__in=['approved', 'confirmed', 'completed']
-    ).values('service__name').annotate(sayi=Count('id')).order_by('-sayi')[:5]  # En popüler 5 hizmet
+    ).values('service__name').annotate(sayi=Count('id')).order_by('-sayi')[:5]
 
     hizmet_isimleri = [item['service__name'] for item in hizmet_dagilimi]
     hizmet_sayilari = [item['sayi'] for item in hizmet_dagilimi]
 
-    # ==========================================
-    # 2. CİRO ŞAMPİYONLARI (Hangi hizmet ne kadar kazandırdı?)
-    # ==========================================
-    ciro_dagilimi = isletme.appointments.filter(
+    # --- YENİ CİRO HESAPLAMASI (ADİSYONLAR DAHİL) ---
+    ciro_dagilimi_ham = isletme.appointments.filter(
         status__in=['approved', 'confirmed', 'completed']
     ).values('service__name').annotate(toplam_ciro=Sum('final_service_price')).order_by('-toplam_ciro')[:5]
 
-    ciro_isimleri = [item['service__name'] for item in ciro_dagilimi]
-    ciro_tutarlari = [float(item['toplam_ciro'] or 0) for item in
-                      ciro_dagilimi]  # Decimal hatası vermemesi için float'a çevirdik
+    ciro_dagilimi = list(ciro_dagilimi_ham)
+    for item in ciro_dagilimi:
+        # YENİ KOD: Performans için total_price_cache kullanıldı
+        ekstra = AdisyonItem.objects.filter(
+            adisyon__appointment__service__name=item['service__name'],
+            adisyon__status='closed',
+            adisyon__business=isletme
+        ).aggregate(top=Sum('total_price_cache'))['top'] or Decimal('0.00')
 
-    # ==========================================
-    # 3. BAŞARI & İPTAL METRİKLERİ
-    # ==========================================
+        item['toplam_ciro'] += ekstra
+
+    # Ekstra paralar sıralamayı bozmasın diye tekrar sıralıyoruz
+    ciro_dagilimi = sorted(ciro_dagilimi, key=lambda x: x['toplam_ciro'], reverse=True)
+
+    ciro_isimleri = [item['service__name'] for item in ciro_dagilimi]
+    ciro_tutarlari = [float(item['toplam_ciro'] or 0) for item in ciro_dagilimi]
+
     toplam_randevu = isletme.appointments.count()
     tamamlananlar = isletme.appointments.filter(status__in=['approved', 'confirmed', 'completed']).count()
-    iptaller = isletme.appointments.filter(status='cancelled').count()
+    iptaller = isletme.appointments.filter(status__in=['cancelled', 'customer_cancelled']).count()
 
-    basari_orani = 0
-    iptal_orani = 0
-    if toplam_randevu > 0:
-        basari_orani = int((tamamlananlar / toplam_randevu) * 100)
-        iptal_orani = int((iptaller / toplam_randevu) * 100)
+    basari_orani = int((tamamlananlar / toplam_randevu) * 100) if toplam_randevu > 0 else 0
+    iptal_orani = int((iptaller / toplam_randevu) * 100) if toplam_randevu > 0 else 0
 
-    # ==========================================
-    # 4. PERSONEL KARNESİ (Kim kaç para getirdi?)
-    # ==========================================
-    personel_performans = isletme.appointments.filter(
+    personel_performans_ham = isletme.appointments.filter(
         status__in=['approved', 'confirmed', 'completed'],
-        staff__isnull=False  # Sadece personeli seçilmiş olanlar
+        staff__isnull=False
     ).values('staff__name').annotate(
         islem_sayisi=Count('id'),
         getiri=Sum('final_service_price')
-    ).order_by('-getiri')
+    )
+
+    personel_performans = list(personel_performans_ham)
+    for personel in personel_performans:
+        # YENİ KOD: Performans için total_price_cache kullanıldı
+        ekstra = AdisyonItem.objects.filter(
+            adisyon__appointment__staff__name=personel['staff__name'],
+            adisyon__status='closed',
+            adisyon__business=isletme
+        ).aggregate(top=Sum('total_price_cache'))['top'] or Decimal('0.00')
+
+        personel['getiri'] += ekstra
+
+    # En çok kazandıran personeli en üste al
+    personel_performans = sorted(personel_performans, key=lambda x: x['getiri'], reverse=True)
+
+    urun_dagilimi = AdisyonItem.objects.filter(
+        adisyon__business=isletme,
+        adisyon__status='closed',
+        product__isnull=False
+    ).values('product__name').annotate(
+        # YENİ KOD: Performans için total_price_cache kullanıldı
+        toplam_ciro=Sum('total_price_cache')
+    ).order_by('-toplam_ciro')[:5]
+
+    urun_isimleri = [item['product__name'] for item in urun_dagilimi]
+    urun_tutarlari = [float(item['toplam_ciro'] or 0) for item in urun_dagilimi]
 
     context = {
         'isletme': isletme,
         'basari_orani': basari_orani,
         'iptal_orani': iptal_orani,
         'personel_performans': personel_performans,
-        # Grafikler için veriler (JSON)
         'hizmet_isimleri_json': json.dumps(hizmet_isimleri),
         'hizmet_sayilari_json': json.dumps(hizmet_sayilari),
         'ciro_isimleri_json': json.dumps(ciro_isimleri),
         'ciro_tutarlari_json': json.dumps(ciro_tutarlari),
+        'urun_isimleri_json': json.dumps(urun_isimleri),
+        'urun_tutarlari_json': json.dumps(urun_tutarlari),
     }
 
     return render(request, "businesses/isletme_analiz.html", context)
 
 
-from django.contrib.auth import \
-    logout  # Üstteki importlara bunu da ekleyebilirsin, eklemesen de user silinince otomatik düşer ama temiz olsun.
-
-
 @login_required(login_url="/hesap/giris/")
 def hesap_sil(request):
-    isletme = Business.objects.filter(owner=request.user).first()
-
     if request.method == "POST":
-        # ==========================================
-        # 🔒 ZEKİ GÜVENLİK KİLİDİ: İLERİ TARİHLİ RANDEVU KONTROLÜ
-        # ==========================================
-        if isletme:
-            gelecek_randevular = isletme.appointments.filter(
-                date_time__gt=timezone.now(),
-                status__in=['pending', 'approved', 'confirmed']
-            )
+        # 🔒 GÜVENLİK: Şifre doğrulaması
+        sifre = request.POST.get('password', '')
+        if not request.user.check_password(sifre):
+            messages.error(request, "🔒 Güvenlik doğrulaması başarısız! Girdiğiniz şifre yanlış.")
+            return redirect("isletme_ayarlar")
 
-            if gelecek_randevular.exists():
-                randevu_sayisi = gelecek_randevular.count()
-                messages.error(request,
-                               f"🚨 DİKKAT: Hesabınızı silemezsiniz! İleri tarihli onaylanmış veya bekleyen {randevu_sayisi} adet randevunuz bulunuyor. Lütfen önce bu randevuları iptal edip müşterilerin ücret iadelerini sağlayınız.")
-                return redirect("isletme_ayarlar")
+        isletme = get_aktif_isletme(request)
+        if not isletme:
+            return redirect('kayit')
 
-        # Engel yoksa hesabı sil
-        user = request.user
-        user.delete()
-        messages.success(request,
-                         "Hesabınız ve işletmenize ait tüm veriler sistemden kalıcı olarak silinmiştir. Elveda! 👋")
-        return redirect("ana_sayfa")
+        # 1. Sadece AKTİF ŞUBEDEKİ gelecek randevuları kontrol et!
+        gelecek_randevular = Appointment.objects.filter(
+            business=isletme,
+            date_time__gt=timezone.now(),
+            status__in=['pending', 'approved', 'confirmed']
+        )
+
+        if gelecek_randevular.exists():
+            randevu_sayisi = gelecek_randevular.count()
+            messages.error(request, f"🚨 DİKKAT: Bu şubenizde toplam {randevu_sayisi} adet bekleyen/onaylı randevu bulunuyor. Şubeyi kapatmadan önce bu randevuları iptal etmelisiniz.")
+            return redirect("isletme_ayarlar")
+
+        # 2. Silinmeden önce adamın başka şubesi var mı sayalım
+        kalan_sube_sayisi = Business.objects.filter(owner=request.user).exclude(id=isletme.id).count()
+        isletme_adi = isletme.name
+
+        # 🔥 AUDIT LOG: Hesap silme (En son işlem)
+        AuditLog.objects.create(
+            business=None,
+            user=request.user,
+            action='delete',
+            model_name='Business/User',
+            details=f"Hesap ve işletme ({isletme_adi}) kalıcı olarak silindi.",
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+
+        # 3. Aktif işletmeyi (şubeyi) sil
+        isletme.delete()
+
+        # 4. Yönlendirme Zekası
+        if kalan_sube_sayisi > 0:
+            # Başka şubeleri varsa Workspace ekranına yolla
+            if 'aktif_isletme_id' in request.session:
+                del request.session['aktif_isletme_id']
+            messages.success(request, f"🏢 '{isletme_adi}' şubeniz kalıcı olarak kapatıldı. Diğer şubelerinizle devam edebilirsiniz.")
+            return redirect("isletme_sec")
+        else:
+            # Son şubesini de sildiyse, adamı komple sistemden (User tablosundan) sil!
+            request.user.delete()
+            messages.success(request, "Tüm şubeleriniz kapatıldı ve hesabınız sistemden kalıcı olarak silindi. Elveda! 👋")
+            return redirect("ana_sayfa")
 
     return redirect("isletme_ayarlar")
 
 
+@require_POST
+@login_required(login_url="/hesap/giris/")
+def galeri_resim_sil(request, id):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+
+    resim = get_object_or_404(BusinessImage, id=id, business=isletme)
+    resim.delete()
+    messages.error(request, "🗑️ Görsel galeriden silindi.")
+    return redirect("isletme_ayarlar")
+
+
 # ==========================================
-# 🔥 GOOGLE CALENDAR OAUTH2 (YETKİLENDİRME ŞOVU) 🔥
+# 🎵 SPOTIFY ENTEGRASYON KÖPRÜSÜ
 # ==========================================
-
-# SADECE GELİŞTİRME ORTAMI İÇİN (Canlıya alırken bu satırı sileceğiz)
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
-# Google'dan sadece takvim etkinliklerini yönetme izni istiyoruz
-SCOPES = ['https://www.googleapis.com/auth/calendar.events']
-
-
-def google_takvim_bagla(request):
-    isletme = get_object_or_404(Business, owner=request.user)
-
-    if not isletme.is_premium:
-        messages.error(request, "Bu özellik sadece Premium işletmelere özeldir.")
-        return redirect('isletme_ayarlar')
-
-    client_config = {
-        "web": {
-            "client_id": settings.GOOGLE_CLIENT_ID,
-            "project_id": "t-randevu",
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "client_secret": settings.GOOGLE_CLIENT_SECRET,
-            "redirect_uris": [request.build_absolute_uri('/businesses/google/callback/')]
-        }
-    }
-
-    flow = Flow.from_client_config(
-        client_config,
-        scopes=SCOPES,
-        redirect_uri=request.build_absolute_uri('/businesses/google/callback/')
-    )
-
-    authorization_url, state = flow.authorization_url(
-        access_type='offline',
-        include_granted_scopes='true',
-        prompt='consent'
-    )
-
-    # 1. State bilgisini kaydediyoruz
-    request.session['google_oauth_state'] = state
-    # 2. 🔥 YENİ: PKCE Şifresini Session'a (Hafızaya) kaydediyoruz!
-    request.session['google_code_verifier'] = getattr(flow, 'code_verifier', None)
-
-    return redirect(authorization_url)
-
-
-def google_takvim_callback(request):
-    # Hafızadaki şifreleri geri çağırıyoruz
-    state = request.session.get('google_oauth_state')
-    code_verifier = request.session.get('google_code_verifier')  # 🔥 YENİ!
-
-    isletme = get_object_or_404(Business, owner=request.user)
-
-    client_config = {
-        "web": {
-            "client_id": settings.GOOGLE_CLIENT_ID,
-            "project_id": "t-randevu",
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "client_secret": settings.GOOGLE_CLIENT_SECRET,
-            "redirect_uris": [request.build_absolute_uri('/businesses/google/callback/')]
-        }
-    }
-
-    flow = Flow.from_client_config(
-        client_config,
-        scopes=SCOPES,
-        state=state,
-        redirect_uri=request.build_absolute_uri('/businesses/google/callback/')
-    )
-
-    # 🔥 YENİ: Hafızadaki şifreyi flow nesnesine geri yüklüyoruz ki Google bizi tanısın!
-    if code_verifier:
-        flow.code_verifier = code_verifier
-
-    authorization_response = request.build_absolute_uri()
-
-    try:
-        flow.fetch_token(authorization_response=authorization_response)
-    except Exception as e:
-        print(f"Token Hatası DETAYI: {e}")  # Konsola gerçek hatayı yazar
-        messages.error(request, "Google onayı sırasında bir güvenlik hatası oluştu. Lütfen tekrar deneyin.")
-        return redirect('isletme_ayarlar')
-
-    credentials = flow.credentials
-
-    # BİNGÖ! Anahtarları veritabanına mühürle
-    isletme.google_access_token = credentials.token
-    if credentials.refresh_token:
-        isletme.google_refresh_token = credentials.refresh_token
-    isletme.google_token_expiry = credentials.expiry
-    isletme.save()
-
-    # Hafızayı temizle (Güvenlik için)
-    if 'google_oauth_state' in request.session:
-        del request.session['google_oauth_state']
-    if 'google_code_verifier' in request.session:
-        del request.session['google_code_verifier']
-
-    messages.success(request, "🎉 Muazzam! Google Takviminiz başarıyla sisteme entegre edildi.")
-    return redirect('isletme_ayarlar')
-
-
-def randevuyu_takvime_ekle(randevu):
-    """ Sihirli anahtarı kullanarak Google Takvime randevuyu işler """
-    isletme = randevu.business
-
-    # Patron takvimi bağlamamışsa sessizce çık
-    if not isletme.google_refresh_token:
-        return False
-
-        # 1. Veritabanındaki anahtarları Google'ın anlayacağı formata çeviriyoruz
-    creds = Credentials(
-        token=isletme.google_access_token,
-        refresh_token=isletme.google_refresh_token,
-        token_uri="https://oauth2.googleapis.com/token",
-        client_id=settings.GOOGLE_CLIENT_ID,
-        client_secret=settings.GOOGLE_CLIENT_SECRET,
-    )
-
-    try:
-        # 2. Google Takvim motorunu çalıştır
-        service = build('calendar', 'v3', credentials=creds)
-
-        # 3. Randevunun ne kadar süreceğini hesapla
-        sure_dk = 60
-        if randevu.service and randevu.service.duration:
-            if randevu.service.duration_type == 'minutes':
-                sure_dk = randevu.service.duration
-            elif randevu.service.duration_type == 'hours':
-                sure_dk = randevu.service.duration * 60
-
-        bitis_zamani = randevu.date_time + datetime.timedelta(minutes=sure_dk)
-
-        # 4. Takvime eklenecek fiyakalı etiketi (Paketi) hazırla
-        event = {
-            'summary': f'💇‍♀️ T-Randevu: {randevu.service.name}',
-            'location': isletme.address or 'Belirtilmedi',
-            'description': f'👤 Müşteri: {randevu.customer.first_name} {randevu.customer.last_name}\n📞 Telefon: {randevu.customer.phone}\n📝 Not: {randevu.customer_note or "Yok"}\n💸 Tutar: {randevu.final_service_price} TL',
-            'start': {
-                'dateTime': randevu.date_time.isoformat(),
-                'timeZone': 'Europe/Istanbul',
-            },
-            'end': {
-                'dateTime': bitis_zamani.isoformat(),
-                'timeZone': 'Europe/Istanbul',
-            },
-            'colorId': '5',  # 5 numara Google Takvimde dikkat çekici bir sarı/hardal rengidir
-            'reminders': {
-                'useDefault': False,
-                'overrides': [
-                    {'method': 'popup', 'minutes': 30},  # Randevudan 30 dk önce patronun telefonuna bildirim atar!
-                ],
-            },
-        }
-
-        # 5. ROKETİ FIRLAT! (Etkinliği Google'a yaz)
-        service.events().insert(calendarId='primary', body=event).execute()
-        return True
-
-    except Exception as e:
-        print(f"Google Takvime Eklerken Hata Çıktı: {e}")
-        return False
-
-    # ==========================================
-    # 🎵 SPOTIFY ENTEGRASYON KÖPRÜSÜ
-    # ==========================================
-
 @login_required(login_url="/hesap/giris/")
 def spotify_bagla(request):
-    isletme = get_object_or_404(Business, owner=request.user)
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
 
-    # 🔥 İŞTE SENİN İSTEDİĞİN GÜVENLİK DUVARI: SADECE PREMIUM!
     if not isletme.is_premium:
         messages.error(request, "❌ DJ Kabini sadece Premium işletmelere özeldir!")
         return redirect('isletme_ayarlar')
 
-    # Rastgele bir güvenlik anahtarı oluşturup hafızaya atıyoruz (CSRF koruması)
     state = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
     request.session['spotify_auth_state'] = state
 
-    # Spotify'dan efsanevi DJ yetkilerini (ve çalma listesi okuma iznini) istiyoruz
     scope = 'user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative'
-    redirect_uri = request.build_absolute_uri('/businesses/spotify/callback/')
+    redirect_uri = request.build_absolute_uri(reverse('spotify_callback'))
 
-    # Spotify'ın kapısına yönlendirme parametreleri
     params = {
         'response_type': 'code',
         'client_id': settings.SPOTIFY_CLIENT_ID,
         'scope': scope,
         'redirect_uri': redirect_uri,
-        'state': state
+        'state': state,
+        'show_dialog': 'true'
     }
 
     url = f"https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}"
     return redirect(url)
 
+
 @login_required(login_url="/hesap/giris/")
 def spotify_callback(request):
-    isletme = get_object_or_404(Business, owner=request.user)
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
 
     state = request.GET.get('state')
     saved_state = request.session.get('spotify_auth_state')
 
-    # Güvenlik kontrolü: Giden adamla dönen adam aynı mı?
     if state is None or state != saved_state:
         messages.error(request, "Spotify güvenlik doğrulaması başarısız oldu. Lütfen tekrar deneyin.")
         return redirect('isletme_ayarlar')
 
     code = request.GET.get('code')
-    redirect_uri = request.build_absolute_uri('/businesses/spotify/callback/')
+    redirect_uri = request.build_absolute_uri(reverse('spotify_callback'))
 
-    # Client ID ve Secret'ı birleştirip şifreliyoruz (Spotify böyle istiyor)
     auth_str = f"{settings.SPOTIFY_CLIENT_ID}:{settings.SPOTIFY_CLIENT_SECRET}"
     b64_auth_str = base64.b64encode(auth_str.encode()).decode()
 
@@ -1282,35 +1350,29 @@ def spotify_callback(request):
         'redirect_uri': redirect_uri
     }
 
-    # Spotify'a kodu verip "Bana Asıl Anahtarları Ver" diyoruz
     response = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
 
     if response.status_code == 200:
         token_data = response.json()
-
-        # Anahtarları veritabanına mühürle!
         isletme.spotify_access_token = token_data.get('access_token')
         if token_data.get('refresh_token'):
             isletme.spotify_refresh_token = token_data.get('refresh_token')
 
-        # Token süresi genelde 1 saattir (3600 saniye)
         expires_in = token_data.get('expires_in', 3600)
         isletme.spotify_token_expiry = timezone.now() + timezone.timedelta(seconds=expires_in)
         isletme.save()
 
-        # Güvenlik hafızasını temizle
         if 'spotify_auth_state' in request.session:
             del request.session['spotify_auth_state']
 
-            messages.success(request, "🎧 Şov başlıyor! Spotify hesabınız DJ Kabinine başarıyla bağlandı.")
-        else:
-            messages.error(request, "Spotify bağlantısı kurulamadı. Ayarlarınızı kontrol edin.")
+        messages.success(request, "🎧 Şov başlıyor! Spotify hesabınız DJ Kabinine başarıyla bağlandı.")
+    else:
+        messages.error(request, "Spotify bağlantısı kurulamadı. Ayarlarınızı kontrol edin.")
 
-        return redirect('isletme_ayarlar')
+    return redirect('isletme_ayarlar')
 
 
 def refresh_spotify_token(isletme):
-    """ Spotify token süresi (1 saat) dolduğunda arka planda sessizce yeniler """
     if not isletme.spotify_refresh_token:
         return False
 
@@ -1331,23 +1393,44 @@ def refresh_spotify_token(isletme):
     return False
 
 
+def execute_spotify_request(isletme, url, method="GET", json_data=None, params=None):
+    """
+    Spotify isteklerini tek bir merkezden yürüterek 401 (Unauthorized) hatası 
+    durumunda token'ı otomatik yenileyen ve isteği tekrarlayan akıllı yardımcı.
+    """
+    if not isletme or not isletme.spotify_access_token:
+        return None
+
+    def make_req(auth_token):
+        h = {'Authorization': f'Bearer {auth_token}'}
+        if method.upper() == "GET":
+            return requests.get(url, headers=h, params=params)
+        elif method.upper() == "POST":
+            return requests.post(url, headers=h, json=json_data)
+        elif method.upper() == "PUT":
+            return requests.put(url, headers=h, json=json_data)
+        return None
+
+    try:
+        response = make_req(isletme.spotify_access_token)
+        if response and response.status_code == 401:
+            if refresh_spotify_token(isletme):
+                response = make_req(isletme.spotify_access_token)
+        return response
+    except Exception as e:
+        print(f"execute_spotify_request hatası ({url}): {e}")
+        return None
+
+
 @login_required(login_url="/hesap/giris/")
 def spotify_current_track(request):
-    """ O an çalan şarkıyı JSON olarak Dashboard'a gönderir """
-    isletme = get_object_or_404(Business, owner=request.user)
-    if not isletme.spotify_access_token:
+    isletme = get_aktif_isletme(request)
+    if not isletme or not isletme.is_premium or not isletme.spotify_access_token:
         return JsonResponse({'status': 'not_connected'})
 
-    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-    response = requests.get('https://api.spotify.com/v1/me/player/currently-playing', headers=headers)
+    response = execute_spotify_request(isletme, 'https://api.spotify.com/v1/me/player/currently-playing')
 
-    # Token eskidiyse yenile ve tekrar dene
-    if response.status_code == 401:
-        if refresh_spotify_token(isletme):
-            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-            response = requests.get('https://api.spotify.com/v1/me/player/currently-playing', headers=headers)
-
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         data = response.json()
         if data and data.get('item'):
             return JsonResponse({
@@ -1360,51 +1443,261 @@ def spotify_current_track(request):
     return JsonResponse({'status': 'not_playing'})
 
 
+def public_spotify_current_track(request, slug):
+    isletme = get_object_or_404(Business, slug=slug)
+    if not isletme.is_premium or not isletme.spotify_access_token:
+        return JsonResponse({'status': 'not_connected'})
+
+    response = execute_spotify_request(isletme, 'https://api.spotify.com/v1/me/player/currently-playing')
+
+    if response and response.status_code == 200:
+        data = response.json()
+        if data and data.get('item'):
+            # Fetch upcoming songs from Queue
+            upcoming_queue = []
+            try:
+                queue_resp = execute_spotify_request(isletme, 'https://api.spotify.com/v1/me/player/queue')
+                if queue_resp and queue_resp.status_code == 200:
+                    q_data = queue_resp.json().get('queue', [])
+                    for item in q_data[:5]: # Get first 5 upcoming tracks
+                        if item:
+                            upcoming_queue.append({
+                                'name': item.get('name'),
+                                'artists': ', '.join([artist['name'] for artist in item.get('artists', [])]),
+                                'album_cover': item.get('album', {}).get('images', [{}])[0].get('url', '') if item.get('album', {}).get('images') else ''
+                            })
+            except Exception as e:
+                print(f"DEBUG: Error fetching Spotify player queue: {e}")
+
+            return JsonResponse({
+                'status': 'playing',
+                'track_name': data['item']['name'],
+                'artist_name': ', '.join([artist['name'] for artist in data['item']['artists']]),
+                'album_cover': data['item']['album']['images'][0]['url'] if data['item']['album']['images'] else '',
+                'is_playing': data.get('is_playing', False),
+                'queue': upcoming_queue
+            })
+    return JsonResponse({'status': 'not_playing', 'queue': []})
+
+
+def public_spotify_jukebox(request, slug):
+    isletme = get_object_or_404(Business, slug=slug)
+    if not isletme.is_premium or not isletme.spotify_access_token:
+        return render(request, 'businesses/isletme_spotify.html', {
+            'isletme': isletme,
+            'spotify_connected': False,
+            'playlists': []
+        })
+
+    is_verified = request.session.get(f'jukebox_verified_{slug}', False)
+
+    return render(request, 'businesses/isletme_spotify.html', {
+        'isletme': isletme,
+        'spotify_connected': True,
+        'playlists': [],
+        'is_verified': is_verified
+    })
+
+
+def public_spotify_search(request, slug):
+    isletme = get_object_or_404(Business, slug=slug)
+    
+    # Sadece bugün randevusu olan doğrulanmış müşteriler arama yapabilir
+    if not request.session.get(f'jukebox_verified_{slug}'):
+        return JsonResponse({
+            'status': 'unauthorized',
+            'message': 'Müzik Kabini sadece bugün salonda geçerli bir randevusu olan müşteriler içindir. Lütfen telefon numaranızla giriş yapın.'
+        }, status=403)
+
+    query = request.GET.get('q', '').strip()
+    if not query or not isletme.is_premium or not isletme.spotify_access_token:
+        return JsonResponse({'tracks': []})
+
+    url = f'https://api.spotify.com/v1/search?q={urllib.parse.quote(query)}&type=track'
+    response = execute_spotify_request(isletme, url)
+
+    tracks = []
+    if response and response.status_code == 200:
+        items = response.json().get('tracks', {}).get('items', [])
+        for item in items:
+            tracks.append({
+                'name': item.get('name'),
+                'uri': item.get('uri'),
+                'id': item.get('id'),
+                'artists': ', '.join([artist['name'] for artist in item.get('artists', [])]),
+                'album_cover': item.get('album', {}).get('images', [{}])[0].get('url', '') if item.get('album', {}).get('images') else '',
+                'duration_ms': item.get('duration_ms')
+            })
+    return JsonResponse({'tracks': tracks})
+
+
+@csrf_exempt
+def public_spotify_add_to_queue(request, slug):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Geçersiz istek metodu.'}, status=400)
+
+    isletme = get_object_or_404(Business, slug=slug)
+    
+    # Sadece bugün randevusu olan doğrulanmış müşteriler sıraya ekleyebilir
+    if not request.session.get(f'jukebox_verified_{slug}'):
+        return JsonResponse({
+            'status': 'unauthorized',
+            'message': 'Müzik Kabini sadece bugün salonda geçerli bir randevusu olan müşteriler içindir. Lütfen telefon numaranızla giriş yapın.'
+        }, status=403)
+
+    if not isletme.is_premium or not isletme.spotify_access_token:
+        return JsonResponse({'status': 'error', 'message': 'Spotify bağlantısı bulunmuyor veya Premium abonelik gerekli.'}, status=400)
+
+    import json
+    try:
+        data = json.loads(request.body)
+        track_uri = data.get('uri')
+    except Exception:
+        track_uri = request.POST.get('uri')
+
+    if not track_uri:
+        return JsonResponse({'status': 'error', 'message': 'Şarkı URI bilgisi alınamadı.'}, status=400)
+
+    url = f'https://api.spotify.com/v1/me/player/queue?uri={track_uri}'
+    response = execute_spotify_request(isletme, url, method="POST")
+
+    if response and response.status_code in [200, 204]:
+        return JsonResponse({'status': 'success'})
+
+    err_msg = "Sıraya eklenemedi. Lütfen salonun çalma cihazının aktif ve açık olduğundan emin olun."
+    try:
+        if response:
+            err_msg = response.json().get('error', {}).get('message', err_msg)
+    except Exception:
+        pass
+    return JsonResponse({'status': 'error', 'message': err_msg})
+
+
+@csrf_exempt
+def public_spotify_verify_customer(request, slug):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Geçersiz istek metodu.'}, status=400)
+
+    isletme = get_object_or_404(Business, slug=slug)
+    if not isletme.is_premium:
+        return JsonResponse({'status': 'error', 'message': 'Bu özellik sadece Premium işletmelere özeldir.'}, status=403)
+
+    import json
+    try:
+        data = json.loads(request.body)
+        phone = data.get('phone', '').strip()
+    except Exception:
+        phone = request.POST.get('phone', '').strip()
+
+    if not phone:
+        return JsonResponse({'status': 'error', 'message': 'Lütfen telefon numaranızı giriniz.'})
+
+    import re
+    digits_only = re.sub(r'\D', '', phone)
+    if len(digits_only) < 10:
+        return JsonResponse({'status': 'error', 'message': 'Lütfen geçerli bir telefon numarası giriniz.'})
+
+    last_10_digits = digits_only[-10:]
+
+    from appointments.models import Appointment
+    from django.utils import timezone
+    from datetime import datetime, time
+
+    today_start = timezone.make_aware(datetime.combine(timezone.now().date(), time.min))
+    today_end = timezone.make_aware(datetime.combine(timezone.now().date(), time.max))
+
+    # Bugün bu dükkanda aktif olan randevuları getir
+    appointments = Appointment.objects.filter(
+        business=isletme,
+        date_time__range=(today_start, today_end),
+        status__in=['pending', 'confirmed', 'completed']
+    )
+
+    found = False
+    for app in appointments:
+        app_phone = re.sub(r'\D', '', app.customer.phone)
+        if app_phone.endswith(last_10_digits):
+            found = True
+            break
+
+    if found:
+        request.session[f'jukebox_verified_{slug}'] = True
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Bugün bu salonda geçerli bir randevunuz bulunamadı! Jukebox sadece salondaki aktif müşterilerimiz içindir.'
+        })
+
+
+@csrf_exempt
+def public_spotify_play_playlist(request, slug):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Geçersiz istek metodu.'}, status=400)
+
+    isletme = get_object_or_404(Business, slug=slug)
+
+    # Sadece bugün randevusu olan doğrulanmış müşteriler oynatma listesi başlatabilir
+    if not request.session.get(f'jukebox_verified_{slug}'):
+        return JsonResponse({
+            'status': 'unauthorized',
+            'message': 'Müzik Kabini sadece bugün salonda geçerli bir randevusu olan müşteriler içindir. Lütfen telefon numaranızla giriş yapın.'
+        }, status=403)
+
+    if not isletme.is_premium or not isletme.spotify_access_token:
+        return JsonResponse({'status': 'error', 'message': 'Spotify bağlantısı bulunmuyor veya Premium abonelik gerekli.'}, status=400)
+
+    import json
+    try:
+        data = json.loads(request.body)
+        playlist_uri = data.get('uri')
+    except Exception:
+        playlist_uri = request.POST.get('uri')
+
+    if not playlist_uri:
+        return JsonResponse({'status': 'error', 'message': 'Oynatma listesi URI bilgisi alınamadı.'}, status=400)
+
+    url = 'https://api.spotify.com/v1/me/player/play'
+    response = execute_spotify_request(isletme, url, method="PUT", json_data={'context_uri': playlist_uri})
+
+    if response and response.status_code in [200, 204]:
+        return JsonResponse({'status': 'success'})
+
+    err_msg = "Çalma listesi oynatılamadı. Lütfen salonun çalma cihazının aktif ve açık olduğundan emin olun."
+    try:
+        if response:
+            err_msg = response.json().get('error', {}).get('message', err_msg)
+    except Exception:
+        pass
+    return JsonResponse({'status': 'error', 'message': err_msg})
+
+
 @login_required(login_url="/hesap/giris/")
 def spotify_skip_track(request):
-    """ Sonraki şarkıya geçme emri gönderir """
-    isletme = get_object_or_404(Business, owner=request.user)
-    if not isletme.spotify_access_token:
+    isletme = get_aktif_isletme(request)
+    if not isletme or not isletme.is_premium or not isletme.spotify_access_token:
         return JsonResponse({'status': 'error'})
 
-    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-    response = requests.post('https://api.spotify.com/v1/me/player/next', headers=headers)
+    response = execute_spotify_request(isletme, 'https://api.spotify.com/v1/me/player/next', method="POST")
 
-    if response.status_code == 401:
-        if refresh_spotify_token(isletme):
-            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-            response = requests.post('https://api.spotify.com/v1/me/player/next', headers=headers)
-
-    # 204 No Content başarılı demek
-    if response.status_code == 204 or response.status_code == 200:
+    if response and response.status_code in [200, 204]:
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'})
 
 
-import json
-
-
 @login_required(login_url="/hesap/giris/")
 def spotify_get_playlists(request):
-    """ Patronun kendi Spotify çalma listelerini getirir """
-    isletme = get_object_or_404(Business, owner=request.user)
-    if not isletme.spotify_access_token:
+    isletme = get_aktif_isletme(request)
+    if not isletme or not isletme.is_premium or not isletme.spotify_access_token:
         return JsonResponse({'status': 'error'})
 
-    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-    response = requests.get('https://api.spotify.com/v1/me/playlists?limit=10', headers=headers)
+    response = execute_spotify_request(isletme, 'https://api.spotify.com/v1/me/playlists?limit=10')
 
-    if response.status_code == 401:
-        if refresh_spotify_token(isletme):
-            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-            response = requests.get('https://api.spotify.com/v1/me/playlists?limit=10', headers=headers)
-
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         playlists = response.json().get('items', [])
-        # Sadece işimize yarayan kısımları (isim, resim ve uri) alıyoruz
         temiz_listeler = []
         for p in playlists:
-            if p:  # Bazen boş gelebilir
+            if p:
                 temiz_listeler.append({
                     'name': p.get('name'),
                     'uri': p.get('uri'),
@@ -1416,64 +1709,45 @@ def spotify_get_playlists(request):
 
 @login_required(login_url="/hesap/giris/")
 def spotify_play_playlist(request):
-    """ Seçilen playlisti çalmaya başlatır """
     if request.method == 'POST':
-        isletme = get_object_or_404(Business, owner=request.user)
+        isletme = get_aktif_isletme(request)
+        if not isletme or not isletme.is_premium: return JsonResponse({'status': 'error'})
+
         try:
             data = json.loads(request.body)
             playlist_uri = data.get('uri')
 
-            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-            # Çal komutu (PUT isteği atıyoruz)
-            response = requests.put('https://api.spotify.com/v1/me/player/play', headers=headers,
-                                    json={'context_uri': playlist_uri})
+            response = execute_spotify_request(isletme, 'https://api.spotify.com/v1/me/player/play', method="PUT", json_data={'context_uri': playlist_uri})
 
-            if response.status_code == 401:
-                if refresh_spotify_token(isletme):
-                    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-                    response = requests.put('https://api.spotify.com/v1/me/player/play', headers=headers,
-                                            json={'context_uri': playlist_uri})
-
-            # Spotify cihaz bulamazsa 404 döner, cihaz aktifse 204 döner
-            if response.status_code == 204 or response.status_code == 200:
+            if response and response.status_code in [200, 204]:
                 return JsonResponse({'status': 'success'})
-            elif response.status_code == 404:
+            elif response and response.status_code == 404:
                 return JsonResponse({'status': 'no_device',
                                      'message': 'Lütfen Spotify uygulamasını açın ve bir şarkı başlatın (Aktif cihaz bulunamadı).'})
             else:
                 return JsonResponse({'status': 'error'})
         except Exception as e:
-            print("Çalma hatası:", e)
             return JsonResponse({'status': 'error'})
     return JsonResponse({'status': 'invalid'})
 
 
 @login_required(login_url="/hesap/giris/")
 def spotify_toggle_playback(request):
-    """ Şarkıyı durdurur (pause) veya başlatır (play) """
     if request.method == 'POST':
-        isletme = get_object_or_404(Business, owner=request.user)
-        if not isletme.spotify_access_token:
+        isletme = get_aktif_isletme(request)
+        if not isletme or not isletme.is_premium or not isletme.spotify_access_token:
             return JsonResponse({'status': 'error'})
 
         try:
             data = json.loads(request.body)
-            action = data.get('action')  # 'play' veya 'pause' gelecek
+            action = data.get('action')
 
-            headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
             url = f'https://api.spotify.com/v1/me/player/{action}'
+            response = execute_spotify_request(isletme, url, method="PUT")
 
-            # Play/Pause işlemleri PUT isteği ile yapılır
-            response = requests.put(url, headers=headers)
-
-            if response.status_code == 401:
-                if refresh_spotify_token(isletme):
-                    headers = {'Authorization': f'Bearer {isletme.spotify_access_token}'}
-                    response = requests.put(url, headers=headers)
-
-            if response.status_code == 204 or response.status_code == 200:
+            if response and response.status_code in [200, 204]:
                 return JsonResponse({'status': 'success', 'action': action})
-            elif response.status_code == 404:
+            elif response and response.status_code == 404:
                 return JsonResponse({'status': 'no_device', 'message': 'Aktif Spotify cihazı bulunamadı.'})
             else:
                 return JsonResponse({'status': 'error'})
@@ -1481,44 +1755,350 @@ def spotify_toggle_playback(request):
             return JsonResponse({'status': 'error'})
     return JsonResponse({'status': 'invalid'})
 
-@login_required(login_url="/hesap/giris/")
-def galeri_resim_sil(request, id):
-    resim = get_object_or_404(BusinessImage, id=id, business__owner=request.user)
-    resim.delete()
-    messages.error(request, "🗑️ Görsel galeriden silindi.")
-    return redirect("isletme_ayarlar")
 
-# ==========================================
-# CANLI ARAMA (LIVE SEARCH) API
-# ==========================================
+@login_required(login_url="/hesap/giris/")
+def spotify_kopar(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+
+    isletme.spotify_access_token = None
+    isletme.spotify_refresh_token = None
+    isletme.spotify_token_expiry = None
+    isletme.save()
+
+    messages.success(request, "Spotify bağlantısı başarıyla kaldırıldı.")
+    return redirect('isletme_ayarlar')
+
+
 # ==========================================
 # CANLI ARAMA VE ÖNERİ API (SIFIRINCI HARF ZEKASI)
 # ==========================================
-from django.http import JsonResponse
-
 def canli_arama_api(request):
-    aranan = request.GET.get('q', '').strip()
-    sonuclar = []
+    try:
+        aranan = request.GET.get('q', '').strip()
+        sonuclar = []
 
-    if len(aranan) == 0:
-        # 1. SENARYO: Kutuya tıkladı ama harfe basmadı!
-        # Taktik: Sadece Premium olan en iyi 5 işletmeyi "Önerilenler" olarak getir.
-        isletmeler = Business.objects.filter(is_premium=True).order_by('-id')[:5]
-        baslik = "🌟 ÖNERİLEN İŞLETMELER"
-    else:
-        # 2. SENARYO: Harfe basmaya başladı! (1. harften itibaren)
-        # Taktik: Paralı parasız ayrımı yapma, isminde o harfler geçen ilk 5'i getir.
-        isletmeler = Business.objects.filter(name__icontains=aranan)[:5]
-        baslik = "🔍 ARAMA SONUÇLARI"
+        # 30 Günlük Süreyi Hesapla (Yeni İşletme Rozeti İçin)
+        otuz_gun_once = timezone.now() - timedelta(days=30)
 
-    for isletme in isletmeler:
-        sonuclar.append({
-            'name': isletme.name,
-            'slug': isletme.slug,
-            'city': isletme.city or '',
-            'district': isletme.district or '',
-            'logo_url': isletme.logo.url if isletme.logo else '',
-            'is_premium': isletme.is_premium  # Ekranda premium rozeti basmak için
+        if len(aranan) == 0:
+            # Sadece premium VE kepenkleri açık olanları getir
+            isletmeler = Business.objects.filter(is_premium=True, is_active=True)
+            baslik = "🌟 ÖNERİLEN İŞLETMELER"
+        else:
+            # İsmi uyan VE kepenkleri açık olanları getir
+            isletmeler = Business.objects.filter(name__icontains=aranan, is_active=True)
+            baslik = "🔍 ARAMA SONUÇLARI"
+
+        # Tıpkı Ana Sayfadaki Gibi Puan ve Yeni Durumunu Hesaba Kat
+        isletmeler = isletmeler.annotate(
+            ortalama_puan=Coalesce(Avg('reviews__rating'), 0.0, output_field=FloatField()),
+            is_yeni=Case(
+                When(created_at__gte=otuz_gun_once, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        ).order_by('-ortalama_puan', '-id')[:5]
+
+        for isletme in isletmeler:
+            logo_url = ''
+            try:
+                if isletme.logo and hasattr(isletme.logo, 'url'):
+                    logo_url = isletme.logo.url
+            except ValueError:
+                logo_url = ''
+
+            sonuclar.append({
+                'name': isletme.name,
+                'slug': isletme.slug,
+                'city': isletme.city or '',
+                'district': isletme.district or '',
+                'logo_url': logo_url,
+                'is_premium': isletme.is_premium,
+                'ortalama_puan': float(isletme.ortalama_puan),
+                'is_yeni': isletme.is_yeni
+            })
+
+        return JsonResponse({'results': sonuclar, 'baslik': baslik})
+    except Exception as e:
+        print(f"CANLI ARAMA HATASI: {e}")
+        return JsonResponse({'results': [], 'baslik': 'HATA OLUŞTU'})
+
+
+@login_required(login_url="/hesap/giris/")
+def analiz_raporu_indir(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme or not isletme.is_premium:
+        return redirect("kayit")
+
+    # CSV Yanıtı Hazırlama
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{isletme.slug}_analiz_raporu.csv"'
+    response.write(u'\ufeff'.encode('utf8'))  # Excel'de Türkçe karakterler bozulmasın diye BOM ekliyoruz
+
+    writer = csv.writer(response)
+    writer.writerow(['İşletme Analiz Raporu', '', ''])
+    writer.writerow([''])  # Boş satır
+
+    # Personel Performans Verilerini Çek
+    personel_performans = isletme.appointments.filter(
+        status__in=['approved', 'confirmed', 'completed'],
+        staff__isnull=False
+    ).values('staff__name').annotate(
+        islem_sayisi=Count('id'),
+        getiri=Sum('final_service_price')
+    )
+
+    writer.writerow(['PERSONEL KARNESİ', 'Tamamlanan İşlem', 'Toplam Getiri (Randevu + Ekstra)'])
+    for p in personel_performans:
+        # Ekstra adisyon gelirini hesapla
+        ekstra = AdisyonItem.objects.filter(
+            adisyon__appointment__staff__name=p['staff__name'],
+            adisyon__status='closed',
+            adisyon__business=isletme
+        ).annotate(satir_toplam=F('quantity') * F('unit_price')).aggregate(top=Sum('satir_toplam'))['top'] or Decimal(
+            '0.00')
+
+        toplam_kazanc = p['getiri'] + ekstra
+        writer.writerow([p['staff__name'], p['islem_sayisi'], f"{toplam_kazanc} TL"])
+
+    return response
+
+
+@login_required(login_url="/hesap/giris/")
+def isletme_giderler(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+
+    bugun = timezone.now().date()
+
+    if not isletme.is_premium:
+        is_premium_teaser = True
+        # Teaser için dummy verileri grupla
+        from collections import OrderedDict
+        dummy_giderler = [
+            {"title": "Dükkan Aylık Kirası", "category": "kira", "amount": Decimal("15000.00"), "date": bugun, "get_category_display": "🏢 Kira ve Dükkan Aidatı"},
+            {"title": "Elektrik & İnternet Faturası", "category": "fatura", "amount": Decimal("3450.00"), "date": bugun, "get_category_display": "⚡ Faturalar (Elektrik, Su, İnternet)"},
+            {"title": "Malzeme & Kozmetik Alımı", "category": "malzeme", "amount": Decimal("8200.00"), "date": bugun, "get_category_display": "📦 Ana Ürün ve Toptan Malzeme Alımı"},
+            {"title": "Personel Maaş & Primleri", "category": "maas", "amount": Decimal("12000.00"), "date": bugun, "get_category_display": "💰 Personel Maaş, Avans ve Primleri"},
+        ]
+        
+        grouped_expenses = OrderedDict()
+        yil = bugun.year
+        ay_tr = "Mayıs" # Statik teaser için
+        grouped_expenses[str(yil)] = OrderedDict({ay_tr: dummy_giderler})
+        
+        kategoriler = Expense.CATEGORY_CHOICES
+        
+        return render(request, "businesses/isletme_giderler.html", {
+            "isletme": isletme,
+            "is_premium_teaser": is_premium_teaser,
+            "grouped_expenses": grouped_expenses,
+            "kategoriler": kategoriler,
+            "gunluk_gider": Decimal("3450.00"),
+            "haftalik_gider": Decimal("11650.00"),
+            "aylik_gider": Decimal("38650.00"),
+            "bugun_tarih": bugun.strftime("%Y-%m-%d")
         })
 
-    return JsonResponse({'results': sonuclar, 'baslik': baslik})
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "add":
+            title = request.POST.get("title")
+            category = request.POST.get("category")
+            amount = request.POST.get("amount")
+            date_str = request.POST.get("date")
+
+            if title and amount:
+                Expense.objects.create(
+                    business=isletme,
+                    title=title,
+                    category=category,
+                    amount=amount,
+                    date=date_str if date_str else timezone.now().date()
+                )
+                messages.success(request, "💸 Gider başarıyla kaydedildi!")
+
+        elif action == "delete":
+            expense_id = request.POST.get("expense_id")
+            gider = get_object_or_404(Expense, id=expense_id, business=isletme)
+            gider.delete()
+            messages.error(request, "🗑️ Gider kaydı silindi.")
+
+        return redirect("isletme_giderler")
+
+    # --- 3 PANELLİ MATEMATİK ZEKASI (Gelecek Tarihli Kayıtlar Hariç) ---
+    # bugun yukarıda tanımlandı
+    bu_haftanin_basi = bugun - timedelta(days=bugun.weekday())  # Pazartesi
+    bu_haftanin_sonu = bu_haftanin_basi + timedelta(days=6)
+    
+    bu_ayin_basi = bugun.replace(day=1)  # Ayın 1'i
+    # Ayın sonunu hesapla
+    if bugun.month == 12:
+        bu_ayin_sonu = bugun.replace(year=bugun.year + 1, month=1, day=1) - timedelta(days=1)
+    else:
+        bu_ayin_sonu = bugun.replace(month=bugun.month + 1, day=1) - timedelta(days=1)
+
+    gunluk_gider = isletme.expenses.filter(date=bugun).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+    
+    # Haftalık: Sadece bu hafta içindekiler (Gelecek aydakiler gelmez)
+    haftalik_gider = isletme.expenses.filter(date__range=[bu_haftanin_basi, bu_haftanin_sonu]).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+    
+    # Aylık: Sadece bu ay içindekiler (Gelecek aydakiler gelmez)
+    aylik_gider = isletme.expenses.filter(date__range=[bu_ayin_basi, bu_ayin_sonu]).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+
+    # --- GEÇMİŞ KAYITLARI GRUPLAMA ---
+    from collections import OrderedDict
+    all_expenses = isletme.expenses.all().order_by("-date", "-id")
+    grouped_expenses = OrderedDict()
+
+    for gider in all_expenses:
+        yil = gider.date.year
+        ay = gider.date.strftime("%B")
+        ay_map = {
+            'January': 'Ocak', 'February': 'Şubat', 'March': 'Mart', 'April': 'Nisan',
+            'May': 'Mayıs', 'June': 'Haziran', 'July': 'Temmuz', 'August': 'Ağustos',
+            'September': 'Eylül', 'October': 'Ekim', 'November': 'Kasım', 'December': 'Aralık'
+        }
+        ay_tr = ay_map.get(ay, ay)
+        
+        yil_key = f"{yil}"
+        if yil_key not in grouped_expenses:
+            grouped_expenses[yil_key] = OrderedDict()
+        
+        if ay_tr not in grouped_expenses[yil_key]:
+            grouped_expenses[yil_key][ay_tr] = []
+            
+        grouped_expenses[yil_key][ay_tr].append(gider)
+
+    kategoriler = Expense.CATEGORY_CHOICES
+
+    return render(request, "businesses/isletme_giderler.html", {
+        "isletme": isletme,
+        "grouped_expenses": grouped_expenses,
+        "kategoriler": kategoriler,
+        "gunluk_gider": gunluk_gider,
+        "haftalik_gider": haftalik_gider,
+        "aylik_gider": aylik_gider,
+        "bugun_tarih": bugun.strftime("%Y-%m-%d")
+    })
+
+
+@login_required(login_url="/hesap/giris/")
+def gider_raporu_indir(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme or not isletme.is_premium:
+        return redirect("dashboard")
+
+    # CSV Yanıtı Hazırlama
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{isletme.slug}_gider_raporu.csv"'
+    response.write(u'\ufeff'.encode('utf8'))  # Excel'de Türkçe karakterler düzgün çıksın diye BOM ekliyoruz
+
+    writer = csv.writer(response)
+    writer.writerow(['İşletme Gider ve Finans Raporu', '', '', ''])
+    writer.writerow([''])
+
+    # 3'lü Özet Matematiği
+    bugun = timezone.now().date()
+    bu_haftanin_basi = bugun - timedelta(days=bugun.weekday())
+    bu_ayin_basi = bugun.replace(day=1)
+
+    gunluk = isletme.expenses.filter(date=bugun).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+    haftalik = isletme.expenses.filter(date__gte=bu_haftanin_basi).aggregate(Sum('amount'))['amount__sum'] or Decimal(
+        '0.00')
+    aylik = isletme.expenses.filter(date__gte=bu_ayin_basi).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+
+    # Excel'in en üstüne özeti bas
+    writer.writerow(['--- ÖZET TABLOSU ---', ''])
+    writer.writerow(['Bugünkü Toplam Gider:', f"{gunluk} TL"])
+    writer.writerow(['Bu Haftaki Toplam Gider:', f"{haftalik} TL"])
+    writer.writerow(['Bu Ayki Toplam Gider:', f"{aylik} TL"])
+    writer.writerow([''])
+
+    # Altına detaylı listeyi bas
+    writer.writerow(['--- DETAYLI GİDER LİSTESİ ---', '', '', ''])
+    writer.writerow(['Tarih', 'Gider Başlığı', 'Kategori', 'Tutar (TL)'])
+
+    giderler = isletme.expenses.all().order_by('-date', '-id')
+    for g in giderler:
+        writer.writerow([g.date.strftime("%d.%m.%Y"), g.title, g.get_category_display(), g.amount])
+
+    return response
+
+@login_required(login_url="/hesap/giris/")
+def isletme_qr_indir(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+
+    # 1. İşletmenin Vitrin Linkini Tam Olarak Al (Örn: http://127.0.0.1:8000/seda-guzellik/)
+    vitrin_url = request.build_absolute_uri(reverse('isletme_detay', kwargs={'slug': isletme.slug}))
+
+    # 2. QR Kodu Oluştur
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H, # Yüksek kalite (Üzerine logo bile eklenebilir)
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(vitrin_url)
+    qr.make(fit=True)
+
+    # 3. Siyah-Beyaz Temiz Bir Resme Çevir
+    img = qr.make_image(fill_color="#09090b", back_color="white")
+
+    # 4. Resmi RAM'de tut ve kullanıcıya PNG olarak indir
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    response = HttpResponse(buffer, content_type="image/png")
+    if request.GET.get('download') == '1':
+        response['Content-Disposition'] = f'attachment; filename="{isletme.slug}_Vitrin_QR.png"'
+    else:
+        response['Content-Disposition'] = f'inline; filename="{isletme.slug}_Vitrin_QR.png"'
+    return response
+
+
+@login_required(login_url="/hesap/giris/")
+def isletme_qr_yazdir(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme: return redirect("kayit")
+    if not isletme.is_premium:
+        messages.error(request, "Bu özellik sadece Premium işletmelere özeldir.")
+        return redirect('isletme_ayarlar')
+    
+    return render(request, 'businesses/qr_yazdir.html', {
+        'isletme': isletme,
+    })
+
+
+@login_required(login_url="/hesap/giris/")
+def isletme_degerlendirmeler(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect("kayit")
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        # 💬 YORUMA YANIT VERME ZEKASI
+        if action == "reply_review":
+            review_id = request.POST.get("review_id")
+            reply_text = request.POST.get("reply_text")
+
+            # Güvenlik: Sadece bu işletmenin yorumu mu diye kontrol ediyoruz
+            review = get_object_or_404(Review, id=review_id, business=isletme)
+
+            review.reply = reply_text
+            review.replied_at = timezone.now()
+            review.save()
+
+            messages.success(request, "💬 Müşteriye yanıtınız başarıyla yayınlandı!")
+            return redirect("isletme_degerlendirmeler")
+
+    # Tüm değerlendirmeleri tarihe göre en yeniden eskiye sırala
+    degerlendirmeler = isletme.reviews.all().order_by("-created_at")
+    return render(request, "businesses/isletme_degerlendirmeler.html",
+                  {"isletme": isletme, "degerlendirmeler": degerlendirmeler})

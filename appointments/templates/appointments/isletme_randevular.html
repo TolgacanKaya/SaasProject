@@ -4,6 +4,8 @@
 {% block page_title %}Tüm Randevular{% endblock %}
 
 {% block content %}
+    {% now "Ymd" as bugunun_tarihi %}
+
     {% if isletme.is_premium %}
         <div class="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl overflow-hidden">
             <div class="flex justify-between items-center p-6 border-b border-slate-800 bg-slate-900/50">
@@ -79,7 +81,7 @@
                                         </span>
                                     {% elif randevu.status == 'completed' %}
                                         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.428-1.428L13.5 18.75l1.183-.394a2.25 2.25 0 001.428-1.428l.394-1.183.394 1.183a2.25 2.25 0 001.428 1.428l1.183.394-1.183.394a2.25 2.25 0 00-1.428 1.428z" /></svg>
                                             İşlem Tamamlandı
                                         </span>
                                     {% elif randevu.status == 'cancelled' %}
@@ -97,6 +99,16 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
+
+                                    {% if randevu.status == 'pending' or randevu.status == 'confirmed' %}
+                                        {% if randevu.date_time > simdi %}
+                                        <button type="button" onclick="openTransferWarningModal({{ randevu.id }}, {{ randevu.service.id }})" class="px-4 py-2 bg-sky-500/10 text-sky-400 border border-sky-500/30 hover:bg-sky-500 hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5" title="Tarihi veya Personeli Değiştir">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" /></svg>
+                                            Aktar / Ertele
+                                        </button>
+                                        {% endif %}
+                                    {% endif %}
+
                                     <button type="button" onclick="openDetayModal('vipModal{{ randevu.id }}')" class="px-4 py-2 bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
                                         Detay
@@ -124,10 +136,17 @@
                                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-amber-400"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75v-.008z" /></svg>
                                         Randevu Detayı
+                                        {% if randevu.status == 'completed' %}
+                                            <span class="ml-2 px-2 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] uppercase rounded-md border border-blue-500/30 flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Tamamlandı</span>
+                                        {% elif randevu.status == 'confirmed' or randevu.status == 'approved' %}
+                                            <span class="ml-2 px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] uppercase rounded-md border border-emerald-500/30 flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Onaylı</span>
+                                        {% elif randevu.status == 'pending' %}
+                                            <span class="ml-2 px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] uppercase rounded-md border border-amber-500/30 flex items-center gap-1">⏳ Bekliyor</span>
+                                        {% else %}
+                                            <span class="ml-2 px-2 py-0.5 bg-rose-500/20 text-rose-400 text-[10px] uppercase rounded-md border border-rose-500/30 flex items-center gap-1">❌ İptal</span>
+                                        {% endif %}
                                     </h3>
-                                    <button type="button" onclick="closeDetayModal('vipModal{{ randevu.id }}')" class="text-slate-400 hover:text-white transition-colors text-xl font-bold">
-                                        ✖
-                                    </button>
+                                    <button type="button" onclick="closeDetayModal('vipModal{{ randevu.id }}')" class="text-slate-400 hover:text-white transition-colors text-xl font-bold">✖</button>
                                 </div>
                                 <div class="p-6 space-y-5">
                                     <div>
@@ -222,9 +241,19 @@
                                                 <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl font-bold hover:bg-rose-500 hover:text-white transition-all shadow-lg hover:shadow-rose-500/20">İptal Et</a>
                                             </div>
                                         {% endif %}
-                                    {% elif randevu.status == 'confirmed' %}
+                                    {% elif randevu.status == 'confirmed' or randevu.status == 'approved' %}
                                     <div class="flex gap-3 pt-2 mt-4">
-                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl font-bold hover:bg-rose-500 hover:text-white transition-all">İptal Et</a>
+                                        {% with randevu_tarihi=randevu.date_time|date:"Ymd" %}
+                                            {% if randevu_tarihi <= bugunun_tarihi %}
+                                                <a href="{% url 'adisyon_detay' randevu.id %}" class="flex-1 text-center py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-lg hover:shadow-emerald-500/20 flex items-center justify-center gap-2">💳 Kasaya Git</a>
+                                            {% else %}
+                                                <div class="flex-1 text-center py-3 bg-slate-800 border border-slate-700 text-slate-500 rounded-xl font-bold cursor-not-allowed opacity-70 flex items-center justify-center gap-2" title="Günü gelmeden hesap kesilemez.">
+                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    Günü Bekleniyor
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl font-bold hover:bg-rose-500 hover:text-white transition-all shadow-lg hover:shadow-rose-500/20">İptal Et</a>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -233,7 +262,7 @@
                         {% empty %}
                         <tr>
                             <td colspan="4" class="py-16 text-center">
-                                <p class="text-slate-500 text-sm font-medium">Henüz randevunuz bulunmuyor.</p>
+                                <p class="text-slate-500 text-sm font-medium">Henüz bekleyen randevunuz bulunmuyor.</p>
                             </td>
                         </tr>
                         {% endfor %}
@@ -247,7 +276,6 @@
                     Toplam <span class="font-extrabold text-white">{{ randevular.paginator.count }}</span> randevudan <span class="font-extrabold text-white">{{ randevular.start_index }} - {{ randevular.end_index }}</span> arası.
                 </span>
 
-                <!-- YENİ PAGINATION (PREMIUM) -->
                 <div class="inline-flex -space-x-px rounded-lg shadow-sm">
                     {% if randevular.has_previous %}
                         <a href="?page={{ randevular.previous_page_number }}" class="px-4 py-2 border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm font-bold transition-colors relative z-0 hover:z-10 focus:z-10 first:rounded-l-lg last:rounded-r-lg">Önceki</a>
@@ -326,6 +354,15 @@
                             </td>
                             <td class="px-6 py-4 text-right space-x-2">
                                 <div class="flex items-center justify-end gap-2">
+
+                                    {% if randevu.status == 'pending' or randevu.status == 'confirmed' %}
+                                        {% if randevu.date_time > simdi %}
+                                        <button type="button" onclick="openTransferModal({{ randevu.id }}, {{ randevu.service.id }})" class="px-4 py-2 bg-sky-50 text-sky-600 border border-sky-200 hover:bg-sky-500 hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1" title="Tarihi veya Personeli Değiştir">
+                                            🔄 Aktar / Ertele
+                                        </button>
+                                        {% endif %}
+                                    {% endif %}
+
                                     <button type="button" onclick="openDetayModal('freeModal{{ randevu.id }}')" class="px-4 py-2 bg-indigo-500 text-white hover:bg-indigo-600 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1">
                                         🔍 Detay
                                     </button>
@@ -348,93 +385,119 @@
 
                         <div id="freeModal{{ randevu.id }}" onclick="if(event.target === this) closeDetayModal('freeModal{{ randevu.id }}')" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 opacity-0">
                             <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
-                                <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50">
-                                    <h5 class="text-lg font-bold text-slate-800">📋 Randevu Detayı</h5>
-                                    <button type="button" onclick="closeDetayModal('freeModal{{ randevu.id }}')" class="text-slate-400 hover:text-slate-600 transition-colors text-xl font-bold">✖</button>
+                                <div class="flex justify-between items-center p-5 border-b border-slate-100">
+                                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        📋 Randevu Detayı
+                                        {% if randevu.status == 'completed' %}
+                                            <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded-md border border-blue-200 flex items-center gap-1">✓ Tamamlandı</span>
+                                        {% elif randevu.status == 'confirmed' or randevu.status == 'approved' %}
+                                            <span class="ml-2 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase rounded-md border border-emerald-200 flex items-center gap-1">✓ Onaylı</span>
+                                        {% elif randevu.status == 'pending' %}
+                                            <span class="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase rounded-md border border-amber-200 flex items-center gap-1">⏳ Bekliyor</span>
+                                        {% else %}
+                                            <span class="ml-2 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold uppercase rounded-md border border-rose-200 flex items-center gap-1">❌ İptal</span>
+                                        {% endif %}
+                                    </h3>
+                                    <button type="button" onclick="closeDetayModal('freeModal{{ randevu.id }}')" class="text-slate-400 hover:text-rose-500 transition-colors text-xl font-bold">✖</button>
                                 </div>
-                                <div class="p-6 text-left space-y-4">
+
+                                <div class="p-6 space-y-5">
                                     <div>
-                                        <small class="text-slate-500 block uppercase tracking-wider font-semibold">Müşteri</small>
-                                        <span class="font-bold text-xl text-slate-900">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</span>
-                                    </div>
-                                    <div>
-                                        <small class="text-slate-500 block uppercase tracking-wider font-semibold">İletişim Numarası</small>
-                                        <span class="font-bold text-indigo-600 text-base">📞 {{ randevu.customer.phone }}</span>
+                                        <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Müşteri</p>
+                                        <p class="text-xl font-black text-slate-900">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</p>
+                                        <a href="tel:{{ randevu.customer.phone }}" class="text-indigo-600 hover:underline font-bold mt-1 inline-flex items-center gap-1.5">
+                                            📞 {{ randevu.customer.phone }}
+                                        </a>
                                     </div>
 
                                     <div>
-                                        <small class="text-slate-500 block uppercase tracking-wider font-semibold mb-1">Alınan Hizmet</small>
-                                        <span class="inline-block px-3 py-1 bg-slate-100 text-slate-700 text-sm font-semibold rounded-lg">
-                                            {{ randevu.service.name }} <span class="text-slate-400 ml-1 line-through">({{ randevu.service.price|k_format }} ₺)</span>
+                                        <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Alınan Hizmet</p>
+                                        <span class="inline-block px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700">
+                                            {{ randevu.service.name }} <span class="text-slate-400 ml-1 font-medium">({{ randevu.service.price|k_format }} ₺)</span>
                                         </span>
                                     </div>
 
-                                    <div class="grid grid-cols-2 gap-4 mt-2">
+                                    <div class="grid grid-cols-2 gap-4">
                                         <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Seçilen Personel</p>
-                                            <p class="text-sm font-bold text-slate-800">{% if randevu.staff %}👨‍💼 {{ randevu.staff.name }}{% else %}👥 Fark Etmez{% endif %}</p>
+                                            <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Seçilen Personel</p>
+                                            <p class="text-sm font-bold text-slate-800 inline-flex items-center gap-1.5">
+                                                {% if randevu.staff %}👨‍💼 {{ randevu.staff.name }}{% else %}👥 Fark Etmez{% endif %}
+                                            </p>
                                         </div>
                                         <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Ödenen Toplam</p>
-                                            <p class="text-sm font-extrabold text-emerald-600">💳 {{ randevu.total_online_charged }} ₺</p>
+                                            <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Ödenen Toplam</p>
+                                            <p class="text-sm font-black text-emerald-600 inline-flex items-center gap-1.5">
+                                                💳 {{ randevu.total_online_charged }} ₺
+                                            </p>
                                         </div>
                                     </div>
 
                                     {% if randevu.coupon_used %}
-                                    <div class="p-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-center text-xs font-bold mt-2">
-                                        🎟️ Müşteri "{{ randevu.coupon_used.code }}" kodlu kuponu kullandı.
+                                    <div class="p-2.5 bg-emerald-50 border border-emerald-100 rounded-xl text-center">
+                                        <p class="text-xs font-bold text-emerald-700 flex items-center justify-center gap-1.5">
+                                            🎟️ Müşteri "{{ randevu.coupon_used.code }}" kodlu kuponu kullandı.
+                                        </p>
                                     </div>
                                     {% endif %}
 
-                                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 mt-2">
-                                        <div class="font-bold text-slate-700 flex items-center gap-2 mb-2"><span class="text-rose-500">📍</span> Konum:
-                                            <span class="text-slate-600 font-medium">
-                                                {% if randevu.chosen_location == 'at_home' %} Müşteri Adresinde
-                                                {% elif randevu.chosen_location == 'online' %} Online Görüşme
-                                                {% else %} İşletmenizde Gerçekleşecek {% endif %}
-                                            </span>
-                                        </div>
-
-                                        {% if randevu.chosen_location == 'at_home' and randevu.customer_address %}
-                                            <div class="mt-2 pt-2 border-t border-slate-200">
-                                                <p class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-wider">Açık Adres</p>
-                                                <p class="text-slate-700 text-sm">{{ randevu.customer_address }}</p>
-                                            </div>
-                                        {% elif randevu.chosen_location == 'online' %}
-                                            <div class="mt-2 pt-2 border-t border-slate-200">
-                                                <p class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-wider">Platform: <span class="text-slate-800">{{ randevu.online_app }}</span></p>
-                                                <p class="text-indigo-600 font-bold text-sm bg-white p-2 rounded border border-slate-200 break-all">{{ randevu.online_link }}</p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
                                     {% if randevu.customer_note %}
                                     <div>
-                                        <small class="text-slate-500 block mb-1 uppercase tracking-wider font-semibold">Müşteri Notu</small>
-                                        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm italic">
+                                        <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Müşteri Notu</p>
+                                        <div class="p-3 bg-amber-50 border border-amber-100 rounded-xl text-sm font-medium text-amber-900 italic">
                                             "{{ randevu.customer_note }}"
                                         </div>
                                     </div>
                                     {% endif %}
-                                    <div class="pt-3 border-t border-slate-100">
-                                        <small class="text-slate-500 block uppercase tracking-wider font-semibold mb-1">Tarih & Saat</small>
-                                        <span class="font-bold text-slate-800 text-base flex items-center gap-2">📅 {{ randevu.date_time|date:"d M Y" }} <span class="text-slate-300">|</span> ⏰ {{ randevu.date_time|time:"H:i" }}</span>
+
+                                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                                        <p class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2">
+                                            📍 {% if randevu.chosen_location == 'at_home' %} Müşteri Adresinde
+                                            {% elif randevu.chosen_location == 'online' %} Online Görüşme
+                                            {% else %} İşletmenizde Gerçekleşecek {% endif %}
+                                        </p>
+
+                                        {% if randevu.chosen_location == 'at_home' and randevu.customer_address %}
+                                            <div class="mt-2 pt-2 border-t border-slate-200">
+                                                <p class="text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Açık Adres</p>
+                                                <p class="text-slate-700 text-sm leading-relaxed">{{ randevu.customer_address }}</p>
+                                            </div>
+                                        {% elif randevu.chosen_location == 'online' %}
+                                            <div class="mt-2 pt-2 border-t border-slate-200">
+                                                <p class="text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">Platform: <span class="text-slate-900">{{ randevu.online_app }}</span></p>
+                                                <p class="text-indigo-600 font-bold text-xs bg-white p-2 rounded border border-slate-200 break-all">{{ randevu.online_link }}</p>
+                                            </div>
+                                        {% endif %}
+
+                                        <p class="text-sm text-slate-500 mt-3 pt-3 border-t border-slate-200 flex items-center gap-2">
+                                            📅 {{ randevu.date_time|date:"d M Y" }} - ⏰ {{ randevu.date_time|time:"H:i" }}
+                                        </p>
                                     </div>
 
                                     {% if randevu.status == 'pending' %}
                                         {% if randevu.date_time < simdi %}
                                             <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-center mt-4">
-                                                <p class="text-sm font-bold text-slate-500">🕰️ Bu randevunun saati geçtiği için onay veya iptal işlemi yapılamaz.</p>
+                                                <p class="text-sm font-bold text-slate-400">
+                                                    🕰️ Bu randevunun saati geçtiği için işlem yapılamaz.
+                                                </p>
                                             </div>
                                         {% else %}
-                                            <div class="flex gap-3 pt-4 border-t border-slate-100 mt-4">
-                                                <a href="{% url 'randevu_onayla' randevu.id %}" class="flex-1 text-center py-2.5 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors shadow-sm">Onayla</a>
-                                                <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-2.5 bg-white border-2 border-rose-100 text-rose-500 rounded-xl font-bold hover:bg-rose-50 transition-colors">İptal Et</a>
+                                            <div class="flex gap-3 pt-2 mt-4">
+                                                <a href="{% url 'randevu_onayla' randevu.id %}" class="flex-1 text-center py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-all shadow-md shadow-emerald-500/10">Onayla</a>
+                                                <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-white border border-rose-200 text-rose-500 rounded-xl font-bold hover:bg-rose-50 transition-all">İptal Et</a>
                                             </div>
                                         {% endif %}
-                                    {% elif randevu.status == 'confirmed' %}
-                                    <div class="flex gap-3 pt-4 border-t border-slate-100 mt-4">
-                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-2.5 bg-white border-2 border-rose-100 text-rose-500 rounded-xl font-bold hover:bg-rose-50 transition-colors">İptal Et</a>
+                                    {% elif randevu.status == 'confirmed' or randevu.status == 'approved' %}
+                                    <div class="flex gap-3 pt-2 mt-4">
+                                        {% with randevu_tarihi=randevu.date_time|date:"Ymd" %}
+                                            {% if randevu_tarihi <= bugunun_tarihi %}
+                                                <a href="{% url 'adisyon_detay' randevu.id %}" class="flex-1 text-center py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-600/10 flex items-center justify-center gap-2">💳 Kasaya Git</a>
+                                            {% else %}
+                                                <div class="flex-1 text-center py-3 bg-slate-100 border border-slate-200 text-slate-400 rounded-xl font-bold cursor-not-allowed opacity-70 flex items-center justify-center gap-2">
+                                                    🕰️ Günü Bekleniyor
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-white border border-rose-200 text-rose-500 rounded-xl font-bold hover:bg-rose-50 transition-all">İptal Et</a>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -453,7 +516,6 @@
                     Toplam <span class="font-extrabold text-slate-800">{{ randevular.paginator.count }}</span> randevudan <span class="font-extrabold text-slate-800">{{ randevular.start_index }} - {{ randevular.end_index }}</span> arası.
                 </span>
 
-                <!-- YENİ PAGINATION (FREE) -->
                 <div class="inline-flex -space-x-px rounded-lg shadow-sm">
                     {% if randevular.has_previous %}
                         <a href="?page={{ randevular.previous_page_number }}" class="px-4 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 text-sm font-bold transition-colors relative z-0 hover:z-10 focus:z-10 first:rounded-l-lg last:rounded-r-lg">Önceki</a>
@@ -475,23 +537,125 @@
             {% endif %}
         </div>
     {% endif %}
+
+<div id="transferWarningModal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="{% if isletme.is_premium %}bg-slate-900 border-slate-700 shadow-amber-900/20{% else %}bg-white border-slate-200{% endif %} border w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 text-center p-8">
+            <div class="w-20 h-20 mx-auto bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mb-5 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-10 h-10">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-black mb-3 {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}">Müşteri Mağduriyeti Yaşanmasın!</h3>
+            <p class="text-sm font-medium mb-8 leading-relaxed {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">
+                Lütfen aktarma yapacağınız tarih ve saati, müşterinin onayladığı zamana <strong>en yakın ve uygun</strong> olanından seçmeye özen gösterin.
+            </p>
+            <div class="flex gap-3">
+                <button onclick="closeTransferWarningModal()" class="flex-1 py-3 rounded-xl font-bold transition-all text-slate-500 bg-slate-100 hover:bg-slate-200 {% if isletme.is_premium %}bg-slate-800 text-slate-400 hover:bg-slate-700{% endif %}">
+                    Vazgeç
+                </button>
+                <button id="proceedTransferBtn" class="flex-1 py-3 rounded-xl font-black transition-all shadow-lg text-white bg-amber-500 hover:bg-amber-600 shadow-amber-500/30 hover:-translate-y-0.5">
+                    Anladım, Devam
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="transferModal" onclick="if(event.target === this) closeTransferModal()" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="{% if isletme.is_premium %}bg-slate-900 border-slate-700 shadow-sky-900/20{% else %}bg-white border-slate-200{% endif %} border w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
+
+            <div class="flex justify-between items-center p-5 border-b {% if isletme.is_premium %}border-slate-800 bg-slate-800/30{% else %}border-slate-100 bg-slate-50{% endif %}">
+                <h3 class="text-lg font-bold flex items-center gap-2 {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}">
+                    {% if isletme.is_premium %}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-sky-400"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" /></svg>
+                    {% else %}
+                        🔄
+                    {% endif %}
+                    Randevuyu Ertele / Aktar
+                </h3>
+                <button type="button" onclick="closeTransferModal()" class="text-slate-400 hover:text-rose-500 transition-colors text-xl font-bold">✖</button>
+            </div>
+
+            <form method="POST" action="{% url 'randevu_aktar' %}" id="transferForm" class="p-6 space-y-5">
+                {% csrf_token %}
+                <input type="hidden" name="randevu_id" id="transfer_randevu_id">
+                <input type="hidden" name="service_id" id="transfer_service_id">
+                <input type="hidden" name="new_time" id="transfer_time_id" required>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider mb-2 {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">1. Yeni Personel Seçimi</label>
+                        <select name="new_staff_id" id="transfer_staff_select" class="w-full px-4 py-3 border rounded-xl outline-none font-medium cursor-pointer transition-all {% if isletme.is_premium %}bg-slate-950 border-slate-700 text-white focus:border-sky-500{% else %}bg-slate-50 border-slate-200 text-slate-800 focus:border-indigo-500{% endif %}" required onchange="fetchTransferSlots()">
+                            <option value="">-- Yükleniyor... --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider mb-2 {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">2. Yeni Tarih</label>
+                        <input type="date" name="new_date" id="transfer_date_input" class="w-full px-4 py-3 border rounded-xl outline-none font-bold cursor-pointer transition-all {% if isletme.is_premium %}bg-slate-950 border-slate-700 text-white focus:border-sky-500{% else %}bg-white border-slate-200 text-slate-800 focus:border-indigo-500{% endif %}" required onchange="fetchTransferSlots()">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider mb-2 flex items-center justify-between {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">
+                        <span>3. Yeni Saat</span>
+                        <span id="transferSpinner" class="hidden text-sky-500 animate-pulse flex items-center gap-1">
+                            {% if isletme.is_premium %}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 animate-spin"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                            {% else %}
+                                ⏳
+                            {% endif %}
+                            Aranıyor...
+                        </span>
+                    </label>
+                    <div id="transferSlotsContainer" class="min-h-[60px] max-h-56 overflow-y-auto custom-scrollbar p-4 rounded-xl border {% if isletme.is_premium %}bg-slate-950 border-slate-800{% else %}bg-slate-50 border-slate-200{% endif %}">
+                        <p class="text-xs font-medium text-center py-2 {% if isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">Boş saatleri görmek için personel ve tarih seçin.</p>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t {% if isletme.is_premium %}border-slate-800{% else %}border-slate-100{% endif %}">
+                    <button type="submit" id="transferSubmitBtn" class="w-full py-3.5 rounded-xl font-bold transition-all shadow-lg text-white opacity-50 cursor-not-allowed
+                        {% if isletme.is_premium %}bg-sky-600 hover:bg-sky-500 shadow-sky-500/20{% else %}bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/20{% endif %}" disabled>
+                        Tarihi Güncelle ve Aktar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<div id="transferSuccessModal" class="hidden fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="{% if isletme.is_premium %}bg-slate-900 border-slate-700 shadow-emerald-900/20{% else %}bg-white border-slate-200{% endif %} border w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 text-center p-8">
+            <div class="w-24 h-24 mx-auto bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-12 h-12">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-black mb-3 {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}">İşlem Başarılı!</h3>
+            <p class="text-sm font-medium mb-8 leading-relaxed {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">
+                Randevu yeni personeline ve saatine başarıyla aktarıldı. Müşteriye bildirim iletildi.
+            </p>
+            <button onclick="closeTransferSuccessModal()" class="w-full py-4 rounded-xl font-black transition-all shadow-lg text-white bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/30 hover:-translate-y-1">
+                Harika, Anladım
+            </button>
+        </div>
+    </div>
 {% endblock %}
 
 {% block extra_js %}
+<style>
+    /* Modal İçi İnce Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: {% if isletme.is_premium %}#334155{% else %}#cbd5e1{% endif %}; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: {% if isletme.is_premium %}#0ea5e9{% else %}#4f46e5{% endif %}; }
+</style>
+
 <script>
     function openDetayModal(modalId) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
-
-        // 1. ZEKİ IŞINLANMA: Modalı tablonun (tr) içinden söküp en dışa (body) alıyoruz!
-        // Bu sayede scroll nerede olursa olsun arka plan %100 bulanıklaşır.
         document.body.appendChild(modal);
-
-        // 2. Modalı Görünür Yap ve Arka Plan Kaymasını Kilitle
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
-
-        // 3. Jilet Animasyonu Tetikle (Opacity ve Scale)
         setTimeout(() => {
             modal.classList.remove('opacity-0');
             modal.firstElementChild.classList.remove('scale-95');
@@ -502,13 +666,260 @@
     function closeDetayModal(modalId) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
-
-        // 1. Animasyonu Geri Sar
         modal.classList.add('opacity-0');
         modal.firstElementChild.classList.remove('scale-100');
         modal.firstElementChild.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
 
-        // 2. Animasyon Bitince Gizle (300ms sonra)
+    // ==========================================
+    // 🔥 AKTARMA MODALI VE API JS KODLARI 🔥
+    // ==========================================
+    const isletmeSlug = "{{ isletme.slug }}";
+
+    // Tarih Sınırlandırması (Geçmişe alınamaz)
+    const tDateInput = document.getElementById('transfer_date_input');
+    const today = new Date();
+    const offset = today.getTimezoneOffset() * 60000;
+    const localNow = new Date(today.getTime() - offset);
+    tDateInput.setAttribute('min', localNow.toISOString().split('T')[0]);
+
+    async function openTransferModal(randevuId, serviceId) {
+        const modal = document.getElementById('transferModal');
+        document.getElementById('transfer_randevu_id').value = randevuId;
+        document.getElementById('transfer_service_id').value = serviceId;
+
+        // Reset Form
+        document.getElementById('transfer_time_id').value = '';
+        document.getElementById('transferSlotsContainer').innerHTML = `<p class="text-xs font-medium text-center py-2 text-slate-500">Boş saatleri görmek için personel ve tarih seçin.</p>`;
+        document.getElementById('transferSubmitBtn').disabled = true;
+        document.getElementById('transferSubmitBtn').classList.add('opacity-50', 'cursor-not-allowed');
+
+        // Bu hizmeti veren personelleri API'den çek
+        const staffSelect = document.getElementById('transfer_staff_select');
+        staffSelect.innerHTML = '<option value="">-- Personeller Yükleniyor... --</option>';
+
+        try {
+            const response = await fetch(`/randevu-yonetimi/api/service-staffs/${isletmeSlug}/${serviceId}/`);
+            const data = await response.json();
+
+            let html = '<option value="" disabled selected>-- Personel Seçin --</option>';
+            html += '<option value="0">👥 Fark Etmez (Boşluk Bul)</option>';
+
+            if(data.staffs) {
+                data.staffs.forEach(staff => {
+                    html += `<option value="${staff.id}">👨‍💼 ${staff.name} (${staff.title})</option>`;
+                });
+            }
+            staffSelect.innerHTML = html;
+        } catch (e) {
+            staffSelect.innerHTML = '<option value="">Hata oluştu. Sayfayı yenileyin.</option>';
+        }
+
+        // Modalı Göster
+        document.body.appendChild(modal);
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.firstElementChild.classList.remove('scale-95');
+            modal.firstElementChild.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeTransferModal() {
+        const modal = document.getElementById('transferModal');
+        modal.classList.add('opacity-0');
+        modal.firstElementChild.classList.remove('scale-100');
+        modal.firstElementChild.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+
+    async function fetchTransferSlots() {
+        const date = document.getElementById('transfer_date_input').value;
+        const staffId = document.getElementById('transfer_staff_select').value;
+        const serviceId = document.getElementById('transfer_service_id').value;
+        const container = document.getElementById('transferSlotsContainer');
+        const spinner = document.getElementById('transferSpinner');
+
+        if (!date || !staffId) return;
+
+        spinner.classList.remove('hidden');
+        container.innerHTML = `<div class="flex justify-center py-4"><div class="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div></div>`;
+
+        // Fark Etmez seçildiyse staff_id'yi boş yolla (0 gelmişti)
+        const finalStaffId = staffId === "0" ? "" : staffId;
+
+        try {
+            const url = `/randevu-yonetimi/api/available-times/${isletmeSlug}/?date=${date}&service_id=${serviceId}&staff_id=${finalStaffId}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.error) {
+                container.innerHTML = `<p class="text-xs text-rose-500 font-bold text-center py-2">${data.error}</p>`;
+                return;
+            }
+
+            let slots = data.slots || data;
+            if (!slots || slots.length === 0) {
+                container.innerHTML = `<p class="text-xs font-bold text-center py-2 text-slate-500">Bu tarihte uygun saat bulunamadı.</p>`;
+                return;
+            }
+
+            // GÜNCELLENDİ: Yatayda daha fazla saat sığması için grid sınıfları (grid-cols-5, md:grid-cols-6) eklendi
+            let html = `<div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-2">`;
+            slots.forEach(slot => {
+                if (slot.available) {
+                    html += `<button type="button" onclick="selectTransferTime('${slot.time}', this)" class="transfer-time-btn py-2 rounded-lg text-xs font-bold border transition-colors {% if isletme.is_premium %}bg-slate-900 border-slate-700 text-slate-300 hover:border-sky-500 hover:text-sky-400{% else %}bg-white border-slate-200 text-slate-700 hover:border-indigo-500 hover:text-indigo-600{% endif %}">${slot.time}</button>`;
+                } else {
+                    html += `<button type="button" disabled class="py-2 rounded-lg text-xs font-medium border border-dashed opacity-40 cursor-not-allowed {% if isletme.is_premium %}bg-slate-950 border-slate-800 text-slate-600{% else %}bg-slate-50 border-slate-200 text-slate-400{% endif %}">${slot.time}</button>`;
+                }
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+
+        } catch (e) {
+            container.innerHTML = `<p class="text-xs text-rose-500 font-bold text-center py-2">Sistem Hatası.</p>`;
+        } finally {
+            spinner.classList.add('hidden');
+        }
+    }
+
+    function selectTransferTime(time, btn) {
+        document.getElementById('transfer_time_id').value = time;
+
+        // Önceki seçimleri temizle
+        document.querySelectorAll('.transfer-time-btn').forEach(el => {
+            el.classList.remove('{% if isletme.is_premium %}bg-sky-500/20{% else %}bg-indigo-50{% endif %}', '{% if isletme.is_premium %}border-sky-500{% else %}border-indigo-500{% endif %}');
+        });
+
+        // Yeni seçimi parlat
+        btn.classList.add('{% if isletme.is_premium %}bg-sky-500/20{% else %}bg-indigo-50{% endif %}', '{% if isletme.is_premium %}border-sky-500{% else %}border-indigo-500{% endif %}');
+
+        // Gönder butonunu aktif et
+        const submitBtn = document.getElementById('transferSubmitBtn');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+     // ==========================================
+    // 🔥 BAŞARILI MODALI FONKSİYONLARI 🔥
+    // ==========================================
+    function openTransferSuccessModal() {
+        const modal = document.getElementById('transferSuccessModal');
+        document.body.appendChild(modal);
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.firstElementChild.classList.remove('scale-95');
+            modal.firstElementChild.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeTransferSuccessModal(redirectUrl = null) {
+        const modal = document.getElementById('transferSuccessModal');
+        modal.classList.add('opacity-0');
+        modal.firstElementChild.classList.remove('scale-100');
+        modal.firstElementChild.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            // Modal kapanınca tablo güncellensin diye sayfayı yeniliyoruz
+            if(redirectUrl && typeof redirectUrl === 'string') {
+                window.location.href = redirectUrl;
+            } else {
+                window.location.reload();
+            }
+        }, 300);
+    }
+
+    // ==========================================
+    // 🔥 FORMU ARKA PLANDA (AJAX) GÖNDERME 🔥
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('transferForm');
+
+        if (form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // Sayfanın yenilenmesini engelle
+
+                const btn = document.getElementById('transferSubmitBtn');
+                const originalText = btn.innerHTML;
+
+                // Butonu yükleniyor moduna al
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Aktarılıyor...`;
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (response.ok) {
+                        // Eski modalı kapat
+                        closeTransferModal();
+
+                        // Yarım saniye sonra Başarılı modalını aç
+                        setTimeout(() => {
+                            openTransferSuccessModal();
+
+                            // "Harika Anladım" butonuna basıldığında gidilecek URL'yi hafızaya al
+                            document.querySelector('#transferSuccessModal button').onclick = () => closeTransferSuccessModal(response.url);
+                        }, 300);
+
+                    } else {
+                        alert("İşlem sırasında bir hata oluştu.");
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                } catch(err) {
+                    alert("Bağlantı hatası lütfen tekrar deneyin.");
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            });
+        }
+    });
+
+function openTransferWarningModal(randevuId, serviceId) {
+        const modal = document.getElementById('transferWarningModal');
+        document.body.appendChild(modal);
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+
+        // Devam butonuna tıklandığında uyarıyı kapatıp asıl aktarma modalını açsın
+        document.getElementById('proceedTransferBtn').onclick = () => {
+            closeTransferWarningModal();
+            setTimeout(() => {
+                openTransferModal(randevuId, serviceId);
+            }, 300); // Kapanma animasyonu bitince aç
+        };
+
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.firstElementChild.classList.remove('scale-95');
+            modal.firstElementChild.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeTransferWarningModal() {
+        const modal = document.getElementById('transferWarningModal');
+        modal.classList.add('opacity-0');
+        modal.firstElementChild.classList.remove('scale-100');
+        modal.firstElementChild.classList.add('scale-95');
         setTimeout(() => {
             modal.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');

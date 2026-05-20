@@ -5,101 +5,145 @@
 {% block page_title %}Genel Bakış{% endblock %}
 
 {% block content %}
+    <!-- 🔥 PREMIUM LIVE STATUS BAR (Clock & Date) 🔥 -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 p-6 rounded-3xl {% if isletme.is_premium %}bg-slate-900/40 border border-slate-800 shadow-[0_15px_40px_rgba(0,0,0,0.2)]{% else %}bg-white border border-slate-100 shadow-sm{% endif %} backdrop-blur-md dash-anim-0">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl {% if isletme.is_premium %}bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-[0_0_20px_rgba(251,191,36,0.1)]{% else %}bg-indigo-50 text-indigo-600 border border-indigo-100{% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <div>
+                <h4 id="live-date" class="text-sm font-black {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %} uppercase tracking-widest leading-none mb-1">Yükleniyor...</h4>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-bold {% if isletme.is_premium %}text-emerald-400{% else %}text-emerald-600{% endif %} uppercase tracking-tighter">Canlı Sistem Durumu</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col items-center md:items-end">
+            <div id="live-clock" class="text-4xl md:text-5xl font-black tracking-tighter {% if isletme.is_premium %}text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]{% else %}text-slate-900{% endif %} leading-none">00:00:00</div>
+            <p class="text-[10px] font-bold {% if isletme.is_premium %}text-amber-500/60{% else %}text-indigo-600/60{% endif %} uppercase tracking-[0.2em] mt-1">GMT+3 Istanbul Timezone</p>
+        </div>
+    </div>
+    
+    {% if not isletme.iyzico_sub_merchant_key %}
+    <div class="mb-8 p-6 md:p-8 rounded-[2rem] border transition-all duration-500 dash-anim-0
+        {% if isletme.is_premium %}
+            bg-gradient-to-br from-amber-500/10 via-slate-900/40 to-amber-500/5 border-amber-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)]
+        {% else %}
+            bg-gradient-to-br from-indigo-50 to-white border-indigo-100 shadow-sm
+        {% endif %}">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl animate-pulse shrink-0
+                    {% if isletme.is_premium %}bg-amber-500/20 text-amber-400 border border-amber-500/30{% else %}bg-indigo-100 text-indigo-600 border border-indigo-200{% endif %}">
+                    ⚡
+                </div>
+                <div>
+                    <h4 class="text-xl font-black {% if isletme.is_premium %}text-white{% else %}text-slate-900{% endif %} mb-2">Ödeme Altyapınız Hazır Değil</h4>
+                    <p class="text-sm {% if isletme.is_premium %}text-slate-400{% else %}text-slate-600{% endif %} font-medium leading-relaxed max-w-xl">
+                        Müşterilerinizin online randevu alabilmesi için finansal ayarları tamamlamanız gerekmektedir. 
+                        <span class="block mt-1 font-bold {% if isletme.is_premium %}text-amber-400/80{% else %}text-indigo-600/80{% endif %}">Marketplace sistemiyle ödemeleriniz doğrudan IBAN'ınıza aktarılır.</span>
+                    </p>
+                </div>
+            </div>
+            <a href="{% url 'isletme_ayarlar' %}" class="shrink-0 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:-translate-y-1 shadow-lg flex items-center gap-2
+                {% if isletme.is_premium %}
+                    bg-amber-500 hover:bg-amber-400 text-black shadow-amber-500/20
+                {% else %}
+                    bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20
+                {% endif %}">
+                Hemen Ayarla
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+            </a>
+        </div>
+    </div>
+    {% endif %}
 
-    <div id="guideWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl transform scale-95 transition-transform duration-300 relative overflow-hidden" id="guideModalContent">
+    {% now "Ymd" as bugunun_tarihi %}
 
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+    <div id="guideWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="{% if isletme.is_premium %}bg-slate-900 border border-slate-800 shadow-[0_25px_70px_rgba(0,0,0,0.5)]{% else %}bg-white shadow-2xl{% endif %} rounded-3xl max-w-lg w-full p-8 transform scale-95 transition-transform duration-300 relative overflow-hidden" id="guideModalContent">
 
-            <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner border border-indigo-100">
+            <div class="absolute -top-10 -right-10 w-32 h-32 {% if isletme.is_premium %}bg-amber-500/10{% else %}bg-indigo-500/10{% endif %} rounded-full blur-2xl"></div>
+
+            <div class="w-20 h-20 {% if isletme.is_premium %}bg-amber-500/10 text-amber-500 border-amber-500/20{% else %}bg-indigo-50 text-indigo-600 border-indigo-100{% endif %} rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner border">
                 📖
             </div>
 
-            <h3 class="text-2xl font-extrabold text-slate-900 text-center mb-3">T-Randevu'ya Hoş Geldiniz!</h3>
+            <h3 class="text-2xl font-extrabold {% if isletme.is_premium %}text-white{% else %}text-slate-900{% endif %} text-center mb-3">T-Randevu'ya Hoş Geldiniz!</h3>
 
-            <p class="text-slate-600 text-center font-medium leading-relaxed mb-8">
-                Sistemi en verimli şekilde kullanmak ve müşterilerinize kusursuz bir deneyim sunmak için, ayarlara başlamadan önce <strong class="text-indigo-600">Kullanım Rehberine</strong> göz atmanızı şiddetle tavsiye ederiz.
+            <p class="{% if isletme.is_premium %}text-slate-400{% else %}text-slate-600{% endif %} text-center font-medium leading-relaxed mb-8 text-sm md:text-base">
+                Sistemi en verimli şekilde kullanmak ve müşterilerinize kusursuz bir deneyim sunmak için, ayarlara başlamadan önce <strong class="{% if isletme.is_premium %}text-amber-400{% else %}text-indigo-600{% endif %}">Kullanım Rehberine</strong> göz atmanızı şiddetle tavsiye ederiz.
             </p>
 
             <div class="flex flex-col gap-3">
-                <a href="{% url 'rehber' %}" onclick="closeGuideModal()" target="_blank" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-500 hover:to-blue-400 text-white font-extrabold text-center rounded-xl shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5">
+                <a href="{% url 'rehber' %}" onclick="closeGuideModal()" target="_blank" class="w-full py-4 {% if isletme.is_premium %}bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950{% else %}bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-500 hover:to-blue-400 text-white{% endif %} font-black text-center rounded-xl shadow-lg transition-all hover:-translate-y-0.5">
                     Hemen Rehberi Oku
                 </a>
-                <button onclick="closeGuideModal()" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-colors">
+                <button onclick="closeGuideModal()" class="w-full py-3.5 {% if isletme.is_premium %}bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-slate-200{% else %}bg-slate-100 hover:bg-slate-200 text-slate-600{% endif %} font-bold rounded-xl transition-colors">
                     Daha Sonra İncelerim
                 </button>
             </div>
         </div>
     </div>
 
-
-    {% if isletme.is_premium %}
-    <div id="premiumWelcomeModal" class="fixed inset-0 z-[99999] flex items-center justify-center bg-background/95 backdrop-blur-lg transition-opacity duration-700 opacity-0 hidden">
-        <div class="text-center transform scale-75 opacity-0 transition-all duration-1000" id="premiumWelcomeContent">
-            <div class="relative w-32 h-32 mx-auto mb-8">
-                <div class="absolute inset-0 bg-amber-500 rounded-full blur-[50px] animate-pulse opacity-50"></div>
-                <div class="relative w-full h-full bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-500/30 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(251,191,36,0.3)]">
-                    <span class="text-6xl drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]">👑</span>
-                </div>
-            </div>
-
-            <h2 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 mb-3 tracking-tight">
-                Hoş Geldiniz.
-            </h2>
-            <div class="flex items-center justify-center gap-3">
-                <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-amber-500/50"></div>
-                <p class="text-amber-500/80 font-bold tracking-[0.3em] uppercase text-sm">Premium Sistem Devrede</p>
-                <div class="h-[1px] w-12 bg-gradient-to-l from-transparent to-amber-500/50"></div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
     {% if isletme.is_premium %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-6 relative overflow-hidden group shadow-xl dash-anim-1">
+            <!-- Toplam Randevu Card -->
+            <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl p-6 relative overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-amber-500/5 hover:border-amber-500/30 transition-all duration-300 dash-anim-1">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-all duration-500"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="p-3 bg-amber-400/10 rounded-xl text-amber-400 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(251,191,36,0.15)]">
+                    <div class="p-3 bg-amber-400/10 rounded-2xl text-amber-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-[0_0_15px_rgba(251,191,36,0.15)]">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                     </div>
+                    <span class="px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold rounded-lg uppercase tracking-wider">Mevcut</span>
                 </div>
-                <h3 class="text-3xl font-extrabold text-white mb-1 drop-shadow-md">{{ toplam_randevu|k_format }}</h3>
-                <p class="text-sm text-slate-400 font-medium tracking-wide uppercase">Toplam Randevu</p>
+                <h3 class="text-4xl font-black text-white mb-1 tracking-tight group-hover:text-amber-300 transition-colors">{{ toplam_randevu|k_format }}</h3>
+                <p class="text-xs text-slate-400 font-bold tracking-wider uppercase">Toplam Randevu</p>
             </div>
 
-            <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-6 relative overflow-hidden group shadow-xl dash-anim-2">
+            <!-- Aktif Müşteri Card -->
+            <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl p-6 relative overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-emerald-500/5 hover:border-emerald-500/30 transition-all duration-300 dash-anim-2">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all duration-500"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="p-3 bg-emerald-400/10 rounded-xl text-emerald-400 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(52,211,153,0.15)]">
+                    <div class="p-3 bg-emerald-400/10 rounded-2xl text-emerald-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-[0_0_15px_rgba(52,211,153,0.15)]">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     </div>
+                    <span class="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-lg uppercase tracking-wider">Aktif</span>
                 </div>
-                <h3 class="text-3xl font-extrabold text-white mb-1 drop-shadow-md">{{ toplam_musteri|k_format }}</h3>
-                <p class="text-sm text-slate-400 font-medium tracking-wide uppercase">Aktif Müşteri</p>
+                <h3 class="text-4xl font-black text-white mb-1 tracking-tight group-hover:text-emerald-300 transition-colors">{{ toplam_musteri|k_format }}</h3>
+                <p class="text-xs text-slate-400 font-bold tracking-wider uppercase">Aktif Müşteri</p>
             </div>
 
-            <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-6 relative overflow-hidden group shadow-xl dash-anim-3">
+            <!-- Aktif Uzmanlar Card -->
+            <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl p-6 relative overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-pink-500/5 hover:border-pink-500/30 transition-all duration-300 dash-anim-3">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl group-hover:bg-pink-500/10 transition-all duration-500"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="p-3 bg-pink-400/10 rounded-xl text-pink-400 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(244,114,182,0.15)]">
+                    <div class="p-3 bg-pink-400/10 rounded-2xl text-pink-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-[0_0_15px_rgba(244,114,182,0.15)]">
                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                          </svg>
                     </div>
+                    <span class="px-2 py-0.5 bg-pink-500/10 border border-pink-500/20 text-pink-400 text-[10px] font-bold rounded-lg uppercase tracking-wider">Ekip</span>
                 </div>
-                <h3 class="text-3xl font-extrabold text-white mb-1 drop-shadow-md">{{ aktif_personel_sayisi }}</h3>
-                <p class="text-sm text-slate-400 font-medium tracking-wide uppercase">Aktif Uzmanlar</p>
+                <h3 class="text-4xl font-black text-white mb-1 tracking-tight group-hover:text-pink-300 transition-colors">{{ aktif_personel_sayisi }}</h3>
+                <p class="text-xs text-slate-400 font-bold tracking-wider uppercase">Aktif Uzmanlar</p>
             </div>
 
-            <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-6 relative overflow-hidden group shadow-xl dash-anim-4">
+            <!-- Olası Kazanç Card -->
+            <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl p-6 relative overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:shadow-purple-500/5 hover:border-purple-500/30 transition-all duration-300 dash-anim-4">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all duration-500"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <div class="p-3 bg-purple-400/10 rounded-xl text-purple-400 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(192,132,252,0.15)]">
+                    <div class="p-3 bg-purple-400/10 rounded-2xl text-purple-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-[0_0_15px_rgba(192,132,252,0.15)]">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <span class="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold">{{ simdi|date:"F" }} Ayı</span>
+                    <span class="px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold rounded-xl">{{ simdi|date:"F" }} Ayı</span>
                 </div>
-                <h3 class="text-3xl font-extrabold text-white mb-1 drop-shadow-md">{{ aylik_kazanc|k_format }} <span class="text-xl text-purple-400">₺</span></h3>
-                <p class="text-sm text-slate-400 font-medium tracking-wide uppercase">Olası Kazanç</p>
+                <h3 class="text-4xl font-black text-white mb-1 tracking-tight group-hover:text-purple-300 transition-colors">{{ aylik_kazanc|k_format }} <span class="text-xl text-purple-400 font-black">₺</span></h3>
+                <p class="text-xs text-slate-400 font-bold tracking-wider uppercase">Olası Kazanç</p>
             </div>
         </div>
 
@@ -122,15 +166,17 @@
             </div>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl overflow-hidden mb-10 dash-anim-6">
-            <div class="flex justify-between items-center p-6 border-b border-slate-800 bg-slate-900/50">
-                <h2 class="text-xl font-bold text-white flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-amber-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
-                    </svg>
-                    Yaklaşan Randevular
+        <div class="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-3xl overflow-hidden mb-10 dash-anim-6 hover:border-amber-500/10 transition-all duration-300">
+            <div class="flex justify-between items-center p-6 border-b border-slate-800/60 bg-slate-950/20">
+                <h2 class="text-xl font-extrabold text-white flex items-center gap-3">
+                    <div class="p-2 bg-amber-500/10 text-amber-400 rounded-xl shadow-[0_0_15px_rgba(251,191,36,0.1)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
+                        </svg>
+                    </div>
+                    <span>Yaklaşan Randevular</span>
                 </h2>
-                <a href="{% url 'isletme_randevular' %}" class="text-sm font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors">
+                <a href="{% url 'isletme_randevular' %}" class="text-sm font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors px-3 py-1.5 bg-amber-500/10 rounded-xl border border-amber-500/20 hover:bg-amber-500 hover:text-black transition-all">
                     Tümünü Gör <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
                 </a>
             </div>
@@ -162,7 +208,7 @@
                                 <div class="text-xs text-slate-500 mt-2.5 font-medium flex items-center gap-1.5">
                                     {% if randevu.chosen_location == 'at_home' %}
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-emerald-400">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125-.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                                         </svg>
                                         Müşteri Adresinde
                                     {% elif randevu.chosen_location == 'online' %}
@@ -182,7 +228,7 @@
                             <td class="px-6 py-4">
                                 <div class="text-sm text-slate-300 flex items-center gap-2">
                                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-slate-400">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0021 18.75m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                                     </svg>
                                     {{ randevu.date_time|date:"d M Y" }}
                                 </div>
@@ -283,7 +329,7 @@
                                     </div>
 
                                     {% if randevu.coupon_used %}
-                                    <div class="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-center">
+                                    <div class="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-center mt-2">
                                         <p class="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" /></svg>
                                             Müşteri "{{ randevu.coupon_used.code }}" kodlu kuponu kullandı.
@@ -328,20 +374,34 @@
                                     </div>
 
                                     {% if randevu.status == 'pending' %}
-                                    <div class="flex gap-3 pt-2">
-                                        <a href="{% url 'randevu_onayla' randevu.id %}" class="flex-1 text-center py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-lg hover:shadow-emerald-500/20">Onayla</a>
-                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl font-bold hover:bg-rose-500 hover:text-white transition-all shadow-lg hover:shadow-rose-500/20">İptal Et</a>
-                                    </div>
+                                        <div class="flex gap-3 pt-2">
+                                            <a href="{% url 'randevu_onayla' randevu.id %}" class="flex-1 text-center py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-lg hover:shadow-emerald-500/20">Onayla</a>
+                                            <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl font-bold hover:bg-rose-500 hover:text-white transition-all shadow-lg hover:shadow-rose-500/20">İptal Et</a>
+                                        </div>
                                     {% elif randevu.status == 'approved' or randevu.status == 'confirmed' %}
-                                    <div class="flex gap-3 pt-2">
-                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl font-bold hover:bg-rose-500 hover:text-white transition-all">İptal Et</a>
+                                    <div class="flex gap-3 pt-2 mt-4">
+                                        {% with randevu_tarihi=randevu.date_time|date:"Ymd" %}
+                                            {% if randevu_tarihi <= bugunun_tarihi %}
+                                                <a href="{% url 'adisyon_detay' randevu.id %}" class="flex-1 text-center py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-lg hover:shadow-emerald-500/20 flex items-center justify-center gap-2">💳 Kasaya Git</a>
+                                            {% else %}
+                                                <div class="flex-1 text-center py-3 bg-slate-800 border border-slate-700 text-slate-500 rounded-xl font-bold cursor-not-allowed opacity-70 flex items-center justify-center gap-2" title="Günü gelmeden hesap kesilemez.">
+                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    Günü Bekleniyor
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl font-bold hover:bg-rose-500 hover:text-white transition-all shadow-lg hover:shadow-rose-500/20">İptal Et</a>
                                     </div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                         {% empty %}
-                        <tr><td colspan="4" class="py-16 text-center"><p class="text-slate-500 text-sm font-medium">Henüz bekleyen randevunuz bulunmuyor.</p></td></tr>
+                        <tr>
+                            <td colspan="4" class="py-16 text-center">
+                                <p class="text-slate-500 text-sm font-medium">Henüz randevunuz bulunmuyor.</p>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -367,6 +427,50 @@
             <div class="bg-white border-l-4 border-l-pink-500 border-y border-r border-slate-200 shadow-sm rounded-2xl p-6 hover:shadow-md transition-shadow">
                 <h6 class="text-slate-500 font-bold text-sm mb-2 uppercase tracking-wide">Aktif Uzmanlar</h6>
                 <h2 class="text-4xl font-extrabold text-slate-800">{{ aktif_personel_sayisi }}</h2>
+            </div>
+        </div>
+
+        <!-- Locked Premium Revenue Chart Teaser -->
+        <div class="bg-white border border-slate-200/80 shadow-sm rounded-2xl overflow-hidden mb-8 p-6 lg:p-8 relative group">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-lg font-extrabold text-slate-800 flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-indigo-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                        </svg>
+                        Son 7 Günlük Kazanç & Ciro Performansı
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1 font-semibold">İşletmenizin günlük ciro ve finansal trend analizi</p>
+                </div>
+                <span class="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-full shadow-sm">👑 Premium Özellik</span>
+            </div>
+
+            <!-- Blurred Chart Mockup with Lock Overlay -->
+            <div class="relative h-[220px] w-full flex items-center justify-center overflow-hidden rounded-xl bg-slate-50/50 border border-slate-100">
+                <!-- Blurred fake SVG chart path background -->
+                <svg class="absolute inset-0 w-full h-full opacity-[0.08] filter blur-[4px] pointer-events-none" viewBox="0 0 500 220" preserveAspectRatio="none">
+                    <path d="M 0 190 Q 50 110 100 160 T 200 70 T 300 130 T 400 30 T 500 80 L 500 220 L 0 220 Z" fill="url(#grad_teaser)" stroke="#6366f1" stroke-width="5" />
+                    <defs>
+                        <linearGradient id="grad_teaser" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#6366f1" stop-opacity="0.5" />
+                            <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+
+                <!-- Overlay with Call-To-Action -->
+                <div class="absolute inset-0 bg-white/60 backdrop-blur-[2.5px] flex flex-col items-center justify-center text-center p-6 z-10">
+                    <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-xl mb-3 shadow-md border border-amber-200/60 animate-bounce">
+                        👑
+                    </div>
+                    <h3 class="text-base font-extrabold text-slate-950 mb-1">Ciro ve Kazanç Grafiğini Etkinleştirin</h3>
+                    <p class="text-xs text-slate-600 max-w-md mb-4 font-semibold leading-relaxed">
+                        Haftalık kazanç durumunuzu, yoğun saatlerinizi ve dükkanınızın finansal performansını grafiklerle analiz etmek için Premium plana geçin.
+                    </p>
+                    <a href="{% url 'isletme_abonelik' %}" class="px-5 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-extrabold text-xs rounded-xl shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 hover:scale-105 transition-all">
+                        👑 Premium'a Yükselt ve Kilidi Aç
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -511,12 +615,28 @@
                                     </div>
 
                                     {% if randevu.status == 'pending' %}
+                                        {% if randevu.date_time < simdi %}
+                                            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-center mt-4">
+                                                <p class="text-sm font-bold text-slate-500">🕰️ Bu randevunun saati geçtiği için onay veya iptal işlemi yapılamaz.</p>
+                                            </div>
+                                        {% else %}
+                                            <div class="flex gap-3 pt-4 border-t border-slate-100 mt-4">
+                                                <a href="{% url 'randevu_onayla' randevu.id %}" class="flex-1 text-center py-2.5 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors shadow-sm">Onayla</a>
+                                                <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-2.5 bg-white border-2 border-rose-100 text-rose-500 rounded-xl font-bold hover:bg-rose-50 transition-colors">İptal Et</a>
+                                            </div>
+                                        {% endif %}
+                                    {% elif randevu.status == 'confirmed' or randevu.status == 'approved' %}
                                     <div class="flex gap-3 pt-4 border-t border-slate-100 mt-4">
-                                        <a href="{% url 'randevu_onayla' randevu.id %}" class="flex-1 text-center py-2.5 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors shadow-sm">Onayla</a>
-                                        <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-2.5 bg-white border-2 border-rose-100 text-rose-500 rounded-xl font-bold hover:bg-rose-50 transition-colors">İptal Et</a>
-                                    </div>
-                                    {% elif randevu.status == 'approved' or randevu.status == 'confirmed' %}
-                                    <div class="flex gap-3 pt-4 border-t border-slate-100 mt-4">
+                                        {% with randevu_tarihi=randevu.date_time|date:"Ymd" %}
+                                            {% if randevu_tarihi <= bugunun_tarihi %}
+                                                <a href="{% url 'adisyon_detay' randevu.id %}" class="flex-1 text-center py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-sm flex items-center justify-center gap-2">💳 Kasaya Git</a>
+                                            {% else %}
+                                                <div class="flex-1 text-center py-2.5 bg-slate-100 text-slate-400 border border-slate-200 rounded-xl font-bold cursor-not-allowed opacity-70 flex items-center justify-center gap-2" title="Günü gelmeden hesap kesilemez.">
+                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    Günü Bekleniyor
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
                                         <a href="{% url 'randevu_iptal' randevu.id %}" class="flex-1 text-center py-2.5 bg-white border-2 border-rose-100 text-rose-500 rounded-xl font-bold hover:bg-rose-50 transition-colors">İptal Et</a>
                                     </div>
                                     {% endif %}
@@ -537,17 +657,18 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // 1 KERELİK REHBER MODALI ZEKASI (Hesaba Özel)
+    // 1 KERELİK REHBER MODALI ZEKASI (IŞINLANMA EKLENDİ)
     document.addEventListener("DOMContentLoaded", function() {
         const guideModal = document.getElementById('guideWelcomeModal');
         const guideContent = document.getElementById('guideModalContent');
 
-        // YENİ: Anahtarı kullanıcı adına özel yapıyoruz
         const guideStorageKey = 'dashboardGuideSeen_{{ request.user.username }}';
 
-        // Eğer BU KULLANICI rehber uyarısını görmediyse aç!
         if (!localStorage.getItem(guideStorageKey)) {
             if (guideModal && guideContent) {
+                // ZEKİ IŞINLANMA: Modalı body'ye taşıyıp z-index hiyerarşisini kırıyoruz!
+                document.body.appendChild(guideModal);
+
                 guideModal.classList.remove('hidden');
                 setTimeout(() => {
                     guideModal.classList.remove('opacity-0');
@@ -562,12 +683,10 @@
         const guideModal = document.getElementById('guideWelcomeModal');
         const guideContent = document.getElementById('guideModalContent');
 
-        // YENİ: Sadece bu kullanıcının gördüğünü kaydet
         const guideStorageKey = 'dashboardGuideSeen_{{ request.user.username }}';
         localStorage.setItem(guideStorageKey, 'true');
 
         if (guideModal && guideContent) {
-            // Yumuşak kapanış animasyonu
             guideModal.classList.add('opacity-0');
             guideContent.classList.remove('scale-100');
             guideContent.classList.add('scale-95');
@@ -582,15 +701,11 @@
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
-        // 1. ZEKİ IŞINLANMA: Modalı tablonun (tr) içinden söküp en dışa (body) alıyoruz!
-        // Bu sayede scroll nerede olursa olsun arka plan %100 bulanıklaşır.
         document.body.appendChild(modal);
 
-        // 2. Modalı Görünür Yap ve Arka Plan Kaymasını Kilitle
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
 
-        // 3. Jilet Animasyonu Tetikle (Opacity ve Scale)
         setTimeout(() => {
             modal.classList.remove('opacity-0');
             modal.firstElementChild.classList.remove('scale-95');
@@ -602,12 +717,10 @@
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
-        // 1. Animasyonu Geri Sar
         modal.classList.add('opacity-0');
         modal.firstElementChild.classList.remove('scale-100');
         modal.firstElementChild.classList.add('scale-95');
 
-        // 2. Animasyon Bitince Gizle (300ms sonra)
         setTimeout(() => {
             modal.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
@@ -618,14 +731,13 @@
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('performanceChart').getContext('2d');
 
-        // Views.py'den gelen JSON verilerini JavaScript dizilerine çeviriyoruz
         const labels = JSON.parse('{{ grafik_etiketleri|safe }}');
         const dataPoints = JSON.parse('{{ grafik_verileri|safe }}');
 
-        // Premium Amber (Altın) Gradient'i oluştur
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(251, 191, 36, 0.4)'); // Daha parlak amber
-        gradient.addColorStop(1, 'rgba(251, 191, 36, 0.0)'); // Aşağı doğru şeffaflaşır
+        const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+        gradient.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+        gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.15)');
+        gradient.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
 
         new Chart(ctx, {
             type: 'line',
@@ -634,67 +746,55 @@
                 datasets: [{
                     label: 'Tamamlanan Randevular',
                     data: dataPoints,
-                    borderColor: '#fbbf24', // amber-400 rengi
+                    borderColor: '#fbbf24',
                     backgroundColor: gradient,
-                    borderWidth: 3,
-                    pointBackgroundColor: '#0f172a', // Arka planla uyumlu koyu renk
+                    borderWidth: 4,
+                    pointBackgroundColor: '#020617',
                     pointBorderColor: '#fbbf24',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
+                    pointBorderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 9,
+                    pointHoverBorderWidth: 4,
+                    pointHoverBackgroundColor: '#fbbf24',
+                    pointHoverBorderColor: '#ffffff',
                     fill: true,
-                    tension: 0.4 // Çizginin kavisli (yumuşak) olmasını sağlar
+                    tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 2500,
+                    easing: 'easeOutQuart'
+                },
                 plugins: {
-                    legend: {
-                        display: false // Etiketi gizle (Temiz tasarım için)
-                    },
+                    legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#1e293b', // hover durumundaki kara kutu
+                        backgroundColor: '#1e293b',
                         titleColor: '#94a3b8',
-                        bodyColor: '#f8fafc',
-                        bodyFont: {
-                            weight: 'bold'
-                        },
+                        bodyColor: '#fbbf24',
+                        bodyFont: { weight: 'bold', family: 'Inter' },
                         padding: 12,
-                        borderColor: '#334155',
-                        borderWidth: 1,
-                        displayColors: false, // Hover kutusundaki renkli kareyi gizler
+                        borderColor: 'rgba(245, 158, 11, 0.3)',
+                        borderWidth: 1.5,
+                        displayColors: false,
                         callbacks: {
-                            label: function(context) {
-                                return context.parsed.y + ' Randevu';
-                            }
+                            label: function(context) { return context.parsed.y + ' Randevu'; }
                         }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: {
-                            stepSize: 1, // Sadece tam sayılar (1.5 randevu olmaz)
-                            color: '#64748b' // X/Y ekseni yazı rengi
-                        },
-                        grid: {
-                            color: 'rgba(51, 65, 85, 0.5)' // Hafif grid çizgileri
-                        },
-                        border: {
-                            display: false
-                        }
+                        ticks: { stepSize: 1, color: '#64748b', font: { family: 'Inter' } },
+                        grid: { color: 'rgba(51, 65, 85, 0.25)' },
+                        border: { display: false }
                     },
                     x: {
-                        ticks: {
-                            color: '#64748b'
-                        },
-                        grid: {
-                            display: false // Dikey çizgileri tamamen kaldır
-                        },
-                        border: {
-                            display: false
-                        }
+                        ticks: { color: '#94a3b8', font: { weight: 'bold', family: 'Inter' } },
+                        grid: { color: 'rgba(245, 158, 11, 0.05)' },
+                        border: { display: false }
                     }
                 }
             }
@@ -708,49 +808,58 @@
     // ==========================================
     {% if isletme.is_premium %}
     document.addEventListener("DOMContentLoaded", function() {
-        // sessionStorage: Sekme kapatılana kadar hafızada tutar. (Her tıkta çıkmasın diye)
         const premiumWelcomeKey = 'premiumWelcomeSeen_{{ request.user.username }}';
-
-        // Önce rehber modalı varsa onunla çakışmaması için kontrol ediyoruz
         const guideStorageKey = 'dashboardGuideSeen_{{ request.user.username }}';
         const guideSeen = localStorage.getItem(guideStorageKey);
 
-        // Eğer rehber görülmüşse VE bu oturumda sinematik açılış henüz yapılmadıysa
         if (guideSeen && !sessionStorage.getItem(premiumWelcomeKey)) {
             const pModal = document.getElementById('premiumWelcomeModal');
             const pContent = document.getElementById('premiumWelcomeContent');
 
-            // Fütüristik bir "Sistem Açılış" sesi (Mixkit ücretsiz ses efekti)
-            const welcomeSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-            welcomeSound.volume = 0.5;
+            if (pModal && pContent) {
+                // SİNEMATİK MODALI DA IŞINLIYORUZ!
+                document.body.appendChild(pModal);
 
-            pModal.classList.remove('hidden');
+                const welcomeSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+                welcomeSound.volume = 0.5;
 
-            // 100ms sonra animasyonları başlat
-            setTimeout(() => {
-                pModal.classList.remove('opacity-0');
-                pContent.classList.remove('scale-75', 'opacity-0');
-                pContent.classList.add('scale-100', 'opacity-100');
+                pModal.classList.remove('hidden');
 
-                // Sesi çalmayı dene (Tarayıcı izin verirse çalar, vermezse sessizce loga düşer)
-                welcomeSound.play().catch(e => console.log('Tarayıcı otomatik sese izin vermedi.'));
-            }, 100);
-
-            // 2.8 Saniye sonra ekrandan yavaşça ve havalı bir şekilde silin
-            setTimeout(() => {
-                pContent.classList.remove('scale-100');
-                pContent.classList.add('scale-110'); // İleri doğru büyüyerek kaybolur
-                pModal.classList.add('opacity-0');
-
-                // Animasyon bitince HTML'den tamamen gizle ve hafızaya yaz
                 setTimeout(() => {
-                    pModal.classList.add('hidden');
-                    sessionStorage.setItem(premiumWelcomeKey, 'true');
-                }, 700);
-            }, 2800);
+                    pModal.classList.remove('opacity-0');
+                    pContent.classList.remove('scale-75', 'opacity-0');
+                    pContent.classList.add('scale-100', 'opacity-100');
+
+                    welcomeSound.play().catch(e => console.log('Tarayıcı otomatik sese izin vermedi.'));
+                }, 100);
+
+                setTimeout(() => {
+                    pContent.classList.remove('scale-100');
+                    pContent.classList.add('scale-110');
+                    pModal.classList.add('opacity-0');
+
+                    setTimeout(() => {
+                        pModal.classList.add('hidden');
+                        sessionStorage.setItem(premiumWelcomeKey, 'true');
+                    }, 700);
+                }, 2800);
+            }
         }
     });
     {% endif %}
-
+    // --- LIVE CLOCK SCRIPT ---
+    function updateLiveClock() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        
+        const dateElement = document.getElementById('live-date');
+        const clockElement = document.getElementById('live-clock');
+        
+        if (dateElement) dateElement.innerText = now.toLocaleDateString('tr-TR', options);
+        if (clockElement) clockElement.innerText = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    
+    setInterval(updateLiveClock, 1000);
+    updateLiveClock();
 </script>
 {% endblock %}

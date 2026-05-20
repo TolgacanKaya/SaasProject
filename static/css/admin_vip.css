@@ -1,0 +1,88 @@
+/* ==========================================
+   👑 T-RANDEVU VİP ADMIN TEMA (TEMİZLENMİŞ)
+   ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body, h1, h2, h3, h4, h5, h6, .brand-text, .nav-link, th, td, input, select, button, label {
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* --- GLOBAL KARANLIK TEMA --- */
+body { background-color: #09090b !important; }
+.content-wrapper { background-color: #09090b !important; }
+.main-sidebar, .main-header { background-color: #18181b !important; border-color: #27272a !important; }
+
+/* --- KARTLAR VE KUTULAR --- */
+.card {
+    background-color: #18181b !important;
+    border: 1px solid #27272a !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+}
+.card-header { border-bottom: 1px solid #27272a !important; }
+
+/* --- INPUT VE SELECT TASARIMLARI (Düzeni bozmayan kısım) --- */
+.form-control, .vTextField, .vURLField, .vLargeTextField, input[type="text"], input[type="number"], input[type="email"] {
+    background-color: #09090b !important;
+    border: 1px solid #27272a !important;
+    color: #f8fafc !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+.form-control:focus, input:focus, select:focus {
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15) !important;
+}
+
+.select2-container--default .select2-selection--single {
+    background-color: #09090b !important;
+    border: 1px solid #27272a !important;
+    border-radius: 12px !important;
+    height: auto !important;
+    padding: 5px !important;
+}
+
+/* --- BUTON KUTUSUNU ZORLA EN ALTA ALMAK İÇİN MİNİ DOKUNUŞ --- */
+/* Jazzmin normalde butonları sağa atar. Eğer sağda hiç istemiyorsan, bu kod onu aşağı iter */
+@media (min-width: 992px) {
+    #content-main > form > div > div.col-12.col-lg-3 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        margin-top: 20px;
+    }
+    #content-main > form > div > div.col-12.col-lg-9 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+}
+/* ==========================================
+   🚨 JAZZMIN'IN SAĞ SÜTUN ZORBALIĞINI BİTİREN KOD 🚨
+   ========================================== */
+
+/* Form alanını ve buton alanını zorla tam genişlik yapıp alt alta diziyoruz */
+.content-wrapper .col-12.col-lg-9,
+.content-wrapper .col-12.col-lg-3 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+}
+
+/* JavaScript butonları kayan (sticky) yapmaya çalışırsa onu da iptal ediyoruz */
+.submit-row {
+    position: static !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    justify-content: center !important;
+    margin-top: 20px !important;
+}
+
+/* Butonlar yan yana daha şık dursun diye ufak bir ayar */
+.submit-row .btn {
+    flex: 1 1 auto !important;
+    margin: 0 !important;
+}

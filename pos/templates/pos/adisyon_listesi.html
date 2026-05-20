@@ -1,0 +1,122 @@
+{% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
+
+{% block title %}Adisyon Geçmişi{% endblock %}
+{% block page_title %}Adisyon Geçmişi{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full md:w-2/3">
+            <div class="p-6 {% if isletme.is_premium %}bg-card border-border{% else %}bg-white border-slate-200{% endif %} border rounded-2xl shadow-sm">
+                <p class="text-xs font-bold {% if isletme.is_premium %}text-muted{% else %}text-slate-500{% endif %} uppercase tracking-wider mb-1">Toplam Adisyon</p>
+                <h3 class="text-2xl font-black text-indigo-500">{{ adisyonlar.paginator.count }} Adet</h3>
+            </div>
+        </div>
+
+        <div class="shrink-0">
+            <a href="{% url 'adisyon_indir_csv' %}" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl font-black text-sm transition-all shadow-lg hover:-translate-y-1 active:scale-95
+                {% if isletme.is_premium %}
+                bg-accent text-black hover:bg-amber-400 shadow-amber-500/20
+                {% else %}
+                bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20
+                {% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                LİSTEYİ DIŞA AKTAR (.CSV)
+            </a>
+        </div>
+    </div>
+
+    <div class="{% if isletme.is_premium %}bg-card border-border{% else %}bg-white border-slate-200{% endif %} border rounded-2xl shadow-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="{% if isletme.is_premium %}bg-background/50 border-border{% else %}bg-slate-50 border-slate-100{% endif %} border-b">
+                        <th class="px-6 py-4 text-xs font-black uppercase tracking-widest {% if isletme.is_premium %}text-muted{% else %}text-slate-500{% endif %}">Fiş No</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase tracking-widest {% if isletme.is_premium %}text-muted{% else %}text-slate-500{% endif %}">Müşteri / Hizmet</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase tracking-widest {% if isletme.is_premium %}text-muted{% else %}text-slate-500{% endif %}">Durum</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase tracking-widest {% if isletme.is_premium %}text-muted{% else %}text-slate-500{% endif %}">Tarih</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase tracking-widest {% if isletme.is_premium %}text-muted{% else %}text-slate-500{% endif %} text-right">Toplam Tutar</th>
+                        <th class="px-6 py-4 text-xs font-black uppercase tracking-widest {% if isletme.is_premium %}text-muted{% else %}text-slate-500{% endif %} text-center">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y {% if isletme.is_premium %}divide-border{% else %}divide-slate-50{% endif %}">
+                    {% for adisyon in adisyonlar %}
+                    <tr class="hover:{% if isletme.is_premium %}bg-white/5{% else %}bg-slate-50/50{% endif %} transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="font-mono font-bold {% if isletme.is_premium %}text-accent{% else %}text-indigo-600{% endif %}">
+                                #{{ adisyon.fis_no|default:adisyon.id }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-sm">{{ adisyon.appointment.customer.first_name }} {{ adisyon.appointment.customer.last_name }}</div>
+                            <div class="text-[10px] text-muted">{{ adisyon.appointment.service.name }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if adisyon.status == 'closed' %}
+                                <span class="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase border border-emerald-500/20">Ödendi</span>
+                            {% else %}
+                                <span class="px-2 py-1 rounded-md bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase border border-amber-500/20">Açık</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium">
+                            {{ adisyon.created_at|date:"d M Y" }}
+                            <span class="text-[10px] text-muted ml-1">{{ adisyon.created_at|time:"H:i" }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-black text-emerald-500 text-lg">
+                                {{ adisyon.grand_total }} ₺
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <a href="{% url 'adisyon_yazdir' adisyon.id %}" target="_blank"
+                               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all
+                               {% if isletme.is_premium %}
+                               bg-accent/10 text-accent border border-accent/20 hover:bg-accent hover:text-black
+                               {% else %}
+                               bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-600 hover:text-white
+                               {% endif %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231a1.125 1.125 0 01-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.933" />
+                                </svg>
+                                Yazdır
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-20 text-center">
+                            <div class="text-4xl mb-4">📑</div>
+                            <h4 class="text-lg font-bold text-muted">Henüz Adisyon Bulunmuyor</h4>
+                            <p class="text-sm text-muted/60">Randevusu biten müşterileriniz için adisyon oluşturduğunuzda burada listelenecektir.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if adisyonlar.has_other_pages %}
+        <div class="px-6 py-4 border-t {% if isletme.is_premium %}border-border{% else %}border-slate-100{% endif %} flex items-center justify-between">
+            <p class="text-xs font-medium text-muted">
+                Toplam {{ adisyonlar.paginator.count }} kayıttan {{ adisyonlar.start_index }}-{{ adisyonlar.end_index }} arası gösteriliyor.
+            </p>
+            <div class="flex gap-2">
+                {% if adisyonlar.has_previous %}
+                    <a href="?page={{ adisyonlar.previous_page_number }}" class="px-3 py-1.5 rounded-lg border {% if isletme.is_premium %}border-border text-slate-300 hover:bg-white/5{% else %}border-slate-200 text-slate-600 hover:bg-slate-50{% endif %} text-xs font-bold transition-all">Geri</a>
+                {% endif %}
+
+                <span class="px-3 py-1.5 rounded-lg {% if isletme.is_premium %}bg-accent text-black{% else %}bg-indigo-600 text-white{% endif %} text-xs font-bold shadow-lg">
+                    {{ adisyonlar.number }}
+                </span>
+
+                {% if adisyonlar.has_next %}
+                    <a href="?page={{ adisyonlar.next_page_number }}" class="px-3 py-1.5 rounded-lg border {% if isletme.is_premium %}border-border text-slate-300 hover:bg-white/5{% else %}border-slate-200 text-slate-600 hover:bg-slate-50{% endif %} text-xs font-bold transition-all">İleri</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

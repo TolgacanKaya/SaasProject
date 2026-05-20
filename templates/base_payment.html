@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:;">
+    <title>{% block title %}Güvenli Ödeme | T-Randevu{% endblock %}</title>
+
+    <link rel="icon" type="image/png" href="{% static 'logo.png' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+    </style>
+    <style>
+        :root {
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-500 selection:text-white flex flex-col min-h-screen">
+
+    <!-- Navbar Devre Dışı -->
+    {% block navbar %}{% endblock %}
+
+    <main class="flex-1 flex flex-col">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer Devre Dışı -->
+    {% block footer %}{% endblock %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

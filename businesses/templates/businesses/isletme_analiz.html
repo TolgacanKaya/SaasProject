@@ -1,17 +1,87 @@
-{% extends "businesses/premium_base.html" %}
+{% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
 {% load custom_filters %}
 
 {% block page_title %}İşletme Analizi{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <h2 class="text-3xl font-black text-white flex items-center gap-3 mb-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-amber-400">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-        </svg>
-        İşletme Analizi
-    </h2>
-    <p class="text-slate-400 font-medium">Hizmet performansları, ciro şampiyonları ve personel istatistikleri.</p>
+<div class="relative min-h-[600px]">
+    {% if is_premium_teaser %}
+    <!-- Premium Teaser Glassmorphism Lock Card -->
+    <div class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md rounded-3xl">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/30 rounded-3xl p-8 max-w-2xl w-full text-center shadow-[0_0_50px_rgba(251,191,36,0.15)] relative overflow-hidden group">
+            <div class="absolute -right-20 -top-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
+            
+            <div class="w-16 h-16 bg-gradient-to-tr from-amber-400 to-amber-500 text-slate-950 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg shadow-amber-500/20 border-2 border-amber-300 animate-bounce">
+                👑
+            </div>
+            
+            <h3 class="text-2xl font-black text-white mb-2 tracking-tight">👑 T-Randevu Premium İşletme Analizi</h3>
+            <p class="text-sm text-slate-400 max-w-lg mx-auto mb-8 font-semibold leading-relaxed">
+                İşletmenizin finansal gücünü elinize alın. Detaylı analiz paneliyle dükkanınızın geleceğini verilere dayanarak yönetin.
+            </p>
+            
+            <!-- Features list instead of slider -->
+            <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-6 mb-8 text-left max-w-md mx-auto shadow-inner relative z-10">
+                <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                    ⚡ Premium Modülle Neler Kazanacaksınız?
+                </h4>
+                <ul class="space-y-3.5 text-xs text-slate-300 font-bold">
+                    <li class="flex items-start gap-2.5">
+                        <span class="text-emerald-400 text-sm leading-none">✔</span>
+                        <span>Hizmet Performans Analizleri & Popüler Hizmet Grafikleri</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <span class="text-emerald-400 text-sm leading-none">✔</span>
+                        <span>Personel Performans Karnesi (Hangi uzman dükkana ne kadar kazandırdı?)</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <span class="text-emerald-400 text-sm leading-none">✔</span>
+                        <span>Fiziksel Ürün Satış Raporlaması & Ekstra Ciro Dağılımları</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <span class="text-emerald-400 text-sm leading-none">✔</span>
+                        <span>Tüm Finansal Verilerinizi Excel Raporu (CSV) Olarak İndirme</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="{% url 'isletme_abonelik' %}" class="px-8 py-3.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-amber-500/20 hover:-translate-y-0.5 transition-all w-full sm:w-auto">
+                    ⭐ Premium Plana Yükselt ve Başla
+                </a>
+                <a href="{% url 'dashboard' %}" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl transition-colors w-full sm:w-auto">
+                    Geri Dön
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="{% if is_premium_teaser %}filter blur-sm select-none pointer-events-none{% endif %}">
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <h2 class="text-3xl font-black text-white flex items-center gap-3 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-amber-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+            İşletme Analizi
+        </h2>
+
+        <div class="flex items-center gap-3">
+            <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Kasa / Adisyon Satışları Senkronize
+            </span>
+
+            <a href="{% url 'analiz_raporu_indir' %}" class="hidden md:inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg transition-all hover:-translate-y-0.5">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                Excel Raporu İndir
+            </a>
+        </div>
+
+    </div>
+    <p class="text-slate-400 font-medium">Hizmet performansları, ciro şampiyonları ve personel istatistikleri. (Randevu + Ekstra Satışlar)</p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -42,44 +112,98 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
 
-    <div class="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl p-6 md:p-8">
-        <h4 class="text-lg font-bold text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-2">
+    <!-- Card 1: Popularity (Doughnut) -->
+    <div class="{% if isletme.is_premium %}bg-slate-900/40 backdrop-blur-md border border-slate-800/80 shadow-[0_30px_60px_rgba(0,0,0,0.4)] hover:border-amber-500/25{% else %}bg-slate-900 border border-slate-800 shadow-2xl{% endif %} rounded-[2.25rem] p-6 md:p-8 relative overflow-hidden transition-all duration-300 group">
+        {% if isletme.is_premium %}
+        <!-- Sci-Fi Premium Backlight Glow -->
+        <div class="absolute -right-10 -bottom-10 w-28 h-28 bg-amber-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/10 transition-colors duration-300"></div>
+        <div class="absolute -left-10 -top-10 w-28 h-28 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
+        {% endif %}
+        
+        <h4 class="text-lg font-bold text-white mb-6 border-b border-slate-800/80 pb-4 flex items-center gap-2 relative z-10">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-amber-400">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.866 8.21 8.21 0 003 2.48z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z" />
             </svg>
             En Popüler Hizmetler
         </h4>
-        <div class="relative h-[300px] w-full flex items-center justify-center">
+        <div class="relative h-[250px] w-full flex items-center justify-center z-10">
             <canvas id="popularityChart"></canvas>
+            {% if isletme.is_premium %}
+            <!-- Central Volume Ring Counter Overlay -->
+            <div class="absolute flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-[9px] uppercase tracking-widest text-slate-500 font-extrabold">Hacim</span>
+                <span class="text-3xl font-black text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.3)] select-none">VIP</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Ultra-Premium Dinamik HTML Göstergeleri (Legend) -->
+        <div id="popularityChartLegend" class="mt-6 grid grid-cols-2 gap-3 text-left relative z-10"></div>
+    </div>
+
+    <!-- Card 2: Revenue (Bar) -->
+    <div class="{% if isletme.is_premium %}bg-slate-900/40 backdrop-blur-md border border-slate-800/80 shadow-[0_30px_60px_rgba(0,0,0,0.4)] hover:border-emerald-500/20{% else %}bg-slate-900 border border-slate-800 shadow-2xl{% endif %} rounded-[2.25rem] p-6 md:p-8 relative overflow-hidden transition-all duration-300 group">
+        {% if isletme.is_premium %}
+        <!-- Emerald Backlight Glow -->
+        <div class="absolute -right-10 -bottom-10 w-28 h-28 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-300"></div>
+        {% endif %}
+        
+        <h4 class="text-lg font-bold text-white mb-1 flex items-center justify-between relative z-10">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-emerald-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Hizmet Gelirleri
+            </div>
+        </h4>
+        <p class="text-[11px] text-slate-500 mb-5 border-b border-slate-800/80 pb-4 relative z-10">Hangi ana hizmetiniz ne kadar kazandırdı?</p>
+        <div class="relative h-[270px] w-full flex items-center justify-center z-10">
+            <canvas id="revenueChart"></canvas>
         </div>
     </div>
 
-    <div class="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl p-6 md:p-8">
-        <h4 class="text-lg font-bold text-white mb-6 border-b border-slate-800 pb-4 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-emerald-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Ciro Şampiyonları
+    <!-- Card 3: Product Sales (Bar) -->
+    <div class="{% if isletme.is_premium %}bg-slate-900/40 backdrop-blur-md border border-slate-800/80 shadow-[0_30px_60px_rgba(0,0,0,0.4)] hover:border-indigo-500/20{% else %}bg-slate-900 border border-slate-800 shadow-2xl{% endif %} rounded-[2.25rem] p-6 md:p-8 relative overflow-hidden transition-all duration-300 group">
+        {% if isletme.is_premium %}
+        <!-- Indigo Backlight Glow -->
+        <div class="absolute -right-10 -bottom-10 w-28 h-28 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-colors duration-300"></div>
+        {% endif %}
+        
+        <h4 class="text-lg font-bold text-white mb-1 flex items-center justify-between relative z-10">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-indigo-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                </svg>
+                Fiziksel Ürün Satışları
+            </div>
         </h4>
-        <div class="relative h-[300px] w-full flex items-center justify-center">
-            <canvas id="revenueChart"></canvas>
+        <p class="text-[11px] text-slate-500 mb-5 border-b border-slate-800/80 pb-4 relative z-10">Adisyondan eklenen en kârlı fiziksel ürünler.</p>
+        <div id="productRevenueChartWrapper" class="relative h-[270px] w-full flex items-center justify-center z-10">
+            <canvas id="productRevenueChart"></canvas>
         </div>
     </div>
 
 </div>
 
 <div class="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl overflow-hidden mb-10">
-    <div class="p-6 border-b border-slate-800 bg-slate-900/50">
-        <h4 class="text-lg font-bold text-white flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-amber-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M18.75 4.236c.982.143 1.954.317 2.916.52a6.003 6.003 0 01-5.395 4.972M10.5 2.25H13.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H10.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5z" />
-            </svg>
-            Personel Performans Karnesi
-        </h4>
-        <p class="text-sm text-slate-500 mt-1">Hangi uzmanınız dükkana ne kadar kazandırdı?</p>
+    <div class="p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h4 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-amber-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M18.75 4.236c.982.143 1.954.317 2.916.52a6.003 6.003 0 01-5.395 4.972M10.5 2.25H13.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H10.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5z" />
+                </svg>
+                Personel Performans Karnesi
+            </h4>
+            <p class="text-sm text-slate-500 mt-1">Hangi uzmanınız dükkana ne kadar kazandırdı?</p>
+        </div>
+        <div class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg shadow-inner">
+            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Randevu + Kasadaki Ekstralar Hesaplanmıştır
+            </span>
+        </div>
     </div>
 
     <div class="overflow-x-auto">
@@ -108,9 +232,12 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <span class="text-emerald-400 font-black text-lg">
-                            {{ personel.getiri|k_format }} ₺
-                        </span>
+                        <div class="flex flex-col items-end">
+                            <span class="text-emerald-400 font-black text-lg">
+                                {{ personel.getiri|k_format }} ₺
+                            </span>
+                            <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-widest mt-0.5">Randevu + Ekstra</span>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
@@ -124,13 +251,42 @@
         </table>
     </div>
 </div>
+</div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        
+
+        // Ortak Ultra-Premium Tooltip Konfigürasyonu
+        const premiumTooltipConfig = {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            titleColor: '#ffffff',
+            titleFont: { family: 'Inter', size: 12, weight: 'bold' },
+            bodyColor: '#cbd5e1',
+            bodyFont: { family: 'Inter', size: 11, weight: '500' },
+            padding: 12,
+            cornerRadius: 12,
+            borderColor: 'rgba(251, 191, 36, 0.15)',
+            borderWidth: 1,
+            displayColors: true,
+            boxWidth: 8,
+            boxHeight: 8,
+            boxPadding: 4,
+            callbacks: {
+                label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) { label += ': '; }
+                    if (context.parsed.y !== null) {
+                        label += context.parsed.y.toLocaleString('tr-TR') + ' ₺';
+                    }
+                    return label;
+                }
+            }
+        };
+
         // --- 1. POPÜLER HİZMETLER GRAFİĞİ (DOUGHNUT) ---
         const popCtx = document.getElementById('popularityChart').getContext('2d');
         const hizmetIsimleri = JSON.parse('{{ hizmet_isimleri_json|safe }}');
@@ -144,25 +300,88 @@
                     datasets: [{
                         data: hizmetSayilari,
                         backgroundColor: [
-                            '#fbbf24', // amber-400
-                            '#f43f5e', // rose-500
-                            '#3b82f6', // blue-500
-                            '#10b981', // emerald-500
-                            '#a855f7'  // purple-500
+                            '#fbbf24', '#f43f5e', '#3b82f6', '#10b981', '#a855f7'
                         ],
-                        borderWidth: 0,
-                        hoverOffset: 10
+                        borderWidth: 2,
+                        borderColor: '#0f172a', // Gece koyusu kenarlık ile dilimleri ayır
+                        hoverOffset: 12
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '70%',
+                    cutout: '75%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 2500,
+                        easing: 'easeOutQuart'
+                    },
                     plugins: {
-                        legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20, font: { weight: 'bold' } } }
+                        legend: { display: false }, // Varsayılan basit göstergeyi kapat
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#ffffff',
+                            titleFont: { family: 'Inter', size: 12, weight: 'bold' },
+                            bodyColor: '#cbd5e1',
+                            bodyFont: { family: 'Inter', size: 11, weight: '500' },
+                            padding: 12,
+                            cornerRadius: 12,
+                            borderColor: 'rgba(251, 191, 36, 0.15)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                    return ` ${val} Adet (%${pct})`;
+                                }
+                            }
+                        }
                     }
                 }
             });
+
+            // 🔥 Ultra Premium Dinamik HTML Göstergeler (Doughnut Legend) 🔥
+            const legendContainer = document.getElementById('popularityChartLegend');
+            if (legendContainer) {
+                legendContainer.innerHTML = '';
+                const colors = ['#fbbf24', '#f43f5e', '#3b82f6', '#10b981', '#a855f7'];
+                const total = hizmetSayilari.reduce((a, b) => a + b, 0);
+                
+                hizmetIsimleri.forEach((name, index) => {
+                    const val = hizmetSayilari[index];
+                    const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                    const color = colors[index % colors.length];
+                    
+                    legendContainer.innerHTML += `
+                        <div class="flex items-center gap-2.5 p-2 bg-slate-950/40 rounded-2xl border border-slate-800/40 hover:bg-slate-950/70 hover:border-slate-700/60 transition-all duration-300">
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-lg" style="background-color: ${color}; box-shadow: 0 0 10px ${color}aa;"></span>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-bold text-slate-300 truncate">${name}</p>
+                                <p class="text-[10px] text-slate-500 font-semibold">%${pct} • ${val} Adet</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        } else {
+            // Boş Doughnut Görünümü
+            document.getElementById('popularityChart').style.display = 'none';
+            const parent = document.getElementById('popularityChart').parentElement;
+            if(parent) {
+                parent.innerHTML += `
+                    <div class="flex flex-col items-center justify-center text-center py-8 px-4 w-full h-full">
+                        <div class="w-16 h-16 bg-slate-850/60 rounded-full border border-slate-800/80 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(255,255,255,0.02)]">
+                            <svg class="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.866 8.21 8.21 0 003 2.48z" />
+                            </svg>
+                        </div>
+                        <h5 class="text-slate-300 font-bold text-sm mb-1">Hizmet Verisi Bulunmuyor</h5>
+                        <p class="text-xs text-slate-500 max-w-[200px]">Bu dükkanda henüz tamamlanmış bir randevu işlemi bulunmuyor.</p>
+                    </div>
+                `;
+            }
         }
 
         // --- 2. CİRO ŞAMPİYONLARI GRAFİĞİ (BAR) ---
@@ -171,6 +390,11 @@
         const ciroTutarlari = JSON.parse('{{ ciro_tutarlari_json|safe }}');
 
         if(ciroTutarlari.length > 0) {
+            const gradientEmerald = revCtx.createLinearGradient(0, 0, 0, 270);
+            gradientEmerald.addColorStop(0, '#10b981'); // emerald-500
+            gradientEmerald.addColorStop(0.3, '#34d399'); // zümrüt parlama
+            gradientEmerald.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
+
             new Chart(revCtx, {
                 type: 'bar',
                 data: {
@@ -178,33 +402,170 @@
                     datasets: [{
                         label: 'Toplam Getiri (₺)',
                         data: ciroTutarlari,
-                        backgroundColor: '#34d399', // emerald-400
-                        borderRadius: 6,
-                        barThickness: 24
+                        backgroundColor: gradientEmerald,
+                        hoverBackgroundColor: '#059669',
+                        borderRadius: 12, // Daha yumuşak premium köşeler
+                        borderWidth: 1.5,
+                        borderColor: '#10b981',
+                        barThickness: 16, // İnce lüks sütunlar
+                        maxBarThickness: 20
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 2500,
+                        easing: 'easeOutElastic',
+                        delay: (context) => context.dataIndex * 150
+                    },
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: premiumTooltipConfig
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { color: '#64748b' },
-                            grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                            ticks: { 
+                                color: '#64748b', 
+                                font: { family: 'Inter', size: 10, weight: '500' },
+                                callback: function(value) { return value.toLocaleString('tr-TR') + ' ₺'; }
+                            },
+                            grid: { 
+                                color: 'rgba(51, 65, 85, 0.12)',
+                                drawTicks: false 
+                            },
                             border: { display: false }
                         },
                         x: {
-                            ticks: { color: '#94a3b8', font: { weight: 'bold' } },
+                            ticks: { 
+                                color: '#94a3b8', 
+                                font: { weight: '600', family: 'Inter', size: 10 } 
+                            },
                             grid: { display: false },
                             border: { display: false }
                         }
                     }
                 }
             });
+        } else {
+            // Boş Ciro Şampiyonları Görünümü
+            document.getElementById('revenueChart').style.display = 'none';
+            const parent = document.getElementById('revenueChart').parentElement;
+            if(parent) {
+                parent.innerHTML += `
+                    <div class="flex flex-col items-center justify-center text-center py-8 px-4 w-full h-full">
+                        <div class="w-16 h-16 bg-slate-850/60 rounded-full border border-slate-800/80 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(255,255,255,0.02)]">
+                            <svg class="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h5 class="text-slate-300 font-bold text-sm mb-1">Finansal Veri Bulunmuyor</h5>
+                        <p class="text-xs text-slate-500 max-w-[200px]">Ciro hesaplaması için henüz ödenmiş randevu kaydı bulunmamaktadır.</p>
+                    </div>
+                `;
+            }
         }
-    });
+
+        // --- 3. ÜRÜN SATIŞLARI GRAFİĞİ (BAR) ---
+        const prodCtx = document.getElementById('productRevenueChart').getContext('2d');
+        const urunIsimleri = JSON.parse('{{ urun_isimleri_json|safe }}');
+        const urunTutarlari = JSON.parse('{{ urun_tutarlari_json|safe }}');
+
+        if(urunTutarlari.length > 0) {
+            const gradientIndigo = prodCtx.createLinearGradient(0, 0, 0, 270);
+            gradientIndigo.addColorStop(0, '#6366f1'); // indigo-500
+            gradientIndigo.addColorStop(0.3, '#818cf8'); // indigo-400 flare
+            gradientIndigo.addColorStop(1, 'rgba(99, 102, 241, 0.02)');
+
+            new Chart(prodCtx, {
+                type: 'bar',
+                data: {
+                    labels: urunIsimleri,
+                    datasets: [{
+                        label: 'Ürün Satışı (₺)',
+                        data: urunTutarlari,
+                        backgroundColor: gradientIndigo,
+                        hoverBackgroundColor: '#4f46e5',
+                        borderRadius: 12,
+                        borderWidth: 1.5,
+                        borderColor: '#6366f1',
+                        barThickness: 16,
+                        maxBarThickness: 20
+                    }]
+                },
+                options: {
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2500,
+                        easing: 'easeOutElastic',
+                        delay: (context) => context.dataIndex * 150
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: premiumTooltipConfig
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { 
+                                color: '#64748b', 
+                                font: { family: 'Inter', size: 10, weight: '500' },
+                                callback: function(value) { return value.toLocaleString('tr-TR') + ' ₺'; }
+                            }, 
+                            grid: { 
+                                color: 'rgba(51, 65, 85, 0.12)',
+                                drawTicks: false 
+                            }, 
+                            border: { display: false } 
+                        },
+                        x: { 
+                            ticks: { 
+                                color: '#94a3b8', 
+                                font: { weight: '600', family: 'Inter', size: 10 } 
+                            }, 
+                            grid: { display: false }, 
+                            border: { display: false } 
+                        }
+                    }
+                }
+            });
+        } else {
+            // 🔥 Ultra Premium Boş Veri Seti Tasarımı (Fallback Cam Plaka) 🔥
+            document.getElementById('productRevenueChart').style.display = 'none';
+            const wrapper = document.getElementById('productRevenueChartWrapper');
+            if(wrapper) {
+                wrapper.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-center py-8 px-4 w-full h-full">
+                        <div class="w-16 h-16 bg-slate-800/40 rounded-full border border-slate-800/80 flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(255,255,255,0.01)] transition-transform duration-500 hover:scale-105">
+                            <svg class="w-8 h-8 text-indigo-400/80 drop-shadow-[0_0_8px_rgba(99,102,241,0.3)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                            </svg>
+                        </div>
+                        <h5 class="text-slate-300 font-bold text-sm mb-1 tracking-wide">Satış Verisi Bulunmuyor</h5>
+                        <p class="text-xs text-slate-500 max-w-[210px] leading-relaxed">Adisyonlardan henüz fiziksel bir kozmetik veya bakım ürünü satışı kaydedilmemiş.</p>
+                    </div>
+                `;
+            }
+        }
+
+
+    // --- PREMIUM TEASER SIMULATOR ---
+    {% if is_premium_teaser %}
+    const slider = document.getElementById('appointmentSlider');
+    const countVal = document.getElementById('appointmentCountVal');
+    const leakVal = document.getElementById('revenueLeakVal');
+    
+    if(slider) {
+        slider.addEventListener('input', function() {
+            const val = parseInt(this.value);
+            countVal.innerText = val + " Randevu";
+            const savedLeak = Math.round(val * 300 * 0.12);
+            leakVal.innerText = savedLeak.toLocaleString('tr-TR') + " ₺ / Ay";
+        });
+    }
+    {% endif %}
+});
 </script>
 {% endblock %}

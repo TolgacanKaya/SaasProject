@@ -7,12 +7,14 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             <div class="lg:col-span-1">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-xl">
-                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7 text-amber-400">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Yeni Hizmet Ekle
+                <div class="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:border-amber-500/10 transition-all duration-300">
+                    <h2 class="text-xl font-extrabold text-white mb-6 flex items-center gap-3 border-b border-slate-800/60 pb-4">
+                        <div class="p-2 bg-amber-500/10 text-amber-400 rounded-xl shadow-[0_0_15px_rgba(251,191,36,0.1)]">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <span>Yeni Hizmet Ekle</span>
                     </h2>
 
                     <form method="POST" action="{% url 'isletme_hizmetler' %}" class="space-y-6">
@@ -24,28 +26,49 @@
 
                         <div>
                             <label class="block text-sm font-semibold text-slate-400 mb-2">Fiyat (₺)</label>
-                            <input type="number" name="price" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" placeholder="Örn: 250" required>
+                            <input type="number" name="price" step="0.01" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" placeholder="Örn: 250" required>
+                        </div>
+
+                        <div class="p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl space-y-4">
+                            <label class="block text-sm font-bold text-amber-400 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.866 8.21 8.21 0 003 2.48z" /></svg>
+                                Flaş Kampanya
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">Kampanya Türü</label>
+                                    <select name="campaign_type" class="premium-select">
+                                        <option value="none" selected>Kampanya Yok</option>
+                                        <option value="percentage">% Yüzdelik İndirim</option>
+                                        <option value="fixed">₺ Sabit İndirim</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1">İndirim Miktarı</label>
+                                    <input type="number" step="0.01" name="campaign_value" value="0" class="premium-number w-full">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="p-5 bg-slate-950 border border-slate-800 rounded-xl">
                             <label class="block text-sm font-semibold text-slate-300 mb-4 border-b border-slate-800 pb-3">Bu Hizmet Nerelerde Verilebilir?</label>
                             <div class="space-y-3">
                                 <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="is_in_store" checked class="w-5 h-5 rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900 focus:ring-offset-slate-900 transition-all">
+                                    <input type="checkbox" name="is_in_store" checked class="premium-checkbox">
                                     <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
                                         İşletmenizde (Dükkan/Klinik)
                                     </span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="is_at_home" class="w-5 h-5 rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900 focus:ring-offset-slate-900 transition-all">
+                                    <input type="checkbox" name="is_at_home" class="premium-checkbox">
                                     <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
                                         Müşteri Adresinde (Ev/Ofis)
                                     </span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="is_online" class="w-5 h-5 rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900 focus:ring-offset-slate-900 transition-all">
+                                    <input type="checkbox" name="is_online" class="premium-checkbox">
                                     <span class="text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" /></svg>
                                         Online (Görüntülü/Sesli)
@@ -60,7 +83,7 @@
                             <div class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
                                 {% for personel in personeller %}
                                 <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="staffs" value="{{ personel.id }}" checked class="w-5 h-5 rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900 :ring-offset-slate-900 transition-all">
+                                    <input type="checkbox" name="staffs" value="{{ personel.id }}" checked class="premium-checkbox">
                                     <span class="flex items-center gap-2 text-sm font-medium text-slate-400 group-hover:text-amber-400 transition-colors">
                                         {% if personel.photo %}
                                             <img src="{{ personel.photo.url }}" class="w-6 h-6 rounded-full object-cover border border-slate-700">
@@ -77,23 +100,47 @@
                         {% endif %}
 
                         <div>
-                            <label class="block text-sm font-semibold text-slate-400 mb-2">Tahmini Süre (İsteğe Bağlı)</label>
-                            <div class="flex gap-3 relative">
-                                <input type="number" name="duration_value" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" placeholder="Örn: 30">
-                                <select name="duration_unit" class="w-1/2 bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all cursor-pointer appearance-none">
+                            <label class="block text-sm font-semibold text-slate-400 mb-2">Tahmini Süre (Min. 15 Dakika)</label>
+                            <div class="flex gap-3">
+                                <input type="number" name="duration_value" id="duration_input" step="15" min="15" class="premium-number w-full lg:w-1/2" placeholder="Örn: 30">
+                                <select name="duration_unit" id="duration_unit" class="premium-select w-full lg:w-1/2">
                                     <option value="minutes">Dakika</option>
                                     <option value="hours">Saat</option>
                                     <option value="days">Gün</option>
                                     <option value="weeks">Hafta</option>
                                     <option value="months">Ay</option>
                                 </select>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                </svg>
                             </div>
+                            <p class="text-[10px] text-amber-500/80 mt-1.5 leading-relaxed">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3 inline mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+                                Dakika seçerken 15 ve katlarını kullanın. Mesaiyi aşan sürelerde Gün/Hafta seçin.
+                            </p>
                         </div>
 
-                        <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 font-extrabold rounded-xl hover:-translate-y-0.5 shadow-[0_0_20px_rgba(251,191,36,0.25)] transition-all duration-300 mt-4 flex items-center justify-center gap-2">
+                        <script>
+                            document.getElementById('duration_unit').addEventListener('change', function() {
+                                const input = document.getElementById('duration_input');
+                                if (this.value === 'minutes') {
+                                    input.step = "15";
+                                    input.min = "15";
+                                } else {
+                                    input.step = "1";
+                                    input.min = "1";
+                                }
+                            });
+                        </script>
+
+                        <div class="col-span-full">
+                            <label class="block text-sm font-semibold mb-2 flex items-center gap-2 text-slate-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-amber-400"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                Müşteriye Gösterilecek Randevu Talimatı (İsteğe Bağlı)
+                            </label>
+                            <textarea name="booking_instruction" rows="2" placeholder="Örn: Lütfen randevu notu kısmına aracınızın marka/modelini veya daha önceki işlemlerinizi yazınız."
+                                      class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-1 resize-none transition-all text-sm bg-slate-950 border-slate-800 text-slate-200 focus:border-amber-400 focus:ring-amber-400"></textarea>
+                            <p class="text-xs mt-1.5 text-slate-500">Bu uyarı, müşteri bu hizmeti seçtiğinde not kutusunun üzerinde dikkat çeken bir renkle gösterilir.</p>
+                        </div>
+
+                        <button type="submit" class="w-full py-4 premium-glow-btn premium-glow-animate text-slate-900 font-extrabold rounded-xl hover:-translate-y-0.5 transition-all duration-300 mt-4 flex items-center justify-center gap-2">
                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -104,13 +151,15 @@
             </div>
 
             <div class="lg:col-span-2">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden h-full flex flex-col">
-                    <div class="p-6 border-b border-slate-800 bg-slate-900/50">
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-amber-400">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                            </svg>
-                            Mevcut Hizmetleriniz
+                <div class="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.3)] rounded-3xl overflow-hidden h-full flex flex-col hover:border-amber-500/10 transition-all duration-300">
+                    <div class="p-6 border-b border-slate-800/60 bg-slate-950/20">
+                        <h2 class="text-xl font-extrabold text-white flex items-center gap-3">
+                            <div class="p-2 bg-amber-500/10 text-amber-400 rounded-xl shadow-[0_0_15px_rgba(251,191,36,0.1)]">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                </svg>
+                            </div>
+                            <span>Mevcut Hizmetleriniz</span>
                         </h2>
                     </div>
 
@@ -128,7 +177,12 @@
                                 {% for hizmet in hizmetler %}
                                 <tr class="hover:bg-slate-800/30 transition-colors duration-200">
                                     <td class="px-6 py-4">
-                                        <div class="font-bold text-slate-200 text-base">{{ hizmet.name }}</div>
+                                        <div class="font-bold text-slate-200 text-base flex items-center gap-2">
+                                            {{ hizmet.name }}
+                                            {% if hizmet.has_campaign %}
+                                                <span class="px-2 py-0.5 bg-rose-500/20 text-rose-400 text-[9px] font-black uppercase rounded-full border border-rose-500/30 animate-pulse">Kampanya</span>
+                                            {% endif %}
+                                        </div>
                                         <div class="text-xs text-slate-500 mt-1.5 flex gap-2">
                                             {% if hizmet.is_in_store %}
                                                 <span title="İşletmede" class="flex items-center gap-1">
@@ -179,16 +233,22 @@
                                             <span class="text-slate-600">-</span>
                                         {% endif %}
                                     </td>
-                                    <td class="px-6 py-4 font-extrabold text-white text-lg">
-                                        {{ hizmet.price }} ₺
+                                    <td class="px-6 py-4">
+                                        {% if hizmet.has_campaign %}
+                                            <div class="text-xs text-rose-400 line-through font-medium">{{ hizmet.price }} ₺</div>
+                                            <div class="font-extrabold text-emerald-400 text-lg">{{ hizmet.discounted_price|floatformat:2 }} ₺</div>
+                                        {% else %}
+                                            <div class="font-extrabold text-white text-lg">{{ hizmet.price }} ₺</div>
+                                        {% endif %}
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <a href="{% url 'hizmet_duzenle' hizmet.id %}" class="inline-flex items-center justify-center p-2 rounded-lg bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-slate-900 transition-colors border border-amber-500/20 hover:border-transparent mr-2" title="Düzenle">
                                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                         </a>
-                                        <a href="{% url 'hizmet_sil' hizmet.id %}" class="inline-flex items-center justify-center p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors border border-rose-500/20 hover:border-transparent" onclick="return confirm('Bu hizmeti silmek istediğinize emin misiniz?');" title="Sil">
+                                        <button type="button" onclick="openDeleteServiceModal('{% url 'hizmet_sil' hizmet.id %}', '{{ hizmet.name }}')"
+                                                class="inline-flex items-center justify-center p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors border border-rose-500/20 hover:border-transparent" title="Sil">
                                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                        </a>
+                                        </button>
                                     </td>
                                 </tr>
                                 {% empty %}
@@ -228,7 +288,28 @@
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Fiyat (₺)</label>
-                            <input type="number" name="price" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800" placeholder="Örn: 250" required>
+                            <input type="number" name="price" step="0.01" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800" placeholder="Örn: 250" required>
+                        </div>
+
+                        <div class="p-4 bg-rose-50 border border-rose-100 rounded-xl space-y-4">
+                            <label class="block text-sm font-bold text-rose-600 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.866 8.21 8.21 0 003 2.48z" /></svg>
+                                Flaş Kampanya
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1">Kampanya Türü</label>
+                                    <select name="campaign_type" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer">
+                                        <option value="none" selected>Kampanya Yok</option>
+                                        <option value="percentage">% Yüzdelik İndirim</option>
+                                        <option value="fixed">₺ Sabit İndirim</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1">İndirim Miktarı</label>
+                                    <input type="number" step="0.01" name="campaign_value" value="0" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
@@ -286,6 +367,20 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </div>
+                            <p class="text-[10px] text-amber-600 mt-1.5 leading-relaxed">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3 inline mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+                                Sistem kilitlenmemesi için mesai saatinizi aşan sürelerde lütfen <strong>"Gün"</strong> veya <strong>"Hafta"</strong> birimini seçiniz.
+                            </p>
+                        </div>
+
+                        <div class="col-span-full">
+                            <label class="block text-sm font-bold mb-2 flex items-center gap-2 text-slate-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-indigo-500"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                Müşteriye Gösterilecek Randevu Talimatı (İsteğe Bağlı)
+                            </label>
+                            <textarea name="booking_instruction" rows="2" placeholder="Örn: Lütfen randevu notu kısmına aracınızın marka/modelini veya daha önceki işlemlerinizi yazınız."
+                                      class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-800 resize-none text-sm"></textarea>
+                            <p class="text-xs mt-1.5 text-slate-500">Bu uyarı, müşteri bu hizmeti seçtiğinde not kutusunun üzerinde dikkat çeken bir renkle gösterilir.</p>
                         </div>
 
                         <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 hover:-translate-y-0.5 transition-all duration-300 mt-2 flex items-center justify-center gap-2">
@@ -303,7 +398,7 @@
                     <div class="bg-slate-50 border-b border-slate-200 px-6 py-4">
                         <h5 class="font-bold text-slate-700 m-0 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-indigo-600">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                             </svg>
                             Mevcut Hizmetleriniz
                         </h5>
@@ -323,7 +418,12 @@
                                 {% for hizmet in hizmetler %}
                                 <tr class="hover:bg-slate-50 transition-colors">
                                     <td class="px-6 py-4">
-                                        <div class="font-bold text-slate-900">{{ hizmet.name }}</div>
+                                        <div class="font-bold text-slate-900 flex items-center gap-2">
+                                            {{ hizmet.name }}
+                                            {% if hizmet.has_campaign %}
+                                                <span class="px-2 py-0.5 bg-rose-100 text-rose-600 text-[9px] font-black uppercase rounded-full border border-rose-200 animate-pulse">Kampanya</span>
+                                            {% endif %}
+                                        </div>
                                         <div class="text-xs text-slate-500 mt-1 flex gap-2">
                                             {% if hizmet.is_in_store %}<span title="İşletmede">📍 İşletme</span>{% endif %}
                                             {% if hizmet.is_at_home %}<span title="Evde">🏠 Evde</span>{% endif %}
@@ -356,16 +456,24 @@
                                             <span class="text-slate-400">-</span>
                                         {% endif %}
                                     </td>
-                                    <td class="px-6 py-4 font-bold text-emerald-600">
-                                        {{ hizmet.price }} ₺
+                                    <td class="px-6 py-4">
+                                        {% if hizmet.has_campaign %}
+                                            <div class="text-xs text-slate-400 line-through font-semibold">{{ hizmet.price }} ₺</div>
+                                            <div class="font-extrabold text-emerald-600 text-lg">{{ hizmet.discounted_price|floatformat:2 }} ₺</div>
+                                        {% else %}
+                                            <div class="font-bold text-emerald-600">{{ hizmet.price }} ₺</div>
+                                        {% endif %}
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <a href="{% url 'hizmet_duzenle' hizmet.id %}" class="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-indigo-600 text-sm font-bold rounded-lg hover:bg-indigo-50 transition-colors mr-2">
                                             ✏️ Düzenle
                                         </a>
-                                        <a href="{% url 'hizmet_sil' hizmet.id %}" class="inline-flex items-center px-3 py-1.5 border border-rose-200 text-rose-600 text-sm font-bold rounded-lg hover:bg-rose-50 transition-colors" onclick="return confirm('Silmek istediğinize emin misiniz?');">
-                                            🗑️ Sil
-                                        </a>
+                                        <form method="POST" action="{% url 'hizmet_sil' hizmet.id %}" style="display:inline" onsubmit="return confirm('Silmek istediğinize emin misiniz?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-rose-200 text-rose-600 text-sm font-bold rounded-lg hover:bg-rose-50 transition-colors">
+                                                🗑️ Sil
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                                 {% empty %}
@@ -381,4 +489,57 @@
 
         </div>
     {% endif %}
+
+<div id="deleteServiceModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="{% if isletme.is_premium %}bg-slate-900 border-slate-700{% else %}bg-white border-slate-200{% endif %} border rounded-3xl max-w-sm w-full p-8 shadow-2xl transform scale-95 transition-transform duration-300 text-center" id="deleteServiceContent">
+        <div class="w-16 h-16 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-rose-500/20">
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+        </div>
+        <h3 class="text-xl font-bold {% if isletme.is_premium %}text-white{% else %}text-slate-900{% endif %} mb-2">Hizmeti Sil?</h3>
+        <p class="text-sm font-medium {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %} mb-6">
+            <strong id="deleteServiceName" class="{% if isletme.is_premium %}text-rose-400{% else %}text-rose-600{% endif %}"></strong> adlı hizmeti listeden kaldırmak istediğinize emin misiniz?
+        </p>
+        <div class="flex gap-3">
+            <button onclick="closeDeleteServiceModal()" class="flex-1 py-3 rounded-xl font-bold border transition-colors {% if isletme.is_premium %}bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700{% else %}bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200{% endif %}">İptal</button>
+            <form id="confirmDeleteServiceForm" method="POST" action="#" class="flex-1">
+                {% csrf_token %}
+                <button type="submit" class="w-full py-3 rounded-xl font-bold text-white transition-colors bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-500/20 flex items-center justify-center">Evet, Sil</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDeleteServiceModal(deleteUrl, serviceName) {
+        const modal = document.getElementById('deleteServiceModal');
+        const content = document.getElementById('deleteServiceContent');
+
+        document.getElementById('deleteServiceName').innerText = serviceName;
+        document.getElementById('confirmDeleteServiceForm').action = deleteUrl;
+
+        document.body.appendChild(modal);
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeDeleteServiceModal() {
+        const modal = document.getElementById('deleteServiceModal');
+        const content = document.getElementById('deleteServiceContent');
+
+        modal.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+</script>
 {% endblock %}

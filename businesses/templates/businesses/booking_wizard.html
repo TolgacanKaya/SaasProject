@@ -1,0 +1,1263 @@
+{% extends 'base.html' %}
+
+{% block title %}Randevu Al | {{ isletme.name }}{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   THEMES (PREMIUM VS FREE)
+   ═══════════════════════════════════════════════════════════ */
+{% if isletme.is_premium %}
+:root {
+    --bg-main: #0a0a0a;
+    --bg-card: #141414;
+    --bg-hover: #1c1c1c;
+    --border-dim: #333333;
+    --border-active: #d4af37; /* Lüks Altın */
+    --text-main: #ffffff;
+    --text-muted: #9ca3af;
+    --accent: #d4af37;
+    --accent-glow: rgba(212, 175, 55, 0.4);
+    --btn-text: #000;
+}
+{% else %}
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-hover: #f1f5f9;
+    --border-dim: #e2e8f0;
+    --border-active: #3b82f6; /* Modern Mavi */
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --btn-text: #ffffff;
+}
+{% endif %}
+
+body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+    
+}
+
+
+
+/* ── LAYOUT & CARDS ── */
+.wizard-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+.wizard-card:hover {
+    border-color: var(--border-active);
+    background: var(--bg-hover);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+.wizard-card.selected {
+    border-color: var(--border-active);
+    border-width: 2px;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.sticky-cart {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: sticky;
+    top: 2rem;
+}
+
+/* ── BUTTONS ── */
+.btn-primary-custom {
+    background: var(--accent);
+    color: var(--btn-text);
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border-radius: 99px; /* Rounded pill style like Fresha */
+    width: 100%;
+    text-align: center;
+    transition: all 0.2s;
+    border: none;
+}
+.btn-primary-custom:hover {
+    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--accent-glow);
+}
+.btn-primary-custom:active {
+    transform: scale(0.97);
+}
+.btn-primary-custom:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── BACK BUTTON ── */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.back-btn:hover {
+    background: var(--bg-hover);
+}
+
+/* ── HORIZONTAL DATE SCROLL ── */
+.date-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.8rem;
+    padding-bottom: 1rem;
+    scrollbar-width: none;
+}
+.date-scroll::-webkit-scrollbar { display: none; }
+.date-card {
+    min-width: 70px;
+    padding: 0.8rem 0;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px solid var(--border-dim);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.date-card:hover {
+    border-color: var(--border-active);
+}
+.date-card.selected {
+    background: var(--accent);
+    color: var(--btn-text);
+    border-color: var(--accent);
+}
+
+/* ── TIME SLOTS GRID ── */
+.time-slot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+@media (max-width: 640px) {
+    .time-slot-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.time-slot {
+    width: 100%;
+    padding: 0.85rem;
+    text-align: center;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-dim);
+    background: var(--bg-card);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-body, 'Inter', sans-serif);
+}
+.time-slot:hover {
+    border-color: var(--border-active);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.time-slot.selected {
+    background: var(--accent);
+    color: var(--btn-text);
+    border-color: var(--accent);
+    box-shadow: 0 4px 15px var(--accent-glow);
+    transform: translateY(-2px) scale(1.02);
+}
+.time-slot.disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+    border-style: dashed !important;
+    background: transparent !important;
+    text-decoration: line-through;
+    pointer-events: none;
+    transform: none !important;
+}
+
+/* Form Inputs */
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-dim);
+    background: var(--bg-card);
+    color: var(--text-main);
+    margin-top: 0.3rem;
+}
+.form-input:focus {
+    outline: none;
+    border-color: var(--border-active);
+}
+
+/* ── STEPPER TIMELINE ── */
+.stepper-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+.stepper-container::-webkit-scrollbar {
+    display: none;
+}
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+.step-item.active {
+    opacity: 1;
+    transform: scale(1.02);
+}
+.step-item.done {
+    opacity: 0.85;
+}
+.step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: var(--bg-hover);
+    color: var(--text-muted);
+    border: 1px solid var(--border-dim);
+    transition: all 0.3s ease;
+}
+.step-item.active .step-dot {
+    background: var(--accent);
+    color: var(--btn-text);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+.step-item.done .step-dot {
+    background: var(--border-active);
+    color: var(--btn-text);
+    border-color: var(--border-active);
+}
+.step-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+.step-item.active .step-text {
+    color: var(--text-main);
+}
+.step-item.done .step-text {
+    color: var(--text-main);
+}
+.step-line {
+    flex: 1;
+    min-width: 15px;
+    height: 1px;
+    background: var(--border-dim);
+    opacity: 0.5;
+}
+
+/* Hide Steps */
+.step-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+.step-content.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="mainWizardContent" class="max-w-6xl mx-auto px-4 py-8">
+
+
+    <!-- Header with Back Button -->
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4">
+            <button id="btnBack" class="back-btn interactive-btn !hidden" onclick="goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+            </button>
+            <h1 id="stepTitle" class="text-2xl md:text-3xl font-extrabold font-display tracking-tight">Hizmet Seçimi</h1>
+        </div>
+        <div class="hidden sm:block">
+            <span class="text-xs font-bold uppercase tracking-widest opacity-40">Adım <span id="stepCounter">1</span> / 6</span>
+        </div>
+    </div>
+
+    <!-- Progress Stepper Timeline -->
+    <div class="stepper-container mb-8">
+        <div id="timeline-step-1" class="step-item active">
+            <div class="step-dot">1</div>
+            <span class="step-text">Hizmet</span>
+        </div>
+        <div class="step-line"></div>
+        <div id="timeline-step-2" class="step-item">
+            <div class="step-dot">2</div>
+            <span class="step-text">Konum</span>
+        </div>
+        <div class="step-line"></div>
+        <div id="timeline-step-3" class="step-item">
+            <div class="step-dot">3</div>
+            <span class="step-text">Uzman</span>
+        </div>
+        <div class="step-line"></div>
+        <div id="timeline-step-4" class="step-item">
+            <div class="step-dot">4</div>
+            <span class="step-text">Tarih & Saat</span>
+        </div>
+        <div class="step-line"></div>
+        <div id="timeline-step-5" class="step-item">
+            <div class="step-dot">5</div>
+            <span class="step-text">Özet ve Onay</span>
+        </div>
+        <div class="step-line"></div>
+        <div id="timeline-step-6" class="step-item">
+            <div class="step-dot">6</div>
+            <span class="step-text">Ödeme</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- ── LEFT PANE (STEPS) ── -->
+        <div class="lg:col-span-8">
+            <form id="bookingForm" method="POST" action="{% url 'booking_wizard' isletme.slug %}">
+                {% csrf_token %}
+                <input type="hidden" name="service_id" id="input_service_id" value="">
+                <input type="hidden" name="staff_id" id="input_staff_id" value="">
+                <input type="hidden" name="date" id="input_date" value="">
+                <input type="hidden" name="time" id="input_time" value="">
+                <input type="hidden" name="chosen_location" id="input_chosen_location" value="in_store">
+
+                <!-- STEP 1: SERVICES -->
+                <div id="step1" class="step-content active">
+                    <div class="space-y-4">
+                        {% for hizmet in hizmetler %}
+                        <div id="wizard-service-card-{{ hizmet.id }}" class="wizard-card flex justify-between items-center interactive-card" onclick="selectService({{ hizmet.id }}, '{{ hizmet.name|escapejs }}', {{ hizmet.discounted_price|stringformat:'.2f' }}, '{{ hizmet.formatted_duration }}', {{ hizmet.is_in_store|yesno:'true,false' }}, {{ hizmet.is_at_home|yesno:'true,false' }}, {{ hizmet.is_online|yesno:'true,false' }})">
+                            <div>
+                                <h3 class="text-lg font-bold font-display">{{ hizmet.name }}</h3>
+                                <p class="text-sm var(--text-muted) mt-1">{{ hizmet.formatted_duration }}</p>
+                                {% if hizmet.has_campaign %}
+                                    <p class="text-xs text-rose-500 font-bold mt-1">İndirimli Fiyat</p>
+                                {% endif %}
+                                <p class="text-md font-semibold mt-2">{{ hizmet.discounted_price|floatformat:2 }} ₺</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border border-[var(--border-dim)] flex items-center justify-center text-xl font-light">
+                                +
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>Henüz hizmet eklenmemiş.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- STEP 2: LOCATION SELECTION -->
+                <div id="step2" class="step-content">
+                    <p class="text-sm var(--text-muted) mb-4 font-semibold">Lütfen hizmeti almak istediğiniz konumu seçiniz:</p>
+                    <div class="space-y-4">
+                        <!-- in_store -->
+                        <div id="location-card-in_store" class="wizard-card flex items-center gap-4 interactive-card" onclick="selectLocation('in_store')">
+                            <div class="w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72M6.75 18h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .414.336.75.75.75z" /></svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold font-display">İşletmede (Mekanda)</h3>
+                                <p class="text-sm text-[var(--text-muted)]">Hizmeti almak için salonumuzu/dükkanımızı ziyaret edin.</p>
+                            </div>
+                        </div>
+
+                        <!-- at_home -->
+                        <div id="location-card-at_home" class="wizard-card flex items-center gap-4 interactive-card" onclick="selectLocation('at_home')">
+                            <div class="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold font-display">Müşteri Adresinde (Mobil)</h3>
+                                <p class="text-sm text-[var(--text-muted)]">Uzmanımız belirttiğiniz adrese gelerek hizmet versin.</p>
+                            </div>
+                        </div>
+
+                        <!-- online -->
+                        <div id="location-card-online" class="wizard-card flex items-center gap-4 interactive-card" onclick="selectLocation('online')">
+                            <div class="w-12 h-12 rounded-full bg-sky-500/10 text-sky-600 flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" /></svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold font-display">Online Görüşme</h3>
+                                <p class="text-sm text-[var(--text-muted)]">Zoom, Meet veya görüntülü arama ile uzaktan görüşün.</p>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Inputs Box (Adres ve Online Detaylar) -->
+                        <div id="locationDetailsBox" class="wizard-card cursor-default hover:bg-[var(--bg-card)] hover:border-[var(--border-dim)] !p-6 hidden">
+                            <!-- Address Input Form -->
+                            <div id="locationAddressForm" class="space-y-2 hidden">
+                                <label class="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] ml-1">Hizmet Alınacak Adres</label>
+                                <textarea name="customer_address" id="textarea_customer_address" rows="3" class="form-input" placeholder="Lütfen sokak, mahalle, kapı no ve kat bilgilerini eksiksiz giriniz."></textarea>
+                            </div>
+
+                            <!-- Online Details Form -->
+                            <div id="locationOnlineForm" class="space-y-4 hidden">
+                                <div class="space-y-2">
+                                    <label class="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] ml-1">Kullanılacak Görüntülü Arama Uygulaması</label>
+                                    <select name="online_app" id="select_online_app" class="form-input">
+                                        <option value="Zoom">Zoom</option>
+                                        <option value="Google Meet">Google Meet</option>
+                                        <option value="WhatsApp">WhatsApp</option>
+                                        <option value="Skype">Skype</option>
+                                        <option value="Telefon Görüşmesi">Telefon Görüşmesi</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] ml-1">Kullanıcı Adınız veya Bağlantınız (İsteğe Bağlı)</label>
+                                    <input type="text" name="online_link" id="input_online_link" class="form-input" placeholder="Örn: zoom.us/j/123456 veya WhatsApp telefon numarası">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: PROFESSIONAL -->
+                <div id="step3" class="step-content">
+                    <div class="space-y-4">
+                        <div class="wizard-card flex items-center gap-4 interactive-card" onclick="selectStaff('', 'Fark Etmez')">
+                            <div class="w-12 h-12 rounded-full bg-[var(--border-dim)] flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold font-display">Fark Etmez</h3>
+                                <p class="text-sm var(--text-muted)">Maksimum uygunluk durumu</p>
+                            </div>
+                        </div>
+
+                        {% for personel in aktif_personeller %}
+                        <div class="wizard-card flex items-center gap-4 interactive-card" onclick="selectStaff({{ personel.id }}, '{{ personel.name }}')">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-[var(--border-dim)]">
+                                {% if personel.photo %}
+                                    <img src="{{ personel.photo.url }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <svg class="w-full h-full text-gray-400 p-2" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold">{{ personel.name }}</h3>
+                                {% if personel.title %}<p class="text-sm var(--text-muted)">{{ personel.title }}</p>{% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- STEP 4: DATE & TIME -->
+                <div id="step4" class="step-content">
+                    <h4 class="text-sm font-bold uppercase tracking-widest mb-3" style="color:var(--text-muted)">Gün Seçimi</h4>
+                    <div class="calendar-container wizard-card p-0 mb-6 overflow-hidden">
+                        <div class="flex justify-between items-center p-4 border-b border-[var(--border-dim)] bg-[var(--bg-hover)]">
+                            <button type="button" class="back-btn w-8 h-8" onclick="changeMonth(-1)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                            </button>
+                            <h3 id="currentMonthLabel" class="font-bold text-lg">Ay Yükleniyor</h3>
+                            <button type="button" class="back-btn w-8 h-8" onclick="changeMonth(1)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-px bg-[var(--border-dim)]">
+                            <div class="text-center text-xs font-bold py-2 bg-[var(--bg-card)]">PZT</div>
+                            <div class="text-center text-xs font-bold py-2 bg-[var(--bg-card)]">SAL</div>
+                            <div class="text-center text-xs font-bold py-2 bg-[var(--bg-card)]">ÇAR</div>
+                            <div class="text-center text-xs font-bold py-2 bg-[var(--bg-card)]">PER</div>
+                            <div class="text-center text-xs font-bold py-2 bg-[var(--bg-card)]">CUM</div>
+                            <div class="text-center text-xs font-bold py-2 bg-[var(--bg-card)]">CMT</div>
+                            <div class="text-center text-xs font-bold py-2 bg-[var(--bg-card)] text-rose-500">PAZ</div>
+                        </div>
+                        <div id="calendarGrid" class="grid grid-cols-7 gap-px bg-[var(--border-dim)]">
+                            <!-- JS ile dolacak -->
+                        </div>
+                    </div>
+
+                    <h4 class="text-sm font-bold uppercase tracking-widest mt-8 mb-4 flex items-center gap-2" style="color:var(--text-muted)">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Saat Seçimi
+                    </h4>
+                    <div id="timeSlotsContainer" class="time-slot-grid">
+                        <p class="col-span-full text-sm text-center py-8 opacity-50">Önce bir gün seçiniz.</p>
+                    </div>
+                </div>
+
+                <!-- STEP 5: PERSONAL DETAILS -->
+                <div id="step5" class="step-content">
+                    <div class="wizard-card cursor-default hover:bg-[var(--bg-card)] hover:border-[var(--border-dim)] !p-8">
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="w-12 h-12 bg-indigo-500/10 text-indigo-600 rounded-2xl flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-black tracking-tight">İletişim Bilgileriniz</h3>
+                                <p class="text-xs text-[var(--text-muted)]">Randevu onayı için bu bilgiler gereklidir.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] ml-1">Adınız</label>
+                                <input type="text" name="first_name" required class="form-input !py-3.5" placeholder="Örn: Tolgacan">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] ml-1">Soyadınız</label>
+                                <input type="text" name="last_name" required class="form-input !py-3.5" placeholder="Örn: Kaya">
+                            </div>
+                            <div class="md:col-span-2 space-y-1.5">
+                                <label class="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] ml-1">Telefon Numarası</label>
+                                <input type="tel" name="phone" required class="form-input !py-3.5" placeholder="05XX XXX XX XX">
+                            </div>
+                            <div class="md:col-span-2 space-y-1.5">
+                                <label class="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] ml-1">E-posta (Opsiyonel)</label>
+                                <input type="email" name="email" class="form-input !py-3.5" placeholder="isim@eposta.com">
+                            </div>
+                            <div class="md:col-span-2 space-y-1.5">
+                                <label class="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] ml-1">Notunuz</label>
+                                <textarea name="customer_note" rows="3" class="form-input" placeholder="İşletmeye iletmek istediğiniz özel bir not var mı?"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 6: SECURE PAYMENT -->
+                <div id="step6" class="step-content">
+                    <div class="rounded-3xl p-6 md:p-8 border bg-[var(--bg-card)] border-[var(--border-dim)] shadow-xl relative overflow-hidden">
+                        <!-- Ambient backdrop glows -->
+                        <div class="absolute top-0 left-0 w-full h-1.5 opacity-80 {% if isletme.is_premium %}bg-amber-500{% else %}bg-indigo-600{% endif %}"></div>
+                        
+                        <div id="paymentLoading" class="flex flex-col items-center justify-center py-16 gap-4">
+                            <div class="w-12 h-12 rounded-full border-4 border-t-transparent animate-spin
+                                        {% if isletme.is_premium %}border-amber-400{% else %}border-indigo-600{% endif %}"></div>
+                            <h3 class="text-lg font-bold">Güvenli Ödeme Ekranı Yükleniyor</h3>
+                            <p class="text-xs text-[var(--text-muted)] max-w-xs text-center">İyzico güvenlik altyapısı ile şifrelenmiş ödeme bağlantısı kuruluyor, lütfen bekleyiniz...</p>
+                        </div>
+                        
+                        <!-- Secure payment iframe container -->
+                        <div id="iframeWrapper" class="hidden w-full transition-all duration-500">
+                            <iframe id="paymentIframe" src="" class="w-full min-h-[620px] border-0 bg-transparent rounded-2xl" scrolling="yes"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ── RIGHT PANE (STICKY CART) ── -->
+        <div class="lg:col-span-4">
+            <div class="sticky-cart">
+                <div class="flex items-center gap-4 mb-6 pb-6 border-b" style="border-color:var(--border-dim)">
+                    <div class="w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center shadow-inner border border-slate-200">
+                        {% if isletme.logo %}
+                            <img src="{{ isletme.logo.url }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <span class="text-3xl font-black text-slate-400 select-none drop-shadow-sm">{{ isletme.name|slice:":1"|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold leading-tight">{{ isletme.name }}</h3>
+                        <p class="text-sm mt-1" style="color:var(--text-muted)">{{ isletme.city }} / {{ isletme.district }}</p>
+                    </div>
+                </div>
+
+                <div id="cartEmpty" class="text-center py-4 text-sm" style="color:var(--text-muted)">
+                    Henüz hizmet seçilmedi
+                </div>
+
+                <div id="cartContent" style="display:none;">
+                    <!-- Selected Service -->
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 id="cartServiceName" class="font-bold text-md">Hizmet Adı</h4>
+                            <p id="cartServiceDetails" class="text-sm mt-1" style="color:var(--text-muted)">Süre • Personel</p>
+                        </div>
+                        <span id="cartServicePrice" class="font-bold">0 ₺</span>
+                    </div>
+
+                    <!-- Location Info -->
+                    <div id="cartLocationBlock" class="mb-4 hidden pb-4 border-b" style="border-color:var(--border-dim)">
+                        <h4 class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--text-muted)">Hizmet Türü & Yer</h4>
+                        <p id="cartLocationText" class="text-sm font-semibold"></p>
+                        <p id="cartLocationExtra" class="text-xs mt-1" style="color:var(--text-muted)"></p>
+                    </div>
+
+                    <!-- Date & Time -->
+                    <div id="cartDateTimeBlock" class="mb-4 hidden">
+                        <p id="cartDateTime" class="text-sm font-bold"></p>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="flex justify-between items-center mt-6 pt-6 border-t" style="border-color:var(--border-dim)">
+                        <span class="font-bold text-lg">Toplam</span>
+                        <span id="cartTotal" class="font-bold text-xl">0 ₺</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-8">
+                    <button id="btnBackMain" class="btn-primary-custom !bg-transparent !text-[var(--text-main)] border border-[var(--border-dim)] !w-1/3 !hidden interactive-btn" onclick="goBack()">
+                        Geri
+                    </button>
+                    <button id="btnContinue" class="btn-primary-custom !w-full transition-all interactive-btn" disabled onclick="nextStep()">Devam Et</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    let bookingData = {
+        serviceId: null,
+        serviceName: '',
+        servicePrice: 0,
+        serviceDuration: '',
+        isInStore: true,
+        isAtHome: false,
+        isOnline: false,
+        chosenLocation: 'in_store',
+        customerAddress: '',
+        onlineApp: 'Zoom',
+        onlineLink: '',
+        staffId: '',
+        staffName: '',
+        date: '',
+        time: ''
+    };
+
+    const steps = ['Hizmet Seçimi', 'Konum Seçimi', 'Uzman Seçimi', 'Tarih ve Saat Seçimi', 'Randevu Özeti', 'Güvenli Ödeme'];
+
+    function updateStepperTimeline() {
+        for (let i = 1; i <= 6; i++) {
+            const item = document.getElementById(`timeline-step-${i}`);
+            if (item) {
+                item.classList.remove('active', 'done');
+                if (i === currentStep) {
+                    item.classList.add('active');
+                } else if (i < currentStep) {
+                    item.classList.add('done');
+                }
+            }
+        }
+    }
+
+    function updateCart() {
+        updateStepperTimeline();
+        if (bookingData.serviceId) {
+            document.getElementById('cartEmpty').style.display = 'none';
+            document.getElementById('cartContent').style.display = 'block';
+            document.getElementById('cartServiceName').innerText = bookingData.serviceName;
+            
+            let details = bookingData.serviceDuration;
+            if (bookingData.staffName) details += ` • ${bookingData.staffName} ile`;
+            document.getElementById('cartServiceDetails').innerText = details;
+            
+            document.getElementById('cartServicePrice').innerText = `${bookingData.servicePrice} ₺`;
+            document.getElementById('cartTotal').innerText = `${bookingData.servicePrice} ₺`;
+
+            // Location block display
+            const locBlock = document.getElementById('cartLocationBlock');
+            const locText = document.getElementById('cartLocationText');
+            const locExtra = document.getElementById('cartLocationExtra');
+            
+            if (bookingData.chosenLocation) {
+                locBlock.classList.remove('hidden');
+                if (bookingData.chosenLocation === 'in_store') {
+                    locText.innerText = "İşletmede (Mekanda)";
+                    locExtra.innerText = "{{ isletme.name }} salonunda/dükkanında";
+                } else if (bookingData.chosenLocation === 'at_home') {
+                    locText.innerText = "Müşteri Adresinde";
+                    locExtra.innerText = bookingData.customerAddress ? bookingData.customerAddress : "Adres belirtilmedi";
+                } else if (bookingData.chosenLocation === 'online') {
+                    locText.innerText = "Online Görüşme";
+                    let extra = bookingData.onlineApp;
+                    if (bookingData.onlineLink) extra += ` (${bookingData.onlineLink})`;
+                    locExtra.innerText = extra;
+                }
+            } else {
+                locBlock.classList.add('hidden');
+            }
+        }
+
+        if (bookingData.date && bookingData.time) {
+            document.getElementById('cartDateTimeBlock').classList.remove('hidden');
+            const dateObj = new Date(bookingData.date);
+            const formattedDate = dateObj.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('cartDateTime').innerText = `${formattedDate} - ${bookingData.time}`;
+        } else {
+            document.getElementById('cartDateTimeBlock').classList.add('hidden');
+        }
+
+        // Enable/disable continue button
+        const btn = document.getElementById('btnContinue');
+        if (currentStep === 1 && bookingData.serviceId) btn.disabled = false;
+        else if (currentStep === 2) {
+            if (bookingData.chosenLocation === 'at_home') {
+                btn.disabled = !bookingData.customerAddress || !bookingData.customerAddress.trim();
+            } else {
+                btn.disabled = !bookingData.chosenLocation;
+            }
+        }
+        else if (currentStep === 3 && bookingData.staffName) btn.disabled = false;
+        else if (currentStep === 4 && bookingData.date && bookingData.time) btn.disabled = false;
+        else if (currentStep === 5) btn.disabled = false;
+        else btn.disabled = true;
+
+        if (currentStep === 5) {
+            const isPaymentReady = {% if isletme.iyzico_sub_merchant_key %}true{% else %}false{% endif %};
+            if (!isPaymentReady) {
+                btn.innerText = "Ödeme Altyapısı Hazır Değil";
+                btn.classList.add('!bg-rose-500', '!text-white', 'opacity-80');
+                btn.disabled = true;
+                
+                // Küçük bir açıklama metni ekleyelim
+                const existingWarning = document.getElementById('paymentWarningNote');
+                if(!existingWarning) {
+                    const warning = document.createElement('p');
+                    warning.id = 'paymentWarningNote';
+                    warning.className = "text-[10px] text-rose-500 font-bold mt-2 text-center animate-pulse";
+                    warning.innerText = "İşletme şu an online ödeme kabul edemiyor.";
+                    btn.parentNode.appendChild(warning);
+                }
+            } else {
+                btn.innerText = "Randevuyu Onayla ve Öde";
+                btn.disabled = false;
+            }
+        } else {
+            btn.innerText = "Devam Et";
+            const existingWarning = document.getElementById('paymentWarningNote');
+            if (existingWarning) existingWarning.remove();
+        }
+
+        // Header back button
+        const btnBack = document.getElementById('btnBack');
+        if (currentStep > 1) {
+            btnBack.classList.remove('!hidden');
+            btnBack.style.display = 'flex';
+        } else {
+            btnBack.classList.add('!hidden');
+            btnBack.style.display = 'none';
+        }
+
+        const btnBackMain = document.getElementById('btnBackMain');
+        const btnContinue = document.getElementById('btnContinue');
+        
+        if (currentStep > 1 && currentStep < 6) {
+            btnBackMain.classList.remove('!hidden');
+            btnContinue.classList.remove('!w-full');
+            btnContinue.classList.add('!w-2/3');
+        } else {
+            btnBackMain.classList.add('!hidden');
+            btnContinue.classList.add('!w-full');
+            btnContinue.classList.remove('!w-2/3');
+        }
+
+        document.getElementById('stepCounter').innerText = currentStep;
+
+    }
+
+    function selectService(id, name, price, duration, isInStore, isAtHome, isOnline) {
+        bookingData.serviceId = id;
+        bookingData.serviceName = name;
+        bookingData.servicePrice = parseFloat(price);
+        bookingData.serviceDuration = duration;
+        bookingData.isInStore = isInStore;
+        bookingData.isAtHome = isAtHome;
+        bookingData.isOnline = isOnline;
+        document.getElementById('input_service_id').value = id;
+
+        // Reset location inputs on service change
+        bookingData.chosenLocation = '';
+        bookingData.customerAddress = '';
+        bookingData.onlineApp = 'Zoom';
+        bookingData.onlineLink = '';
+        document.getElementById('input_chosen_location').value = '';
+        document.getElementById('textarea_customer_address').value = '';
+        document.getElementById('select_online_app').value = 'Zoom';
+        document.getElementById('input_online_link').value = '';
+
+        // Hide details box
+        document.getElementById('locationDetailsBox').classList.add('hidden');
+        document.getElementById('locationAddressForm').classList.add('hidden');
+        document.getElementById('locationOnlineForm').classList.add('hidden');
+
+        // Dynamically show/hide location cards based on capability flags
+        const cardInStore = document.getElementById('location-card-in_store');
+        const cardAtHome = document.getElementById('location-card-at_home');
+        const cardOnline = document.getElementById('location-card-online');
+
+        let allowedLocationsCount = 0;
+        let lastAllowedLocation = '';
+
+        if (isInStore) {
+            cardInStore.style.display = 'flex';
+            allowedLocationsCount++;
+            lastAllowedLocation = 'in_store';
+        } else {
+            cardInStore.style.display = 'none';
+        }
+
+        if (isAtHome) {
+            cardAtHome.style.display = 'flex';
+            allowedLocationsCount++;
+            lastAllowedLocation = 'at_home';
+        } else {
+            cardAtHome.style.display = 'none';
+        }
+
+        if (isOnline) {
+            cardOnline.style.display = 'flex';
+            allowedLocationsCount++;
+            lastAllowedLocation = 'online';
+        } else {
+            cardOnline.style.display = 'none';
+        }
+
+        // De-select cards
+        cardInStore.classList.remove('selected');
+        cardAtHome.classList.remove('selected');
+        cardOnline.classList.remove('selected');
+
+        // If only 1 option is allowed, pre-select it
+        if (allowedLocationsCount === 1) {
+            selectLocation(lastAllowedLocation);
+        }
+
+        updateCart();
+        nextStep();
+    }
+
+    function selectLocation(value) {
+        bookingData.chosenLocation = value;
+        document.getElementById('input_chosen_location').value = value;
+
+        // Highlight card
+        const cardInStore = document.getElementById('location-card-in_store');
+        const cardAtHome = document.getElementById('location-card-at_home');
+        const cardOnline = document.getElementById('location-card-online');
+
+        cardInStore.classList.remove('selected');
+        cardAtHome.classList.remove('selected');
+        cardOnline.classList.remove('selected');
+
+        const selectedCard = document.getElementById(`location-card-${value}`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+
+        const detailsBox = document.getElementById('locationDetailsBox');
+        const addressForm = document.getElementById('locationAddressForm');
+        const onlineForm = document.getElementById('locationOnlineForm');
+
+        if (value === 'in_store') {
+            detailsBox.classList.add('hidden');
+            addressForm.classList.add('hidden');
+            onlineForm.classList.add('hidden');
+        } else if (value === 'at_home') {
+            detailsBox.classList.remove('hidden');
+            addressForm.classList.remove('hidden');
+            onlineForm.classList.add('hidden');
+            setTimeout(() => document.getElementById('textarea_customer_address').focus(), 100);
+        } else if (value === 'online') {
+            detailsBox.classList.remove('hidden');
+            addressForm.classList.add('hidden');
+            onlineForm.classList.remove('hidden');
+        }
+
+        updateCart();
+    }
+
+    function selectStaff(id, name) {
+        bookingData.staffId = id;
+        bookingData.staffName = name;
+        document.getElementById('input_staff_id').value = id;
+        updateCart();
+        nextStep();
+    }
+
+    function selectDate(dateStr, cardElement) {
+        bookingData.date = dateStr;
+        bookingData.time = ''; // Reset time
+        document.getElementById('input_date').value = dateStr;
+        
+        generateDates(); // Re-render takvim (seçili rengini uygulamak için)
+        
+        generateTimeSlots();
+        updateCart();
+    }
+
+    function selectTime(timeStr, cardElement) {
+        bookingData.time = timeStr;
+        document.getElementById('input_time').value = timeStr;
+        
+        // Remove active class from all times
+        document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
+        cardElement.classList.add('selected');
+        
+        updateCart();
+    }
+
+    function showWizardToast(message) {
+        const existing = document.getElementById('wizardToast');
+        if (existing) existing.remove();
+        
+        const toast = document.createElement('div');
+        toast.id = 'wizardToast';
+        toast.className = `fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999] px-6 py-4 rounded-2xl font-bold text-xs md:text-sm flex items-center gap-3 shadow-2xl border transition-all duration-300 translate-y-10 opacity-0
+                           {% if isletme.is_premium %}bg-rose-500/15 text-rose-300 border-rose-500/35 shadow-rose-950/40{% else %}bg-rose-50 text-rose-700 border-rose-200 shadow-slate-200{% endif %}`;
+        toast.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.remove('translate-y-10', 'opacity-0');
+        }, 10);
+        
+        setTimeout(() => {
+            toast.classList.add('translate-y-10', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
+    function submitBookingFormAJAX() {
+        const btn = document.getElementById('btnContinue');
+        btn.disabled = true;
+        btn.innerText = "Bağlanıyor...";
+        
+        const form = document.getElementById('bookingForm');
+        const formData = new FormData(form);
+        formData.append('is_ajax', 'true');
+        
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep = 6;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                
+                document.getElementById('stepTitle').innerText = steps[currentStep-1];
+                document.getElementById('btnBack').style.display = 'none';
+                document.getElementById('btnBackMain').classList.add('hidden');
+                btn.style.display = 'none';
+                
+                const iframe = document.getElementById('paymentIframe');
+                const loader = document.getElementById('paymentLoading');
+                const wrapper = document.getElementById('iframeWrapper');
+                
+                iframe.src = data.payment_url;
+                
+                iframe.onload = function() {
+                    loader.classList.add('hidden');
+                    wrapper.classList.remove('hidden');
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+                
+                updateCart();
+            } else {
+                showWizardToast(data.message || "❌ Randevu kaydı oluşturulurken bilinmeyen bir hata oluştu.");
+                btn.disabled = false;
+                btn.innerText = "Randevuyu Onayla ve Öde";
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting booking:', error);
+            showWizardToast("❌ Sunucu ile güvenli bağlantı kurulamadı. Lütfen tekrar deneyin.");
+            btn.disabled = false;
+            btn.innerText = "Randevuyu Onayla ve Öde";
+        });
+    }
+
+    function nextStep() {
+        if (currentStep === 5) {
+            const isPaymentReady = {% if isletme.iyzico_sub_merchant_key %}true{% else %}false{% endif %};
+            if (!isPaymentReady) {
+                showWizardToast("❌ İşletme ödeme altyapısı hazırlık aşamasında olduğu için şu an randevu kabul edemiyor.");
+                return;
+            }
+            // STEP 5: KİŞİSEL BİLGİLER FORM DOĞRULAMA (VALIDATION)
+            const firstNameInput = document.querySelector('input[name="first_name"]');
+            const lastNameInput = document.querySelector('input[name="last_name"]');
+            const phoneInput = document.querySelector('input[name="phone"]');
+            
+            const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+            const lastName = lastNameInput ? lastNameInput.value.trim() : '';
+            const phoneRaw = phoneInput ? phoneInput.value.trim() : '';
+            
+            if (!firstName) {
+                showWizardToast("❌ Lütfen adınızı giriniz.");
+                if (firstNameInput) firstNameInput.focus();
+                return;
+            }
+            if (!lastName) {
+                showWizardToast("❌ Lütfen soyadınızı giriniz.");
+                if (lastNameInput) lastNameInput.focus();
+                return;
+            }
+            if (!phoneRaw) {
+                showWizardToast("❌ Lütfen telefon numaranızı giriniz.");
+                if (phoneInput) phoneInput.focus();
+                return;
+            }
+            
+            // Telefon formatını temizleyip kontrol etme (Örn: en az 10 rakam olmalı)
+            const phoneDigits = phoneRaw.replace(/[^0-9]/g, '');
+            if (phoneDigits.length < 10) {
+                showWizardToast("❌ Geçersiz telefon numarası. Lütfen numaranızı eksiksiz giriniz.");
+                if (phoneInput) phoneInput.focus();
+                return;
+            }
+            
+            submitBookingFormAJAX();
+            return;
+        }
+
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        currentStep++;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+        
+        document.getElementById('stepTitle').innerText = steps[currentStep-1];
+        document.getElementById('btnBack').style.display = 'flex';
+
+        if (currentStep === 4) {
+            generateDates();
+        }
+
+        updateCart();
+    }
+
+    function goBack() {
+        if (currentStep > 1) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            
+            document.getElementById('stepTitle').innerText = steps[currentStep-1];
+            if (currentStep === 1) document.getElementById('btnBack').style.display = 'none';
+            
+            updateCart();
+        }
+    }
+
+    let currentCalDate = new Date();
+    currentCalDate.setDate(1);
+
+    function changeMonth(offset) {
+        currentCalDate.setMonth(currentCalDate.getMonth() + offset);
+        generateDates();
+    }
+
+    function generateDates() {
+        const container = document.getElementById('calendarGrid');
+        container.innerHTML = '';
+        
+        const year = currentCalDate.getFullYear();
+        const month = currentCalDate.getMonth();
+        
+        const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+        document.getElementById('currentMonthLabel').innerText = `${monthNames[month]} ${year}`;
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        // JS days: 0=Sun, 1=Mon ... We want 1=Mon, 7=Sun
+        let startingDay = firstDay.getDay();
+        if (startingDay === 0) startingDay = 7;
+        
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        // 6 ay (180 gün) sonrası sınırlandırması
+        const maxBookingDate = new Date();
+        maxBookingDate.setDate(maxBookingDate.getDate() + 180);
+        maxBookingDate.setHours(23,59,59,999);
+        
+        // Boş kutular
+        for (let i = 1; i < startingDay; i++) {
+            const div = document.createElement('div');
+            div.className = 'bg-[var(--bg-card)] min-h-[60px] p-2';
+            container.appendChild(div);
+        }
+        
+        // Günler
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const div = document.createElement('div');
+            const loopDate = new Date(year, month, day);
+            const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            const isPast = loopDate < today;
+            const isBeyondLimit = loopDate > maxBookingDate;
+            const isSelected = bookingData.date === dateStr;
+            
+            let classes = 'bg-[var(--bg-card)] min-h-[60px] p-2 flex items-center justify-center cursor-pointer transition-colors hover:bg-[var(--bg-hover)]';
+            if (isPast || isBeyondLimit) {
+                classes = 'bg-[var(--bg-card)] min-h-[60px] p-2 flex items-center justify-center opacity-20 cursor-not-allowed';
+            } else if (isSelected) {
+                classes = 'bg-[var(--accent)] min-h-[60px] p-2 flex items-center justify-center text-[var(--btn-text)] font-bold';
+            }
+            
+            div.className = classes;
+            div.innerHTML = `<span class="text-sm">${day}</span>`;
+            
+            if (!isPast && !isBeyondLimit) {
+                div.onclick = function() { selectDate(dateStr, this); };
+            }
+            
+            container.appendChild(div);
+        }
+    }
+
+    function generateTimeSlots() {
+        const container = document.getElementById('timeSlotsContainer');
+        container.className = 'grid grid-cols-4 gap-2';
+        container.innerHTML = '<p class="col-span-4 text-sm text-center py-4" style="color:var(--text-muted)">Saatler yükleniyor...</p>';
+        
+        const dateStr = bookingData.date;
+        const serviceId = bookingData.serviceId;
+        const staffId = bookingData.staffId || '';
+
+        // AJAX ile gerçek saatleri çek
+        fetch(`/randevu-yonetimi/api/available-times/{{ isletme.slug }}/?date=${dateStr}&service_id=${serviceId}&staff_id=${staffId}`)
+            .then(response => response.json())
+            .then(data => {
+                container.innerHTML = '';
+                if (data.error) {
+                    container.className = 'block';
+                    let errorMsg = data.error;
+                    if (errorMsg.includes('kapalıdır') || errorMsg.includes('izin günü') || errorMsg.includes('hizmet vermemektedir')) {
+                        errorMsg = 'İşletme seçilen tarihte hizmet vermemektedir.';
+                    }
+                    container.innerHTML = `<p class="text-sm text-center py-4 text-rose-500 font-bold">${errorMsg}</p>`;
+                } else if (data.slots && data.slots.length > 0) {
+                    container.className = 'grid grid-cols-4 gap-2';
+                    data.slots.forEach(s => {
+                        const div = document.createElement('div');
+                        div.innerText = s.time;
+                        if (s.available) {
+                            div.className = 'time-slot';
+                            div.onclick = function() { selectTime(s.time, this); };
+                        } else {
+                            div.className = 'time-slot disabled';
+                        }
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.className = 'block';
+                    container.innerHTML = '<p class="text-sm text-center py-4 text-rose-500">Bu gün için uygun saat bulunmuyor.</p>';
+                }
+            })
+            .catch(error => {
+                console.error("Saatler çekilirken hata oluştu:", error);
+                container.className = 'block';
+                container.innerHTML = '<p class="text-sm text-center py-4 text-rose-500">Saatler yüklenemedi. Lütfen tekrar deneyin.</p>';
+            });
+    }
+
+    // Automatically pre-select service if ?service_id=X is passed
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const serviceId = urlParams.get('service_id');
+        if (serviceId) {
+            const card = document.getElementById(`wizard-service-card-${serviceId}`);
+            if (card) {
+                card.click();
+            }
+        }
+
+        // Akıllı 05XX XXX XX XX Telefon Giriş Maskesi (Canlı Formatlama)
+        const phoneInput = document.querySelector('input[name="phone"]');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, ''); // Sadece rakamları al
+                
+                // Türkiye telefon formatı için (eğer sıfırla başlamıyorsa ve hane girilmişse başına sıfır ekle)
+                if (value.length > 0 && !value.startsWith('0')) {
+                    value = '0' + value;
+                }
+                
+                let formattedValue = '';
+                if (value.length > 0) {
+                    formattedValue += value.substring(0, 4); // 05XX
+                }
+                if (value.length > 4) {
+                    formattedValue += ' ' + value.substring(4, 7); // 05XX XXX
+                }
+                if (value.length > 7) {
+                    formattedValue += ' ' + value.substring(7, 9); // 05XX XXX XX
+                }
+                if (value.length > 9) {
+                    formattedValue += ' ' + value.substring(9, 11); // 05XX XXX XX XX
+                }
+                
+                e.target.value = formattedValue.trim();
+            });
+        }
+
+        // Konum Detay Girdileri Dinamik Dinleyicileri
+        const txtAddress = document.getElementById('textarea_customer_address');
+        if (txtAddress) {
+            txtAddress.addEventListener('input', function(e) {
+                bookingData.customerAddress = e.target.value;
+                updateCart();
+            });
+        }
+
+        const selOnlineApp = document.getElementById('select_online_app');
+        if (selOnlineApp) {
+            selOnlineApp.addEventListener('change', function(e) {
+                bookingData.onlineApp = e.target.value;
+                updateCart();
+            });
+        }
+
+        const inputOnlineLink = document.getElementById('input_online_link');
+        if (inputOnlineLink) {
+            inputOnlineLink.addEventListener('input', function(e) {
+                bookingData.onlineLink = e.target.value;
+                updateCart();
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yönlendiriliyorsunuz...</title>
+</head>
+<body style="background: transparent; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; color: #888;">
+    <div style="text-align: center;">
+        <p>İşleminiz tamamlandı. Yönlendiriliyorsunuz, lütfen bekleyin...</p>
+    </div>
+    <script>
+        // Flawlessly break out of the iframe and redirect the top level window!
+        if (window.top && window.top !== window.self) {
+            window.top.location.href = "{{ redirect_url|safe }}";
+        } else {
+            window.location.href = "{{ redirect_url|safe }}";
+        }
+    </script>
+</body>
+</html>

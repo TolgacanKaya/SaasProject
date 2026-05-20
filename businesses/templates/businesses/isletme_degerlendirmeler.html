@@ -1,0 +1,141 @@
+{% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
+
+{% block page_title %}Müşteri Değerlendirmeleri{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h3 class="text-2xl font-extrabold {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %} flex items-center gap-2">
+        {% if isletme.is_premium %}
+            <svg class="w-7 h-7 text-accent animate-pulse" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+            </svg>
+        {% else %}
+            ⭐
+        {% endif %}
+        Müşteri Yorumları
+    </h3>
+</div>
+
+<div class="grid grid-cols-1 gap-6">
+    {% for yorum in degerlendirmeler %}
+    <div class="{% if isletme.is_premium %}bg-slate-900 border-slate-800 shadow-xl{% else %}bg-white border-slate-200 shadow-sm{% endif %} border rounded-2xl p-6 relative">
+        
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h4 class="font-bold {% if isletme.is_premium %}text-white{% else %}text-slate-900{% endif %}">{{ yorum.customer.first_name }} {{ yorum.customer.last_name }}</h4>
+                <p class="text-xs {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">{{ yorum.created_at|date:"d M Y - H:i" }}</p>
+            </div>
+            <div class="flex items-center gap-1 text-amber-400 text-lg">
+                {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= yorum.rating %}★{% else %}<span class="opacity-30">★</span>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <p class="{% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %} italic mb-4 font-medium">
+            "{{ yorum.comment }}"
+        </p>
+
+        {% if yorum.reply %}
+            <div class="mt-4 p-4 rounded-xl {% if isletme.is_premium %}bg-slate-800 border border-slate-700{% else %}bg-indigo-50 border border-indigo-100{% endif %} relative">
+                <div class="absolute -top-3 left-4 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest {% if isletme.is_premium %}bg-amber-500 text-slate-900{% else %}bg-indigo-600 text-white{% endif %}">
+                    Sizin Yanıtınız
+                </div>
+                <p class="text-sm font-medium {% if isletme.is_premium %}text-slate-300{% else %}text-slate-800{% endif %} mt-2">
+                    {{ yorum.reply }}
+                </p>
+                <div class="text-[10px] {% if isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %} mt-2 text-right">
+                    {{ yorum.replied_at|date:"d M Y - H:i" }}'de yanıtlandı.
+                </div>
+            </div>
+        {% else %}
+            <div class="mt-4 pt-4 border-t {% if isletme.is_premium %}border-slate-800{% else %}border-slate-100{% endif %} text-right">
+                <button onclick="openReplyModal({{ yorum.id }}, '{{ yorum.customer.first_name }}')" class="px-5 py-2 rounded-xl text-sm font-bold transition-all
+                    {% if isletme.is_premium %}bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-900{% else %}bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-600 hover:text-white{% endif %}">
+                    💬 Yanıtla
+                </button>
+            </div>
+        {% endif %}
+
+    </div>
+    {% empty %}
+    <div class="text-center py-20 {% if isletme.is_premium %}bg-slate-900/50 border border-slate-800{% else %}bg-slate-50 border border-slate-200{% endif %} rounded-2xl">
+        {% if isletme.is_premium %}
+            <div class="flex justify-center mb-4">
+                <svg class="w-12 h-12 text-slate-700" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499c.195-.558.96-.558 1.156 0l2.122 6.094a1 1 0 00.95.69h6.405c.59 0 .835.756.36 1.127l-5.183 3.966a1 1 0 00-.364 1.118l2.122 6.094c.196.558-.454 1.03-1.156.59l-5.183-3.966a1 1 0 00-1.175 0l-5.183 3.966c-.7.44-1.352-.072-1.156-.59l2.122-6.094a1 1 0 00-.364-1.118L2.244 11.41c-.475-.372-.23-1.127.36-1.127h6.405a1 1 0 00.95-.69l2.122-6.094z"></path>
+                </svg>
+            </div>
+        {% else %}
+            <span class="text-5xl opacity-50 block mb-4">⭐</span>
+        {% endif %}
+        <h4 class="text-lg font-bold {% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %}">Henüz Değerlendirme Yok</h4>
+        <p class="text-sm text-slate-500 mt-2">Müşterileriniz hizmet aldıktan sonra buraya yorum bırakabilecekler.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<div id="replyModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="{% if isletme.is_premium %}bg-slate-900 border border-slate-700{% else %}bg-white border border-slate-200{% endif %} rounded-3xl max-w-lg w-full p-8 shadow-2xl transform scale-95 transition-transform duration-300" id="replyContent">
+        <div class="flex justify-between items-center mb-6 border-b {% if isletme.is_premium %}border-slate-800{% else %}border-slate-100{% endif %} pb-4">
+            <h3 class="text-xl font-bold {% if isletme.is_premium %}text-white{% else %}text-slate-900{% endif %}">Müşteriye Yanıt Ver</h3>
+            <button onclick="closeReplyModal()" class="text-slate-400 hover:text-rose-500 font-bold text-xl">✖</button>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reply_review">
+            <input type="hidden" name="review_id" id="modal_review_id">
+
+            <p class="text-sm {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %} mb-4">
+                <span id="modal_customer_name" class="font-bold {% if isletme.is_premium %}text-amber-400{% else %}text-indigo-600{% endif %}"></span> adlı müşteriye yanıt yazıyorsunuz. Bu yanıt profilinizde herkese açık görünecektir.
+            </p>
+
+            <textarea name="reply_text" rows="4" required placeholder="Örn: Bizi tercih ettiğiniz için teşekkür ederiz. Bir sonraki hizmetinizde sizi ağırlamaktan mutluluk duyarız..." 
+                      class="w-full px-4 py-3 rounded-xl outline-none transition-all font-medium resize-none
+                      {% if isletme.is_premium %}bg-slate-950 border border-slate-800 text-white focus:border-amber-400{% else %}bg-slate-50 border border-slate-200 text-slate-900 focus:ring-2 focus:ring-indigo-500{% endif %}"></textarea>
+
+            <button type="submit" class="w-full py-4 mt-6 font-extrabold text-lg rounded-xl shadow-lg transition-all hover:-translate-y-0.5
+                {% if isletme.is_premium %}bg-amber-500 text-slate-900 hover:bg-amber-400{% else %}bg-indigo-600 text-white hover:bg-indigo-700{% endif %}">
+                Yanıtı Yayınla
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function openReplyModal(id, name) {
+        const modal = document.getElementById('replyModal');
+        const content = document.getElementById('replyContent');
+        
+        document.getElementById('modal_review_id').value = id;
+        document.getElementById('modal_customer_name').innerText = name;
+
+        document.body.appendChild(modal);
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeReplyModal() {
+        const modal = document.getElementById('replyModal');
+        const content = document.getElementById('replyContent');
+
+        modal.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Güvenli Ödeme Çerçevesi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            background: transparent !important;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: {% if randevu.business.is_premium %}rgba(251, 191, 36, 0.2){% else %}rgba(99, 102, 241, 0.2){% endif %};
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: {% if randevu.business.is_premium %}rgba(251, 191, 36, 0.4){% else %}rgba(99, 102, 241, 0.4){% endif %};
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="p-3 md:p-5 text-sm {% if randevu.business.is_premium %}text-slate-300{% else %}text-slate-600{% endif %}">
+
+    <div class="max-w-xl mx-auto">
+        
+        <!-- Messages/Alerts -->
+        {% if messages %}
+            <div class="space-y-2.5 mb-5">
+            {% for message in messages %}
+                <div class="p-4 rounded-xl text-xs font-bold flex items-center gap-2 animate-[fadeIn_0.3s_ease]
+                            {% if message.tags == 'error' %}
+                                {% if randevu.business.is_premium %}bg-rose-500/10 text-rose-400 border border-rose-500/20{% else %}bg-rose-50 text-rose-600 border border-rose-200{% endif %}
+                            {% else %}
+                                {% if randevu.business.is_premium %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}
+                            {% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Coupon Code Card -->
+        <div class="rounded-2xl p-5 border relative overflow-hidden mb-5 transition-all
+                    {% if randevu.business.is_premium %}bg-[#0e0e13]/60 border-amber-500/10{% else %}bg-slate-50/50 border-slate-150{% endif %}">
+            <h4 class="text-xs font-black uppercase tracking-widest mb-3 {% if randevu.business.is_premium %}text-amber-400/90{% else %}text-slate-800{% endif %}">İndirim Kuponu</h4>
+
+            {% if not randevu.coupon_used %}
+            <form method="POST" class="flex gap-2">
+                {% csrf_token %}
+                <div class="relative w-full">
+                    <input type="text" name="coupon_code" placeholder="KUPON KODUNUZ" required
+                           class="w-full rounded-xl px-4 py-2.5 outline-none font-bold uppercase transition-all text-xs
+                                  {% if randevu.business.is_premium %}bg-[#060608] border border-amber-500/15 text-white focus:border-amber-400 placeholder-slate-600
+                                  {% else %}bg-white border border-slate-200 text-slate-900 focus:border-indigo-500 placeholder-slate-400{% endif %}">
+                </div>
+                <button type="submit" class="px-4 py-2.5 font-bold text-xs rounded-xl transition-all whitespace-nowrap active:scale-95
+                               {% if randevu.business.is_premium %}bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:brightness-110
+                               {% else %}bg-slate-900 text-white hover:bg-indigo-600{% endif %}">
+                    Uygula
+                </button>
+            </form>
+            {% else %}
+            <div class="relative p-3.5 rounded-xl border flex items-center justify-between gap-3 overflow-hidden
+                        {% if randevu.business.is_premium %}bg-emerald-500/10 border-emerald-500/20{% else %}bg-emerald-50 border-emerald-200{% endif %}">
+                <div class="flex items-center gap-2.5 font-black text-xs {% if randevu.business.is_premium %}text-emerald-400{% else %}text-emerald-700{% endif %}">
+                    {% if randevu.business.is_premium %}
+                    <svg class="w-5 h-5 text-amber-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 110-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2l5.254.764a1 1 0 01.554 1.705l-3.802 3.705.898 5.232a1 1 0 01-1.451 1.054L11 17.197l-4.7 2.471a1 1 0 01-1.451-1.054l.898-5.232-3.802-3.705a1 1 0 01.554-1.705l5.254-.764 1.212-4.456A1 1 0 0112 2z" clip-rule="evenodd" />
+                    </svg>
+                    {% else %}
+                    <span>🎉</span>
+                    {% endif %}
+                    <div>
+                        <span class="block">İndirim Uygulandı</span>
+                        <span class="block text-[10px] uppercase opacity-75 mt-0.5">KOD: {{ randevu.coupon_used.code }}</span>
+                    </div>
+                </div>
+                <div class="text-right text-xs">
+                    <span class="block text-[9px] font-bold uppercase opacity-75">İndirim</span>
+                    <span class="font-extrabold {% if randevu.business.is_premium %}text-white{% else %}text-slate-900{% endif %}">
+                        {% if randevu.coupon_used.discount_type == 'fixed' %}{{ randevu.coupon_used.discount_value|floatformat:2 }} ₺
+                        {% else %}%{{ randevu.coupon_used.discount_value|floatformat:0 }}{% endif %}
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Receipt Box -->
+        <div class="rounded-2xl p-5 border mb-5
+                    {% if randevu.business.is_premium %}bg-[#0e0e13]/60 border-amber-500/10{% else %}bg-slate-50/50 border-slate-150{% endif %}">
+            
+            <div class="space-y-2 text-xs mb-4">
+                <div class="flex justify-between items-center font-bold">
+                    <span class="{% if randevu.business.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">Hizmet Bedeli</span>
+                    <span class="{% if randevu.business.is_premium %}text-white{% else %}text-slate-800{% endif %}">{{ randevu.service.price|floatformat:2 }} ₺</span>
+                </div>
+
+                {% if randevu.coupon_used %}
+                <div class="flex justify-between items-center font-bold text-emerald-500">
+                    <span>Kupon İndirimi</span>
+                    <span>- {% if randevu.coupon_used.discount_type == 'fixed' %}{{ randevu.coupon_used.discount_value|floatformat:2 }} ₺{% else %}%{{ randevu.coupon_used.discount_value|floatformat:0 }}{% endif %}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Total Price -->
+            <div class="flex justify-between items-center p-4 rounded-xl border
+                        {% if randevu.business.is_premium %}bg-amber-500/10 border-amber-500/25{% else %}bg-slate-900 border-slate-800{% endif %}">
+                <div>
+                    <span class="block font-black text-sm {% if randevu.business.is_premium %}text-amber-400{% else %}text-white{% endif %}">Ödenecek Toplam</span>
+                    <span class="block text-[8px] font-bold uppercase tracking-widest mt-0.5 {% if randevu.business.is_premium %}text-amber-500/50{% else %}text-slate-400{% endif %}">Güvenli Tahsilat</span>
+                </div>
+                <span class="text-2xl font-black {% if randevu.business.is_premium %}text-white{% else %}text-white{% endif %}">
+                    {{ randevu.total_online_charged|floatformat:2 }} <span class="{% if randevu.business.is_premium %}text-amber-400{% else %}text-indigo-400{% endif %}">₺</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Contract Aggreement -->
+        <div class="flex items-start gap-2.5 mb-5 px-1">
+            <input id="contract" type="checkbox" checked class="w-3.5 h-3.5 rounded mt-0.5 cursor-pointer accent-amber-500">
+            <label for="contract" class="text-[10px] font-medium leading-normal cursor-pointer {% if randevu.business.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">
+                <a href="{% url 'on_bilgilendirme' %}" target="_blank" class="font-bold underline {% if randevu.business.is_premium %}text-amber-400{% else %}text-indigo-600{% endif %}">Ön Bilgilendirme Koşulları</a>'nı ve <a href="{% url 'mesafeli_satis' %}" target="_blank" class="font-bold underline {% if randevu.business.is_premium %}text-amber-400{% else %}text-indigo-600{% endif %}">Mesafeli Satış Sözleşmesi</a>'ni onaylıyorum.
+            </label>
+        </div>
+
+        <!-- Card Section Line -->
+        <div class="flex items-center justify-center gap-3 mb-5">
+            <div class="h-px flex-1 {% if randevu.business.is_premium %}bg-amber-500/10{% else %}bg-slate-200{% endif %}"></div>
+            <span class="text-[9px] font-black uppercase tracking-wider {% if randevu.business.is_premium %}text-amber-400/50{% else %}text-slate-400{% endif %}">Güvenli Kart Girişi</span>
+            <div class="h-px flex-1 {% if randevu.business.is_premium %}bg-amber-500/10{% else %}bg-slate-200{% endif %}"></div>
+        </div>
+
+        <!-- Secure Iyzico Form Container -->
+        <div class="rounded-2xl p-2 {% if randevu.business.is_premium %}bg-[#0a0a0f] border border-amber-500/10{% else %}bg-white border border-slate-150{% endif %}">
+            <div id="iyzipay-checkout-form" class="w-full transition-all">
+                {{ iyzico_html|safe }}
+            </div>
+        </div>
+        
+    </div>
+
+</body>
+</html>

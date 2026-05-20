@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Randevu Güncellemesi</title>
+</head>
+<body style="background-color: #fcfcfc; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 40px 20px; color: #334155; -webkit-font-smoothing: antialiased;">
+
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #f1f5f9;">
+
+        <div style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); padding: 40px 30px; text-align: left;">
+            <div style="font-size: 40px; margin-bottom: 10px;"></div>
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Randevunuz Güncellendi</h1>
+            <p style="color: #e0f2fe; margin: 8px 0 0 0; font-size: 15px; font-weight: 500;">{{ randevu.business.name }}</p>
+        </div>
+
+        <div style="padding: 40px 30px;">
+            <h2 style="margin-top: 0; font-size: 20px; color: #0f172a; font-weight: 700;">Merhaba {{ randevu.customer.first_name }},</h2>
+            <p style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 25px;">
+                Almış olduğunuz <strong>{{ randevu.service.name }}</strong> hizmeti randevunuzda teknik bir aksaklık veya personel durumu değişikliği sebebiyle küçük bir güncelleme yapılmıştır.
+            </p>
+
+            <div style="background-color: #f0f9ff; padding: 25px; border-radius: 6px; border: 1px solid #bae6fd; margin-bottom: 30px;">
+                <p style="margin: 0 0 15px 0; font-size: 13px; color: #0369a1; text-transform: uppercase; font-weight: 800;">Yeni Randevu Bilgileriniz</p>
+                <table width="100%" style="border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #e0f2fe;">Tarih:</td>
+                        <td style="padding: 8px 0; color: #0f172a; font-weight: 700; font-size: 15px; text-align: right; border-bottom: 1px solid #e0f2fe;">{{ yeni_tarih_str }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #e0f2fe;">Saat:</td>
+                        <td style="padding: 8px 0; color: #0284c7; font-weight: 800; font-size: 17px; text-align: right; border-bottom: 1px solid #e0f2fe;">{{ yeni_saat_str }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #64748b; font-size: 14px; border-bottom: 1px solid #e0f2fe;">Yeni Uzman:</td>
+                        <td style="padding: 8px 0; color: #0f172a; font-weight: 700; font-size: 15px; text-align: right; border-bottom: 1px solid #e0f2fe;">{{ yeni_personel_adi }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #94a3b8; font-size: 12px; font-style: italic;">Eski Bilgiler:</td>
+                        <td style="padding: 8px 0; color: #94a3b8; font-size: 12px; text-align: right; font-style: italic;"><span style="text-decoration: line-through;">{{ eski_zaman }} / {{ eski_personel_adi }}</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="padding-top: 25px; border-top: 1px dashed #cbd5e1; text-align: left;">
+                <p style="font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 25px;">
+                    İşletme tarafından yapılan bu değişikliği onaylamıyorsanız, randevunuzu dilediğiniz zaman <strong>koşulsuz iptal edebilir</strong> ve ücret iadenizi alabilirsiniz.
+                </p>
+
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="center">
+                            <table border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="border-radius: 8px;" bgcolor="#ef4444">
+                                        <a href="{{ iptal_linki }}" target="_blank" style="font-size: 15px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 8px; padding: 16px 32px; border: 1px solid #ef4444; display: block; font-weight: bold;">
+                                            Sisteme Git ve İptal Et
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <p style="font-size: 13px; color: #64748b; margin-top: 25px;">
+                    Sorularınız için işletmeyi arayabilirsiniz: <br>
+                    <a href="tel:{{ randevu.business.phone }}" style="color: #4f46e5; text-decoration: none; font-weight: bold; font-size: 15px;">{{ randevu.business.phone }}</a>
+                </p>
+            </div>
+        </div>
+
+        <div style="background-color: #fcfcfc; padding: 20px; text-align: left; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 12px; font-weight: 600; color: #94a3b8; margin: 0;">T-Randevu © 2026 SaaS Platformu</p>
+        </div>
+    </div>
+
+</body>
+</html>

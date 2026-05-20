@@ -1,0 +1,249 @@
+{% extends 'base_payment.html' %}
+
+{% block title %}Ödeme ve Onay | {{ randevu.business.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-36 pb-24 relative overflow-hidden font-sans {% if randevu.business.is_premium %}bg-[#09090b]{% else %}bg-slate-50{% endif %}">
+
+    <div class="absolute top-20 left-1/4 w-[400px] h-[400px] {% if randevu.business.is_premium %}bg-amber-500/10{% else %}bg-indigo-500/10{% endif %} rounded-full blur-[100px] animate-blob pointer-events-none"></div>
+    <div class="absolute bottom-10 right-1/4 w-[300px] h-[300px] {% if randevu.business.is_premium %}bg-yellow-500/5{% else %}bg-emerald-500/10{% endif %} rounded-full blur-[80px] animate-blob animation-delay-2000 pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+        <div class="text-center mb-10 animate-[fadeSlideUp_0.6s_ease-out_forwards]">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-5 shadow-sm transform hover:scale-105 transition-transform duration-300
+                        {% if randevu.business.is_premium %}bg-[#18181b] border border-[#27272a] text-amber-500{% else %}bg-indigo-50 border border-indigo-100 text-indigo-600{% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-black mb-3 tracking-tight {% if randevu.business.is_premium %}text-white{% else %}text-slate-900{% endif %}">Güvenli Ödeme Ekranı</h1>
+            <p class="font-medium text-sm max-w-lg mx-auto leading-relaxed {% if randevu.business.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">
+                İşlem bedelini İyzico güvencesiyle ödeyerek randevunuzu anında kesinleştirin.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <div class="rounded-[2rem] p-7 md:p-8 border relative overflow-hidden group
+                            {% if randevu.business.is_premium %}bg-[#18181b] border-[#27272a] shadow-2xl shadow-amber-500/5
+                            {% else %}bg-white border-slate-200 shadow-xl shadow-slate-200/40{% endif %}">
+
+                    <div class="absolute top-0 left-0 w-full h-1.5 opacity-80 group-hover:opacity-100 transition-opacity {% if randevu.business.is_premium %}bg-amber-500{% else %}bg-indigo-600{% endif %}"></div>
+
+                    <h3 class="text-xl font-black mb-6 border-b pb-4 {% if randevu.business.is_premium %}text-white border-[#27272a]{% else %}text-slate-900 border-slate-100{% endif %}">
+                        Randevu Özeti
+                    </h3>
+
+                    <div class="space-y-5">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border
+                                        {% if randevu.business.is_premium %}bg-[#09090b] border-[#27272a] text-amber-500{% else %}bg-indigo-50 border-indigo-100 text-indigo-600{% endif %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" /></svg>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest mb-1 {% if randevu.business.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">İşletme</p>
+                                <p class="font-extrabold text-lg leading-tight {% if randevu.business.is_premium %}text-white{% else %}text-slate-800{% endif %}">{{ randevu.business.name }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border
+                                        {% if randevu.business.is_premium %}bg-[#09090b] border-[#27272a] text-amber-500{% else %}bg-indigo-50 border-indigo-100 text-indigo-600{% endif %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest mb-1 {% if randevu.business.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">Hizmet</p>
+                                <p class="font-extrabold text-lg leading-tight {% if randevu.business.is_premium %}text-white{% else %}text-slate-800{% endif %}">{{ randevu.service.name }}</p>
+                            </div>
+                        </div>
+
+                        {% if randevu.staff %}
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border
+                                        {% if randevu.business.is_premium %}bg-[#09090b] border-[#27272a] text-amber-500{% else %}bg-indigo-50 border-indigo-100 text-indigo-600{% endif %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest mb-1 {% if randevu.business.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">Uzman</p>
+                                <p class="font-extrabold text-lg leading-tight {% if randevu.business.is_premium %}text-white{% else %}text-slate-800{% endif %}">{{ randevu.staff.name }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border
+                                        {% if randevu.business.is_premium %}bg-[#09090b] border-[#27272a] text-amber-500{% else %}bg-indigo-50 border-indigo-100 text-indigo-600{% endif %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008z" /></svg>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest mb-1 {% if randevu.business.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">Tarih & Saat</p>
+                                <p class="font-extrabold text-lg leading-tight flex items-center gap-2 {% if randevu.business.is_premium %}text-white{% else %}text-slate-800{% endif %}">
+                                    {{ randevu.date_time|date:"d F Y" }}
+                                    <span class="{% if randevu.business.is_premium %}text-[#27272a]{% else %}text-slate-200{% endif %}">•</span>
+                                    <span class="{% if randevu.business.is_premium %}text-amber-500{% else %}text-indigo-600{% endif %}">{{ randevu.date_time|time:"H:i" }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl p-5 border flex items-center gap-4
+                            {% if randevu.business.is_premium %}bg-[#18181b] border-[#27272a] text-white{% else %}bg-white border-slate-200 text-slate-800{% endif %}">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0
+                                {% if randevu.business.is_premium %}bg-[#09090b] text-slate-500 border border-[#27272a]{% else %}bg-slate-50 text-slate-400 border border-slate-100{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest mb-0.5 {% if randevu.business.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">Randevu Sahibi</p>
+                        <p class="text-sm font-extrabold leading-tight">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</p>
+                        <p class="text-xs font-medium mt-0.5 {% if randevu.business.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">{{ randevu.customer.phone }}</p>
+                    </div>
+                </div>
+
+                <div class="rounded-[2rem] p-7 md:p-8 border relative overflow-hidden transition-all
+                            {% if randevu.business.is_premium %}bg-[#18181b] border-[#27272a]{% else %}bg-white border-slate-200{% endif %}">
+                    <h3 class="text-lg font-black mb-4 {% if randevu.business.is_premium %}text-white{% else %}text-slate-900{% endif %}">İndirim Kuponu</h3>
+
+                    {% if not randevu.coupon_used %}
+                    <form method="POST" class="flex gap-2">
+                        {% csrf_token %}
+                        <div class="relative w-full group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 {% if randevu.business.is_premium %}text-slate-600 group-focus-within:text-amber-500{% else %}text-slate-400 group-focus-within:text-indigo-600{% endif %} transition-colors"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                            </div>
+                            <input type="text" name="coupon_code" placeholder="Kupon Kodu" required
+                                   class="w-full rounded-xl px-4 py-3.5 pl-10 outline-none font-bold uppercase transition-all text-sm
+                                          {% if randevu.business.is_premium %}bg-[#09090b] border-[#27272a] text-white focus:border-amber-500 placeholder-slate-600
+                                          {% else %}bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-indigo-500 placeholder-slate-400{% endif %}">
+                        </div>
+                        <button type="submit" class="px-5 py-3.5 font-black text-sm rounded-xl transition-all whitespace-nowrap active:scale-95
+                                       {% if randevu.business.is_premium %}bg-amber-500 text-[#09090b] hover:bg-amber-400
+                                       {% else %}bg-slate-900 text-white hover:bg-indigo-600{% endif %}">
+                            Uygula
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="relative p-5 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 overflow-hidden
+                                {% if randevu.business.is_premium %}bg-emerald-500/10 border-emerald-500/30{% else %}bg-emerald-50 border-emerald-200{% endif %}">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl"></div>
+
+                        <div class="flex items-center gap-3 font-black z-10 {% if randevu.business.is_premium %}text-emerald-400{% else %}text-emerald-700{% endif %}">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 {% if randevu.business.is_premium %}bg-emerald-500/20{% else %}bg-emerald-200/50{% endif %}">
+                                {% if randevu.business.is_premium %}
+                                <svg class="w-6 h-6 text-amber-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 110-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2l5.254.764a1 1 0 01.554 1.705l-3.802 3.705.898 5.232a1 1 0 01-1.451 1.054L11 17.197l-4.7 2.471a1 1 0 01-1.451-1.054l.898-5.232-3.802-3.705a1 1 0 01.554-1.705l5.254-.764 1.212-4.456A1 1 0 0112 2z" clip-rule="evenodd" />
+                                </svg>
+                                {% else %}
+                                🎉
+                                {% endif %}
+                            </div>
+                            <div>
+                                <span class="block text-sm">Harika! İndirim Uygulandı</span>
+                                <span class="block text-[10px] uppercase tracking-widest mt-0.5 opacity-80">KOD: {{ randevu.coupon_used.code }}</span>
+                            </div>
+                        </div>
+                        <div class="z-10 text-right">
+                            <span class="block text-[10px] font-bold uppercase tracking-widest {% if randevu.business.is_premium %}text-emerald-500/70{% else %}text-emerald-600/70{% endif %} mb-0.5">Kazancınız</span>
+                            <span class="text-xl font-black {% if randevu.business.is_premium %}text-white{% else %}text-slate-900{% endif %}">
+                                {% if randevu.coupon_used.discount_type == 'fixed' %}{{ randevu.coupon_used.discount_value|floatformat:0 }} ₺
+                                {% else %}%{{ randevu.coupon_used.discount_value|floatformat:0 }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-5 space-y-6">
+
+                {% if messages %}
+                    <div class="space-y-3 mb-4">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-xl text-xs font-bold flex items-center gap-2
+                                    {% if message.tags == 'error' %}
+                                        {% if randevu.business.is_premium %}bg-rose-500/10 text-rose-400 border border-rose-500/20{% else %}bg-rose-50 text-rose-600 border border-rose-200{% endif %}
+                                    {% else %}
+                                        {% if randevu.business.is_premium %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}
+                                    {% endif %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="rounded-[2.5rem] p-7 md:p-8 border relative
+                            {% if randevu.business.is_premium %}bg-[#18181b] border-[#27272a] shadow-2xl
+                            {% else %}bg-white border-slate-100 shadow-xl shadow-slate-200/40{% endif %}">
+
+                    <h3 class="text-xl font-black mb-5 {% if randevu.business.is_premium %}text-white{% else %}text-slate-900{% endif %}">Ödeme Detayı</h3>
+
+                    <div class="space-y-3 text-sm p-5 rounded-2xl border mb-6
+                                {% if randevu.business.is_premium %}bg-[#09090b] border-[#27272a]{% else %}bg-slate-50 border-slate-100{% endif %}">
+
+                        <div class="flex justify-between items-center gap-4 font-bold {% if randevu.business.is_premium %}text-slate-300{% else %}text-slate-600{% endif %}">
+                            <span>Hizmet Bedeli</span>
+                            <span class="{% if randevu.business.is_premium %}text-white{% else %}text-slate-800{% endif %} whitespace-nowrap">{{ randevu.service.price|floatformat:2 }} ₺</span>
+                        </div>
+
+                        {% if randevu.coupon_used %}
+                        <div class="flex justify-between items-center gap-4 font-bold bg-emerald-500/10 p-2 -mx-2 rounded-lg
+                                    {% if randevu.business.is_premium %}text-emerald-400{% else %}text-emerald-600{% endif %}">
+                            <span>Kupon İndirimi</span>
+                            <span class="whitespace-nowrap">- {% if randevu.coupon_used.discount_type == 'fixed' %}{{ randevu.coupon_used.discount_value|floatformat:2 }} ₺{% else %}%{{ randevu.coupon_used.discount_value|floatformat:0 }}{% endif %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex justify-between items-center p-5 rounded-2xl mb-6 border
+                                {% if randevu.business.is_premium %}bg-amber-500/10 border-amber-500/30{% else %}bg-slate-900 border-slate-800 shadow-inner{% endif %}">
+                        <div class="pr-2">
+                            <span class="block font-black text-lg {% if randevu.business.is_premium %}text-amber-500{% else %}text-white{% endif %}">Ödenecek Toplam</span>
+                            <span class="block text-[10px] font-bold mt-1 uppercase tracking-widest {% if randevu.business.is_premium %}text-amber-500/60{% else %}text-slate-400{% endif %}">GÜVENLİ TAHSİLAT</span>
+                        </div>
+                        <span class="text-3xl font-black whitespace-nowrap drop-shadow-md {% if randevu.business.is_premium %}text-white{% else %}text-white{% endif %}">
+                            {{ randevu.total_online_charged|floatformat:2 }} <span class="{% if randevu.business.is_premium %}text-amber-500{% else %}text-indigo-400{% endif %}">₺</span>
+                        </span>
+                    </div>
+
+                    <div class="w-full relative">
+
+                        <div class="flex items-start gap-3 mb-5 px-1">
+                            <div class="flex items-center h-5 mt-0.5">
+                                <input id="contract" type="checkbox" checked class="w-4 h-4 rounded transition-all cursor-pointer
+                                       {% if randevu.business.is_premium %}bg-[#09090b] border-[#27272a] text-amber-500 focus:ring-amber-500{% else %}border-slate-300 text-indigo-600 focus:ring-indigo-600{% endif %}">
+                            </div>
+                            <label for="contract" class="text-[11px] font-medium leading-tight cursor-pointer {% if randevu.business.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">
+                                <a href="{% url 'on_bilgilendirme' %}" target="_blank" class="font-bold underline hover:text-indigo-500 transition-colors {% if randevu.business.is_premium %}hover:text-amber-400{% endif %}">Ön Bilgilendirme Koşulları</a>'nı ve <a href="{% url 'mesafeli_satis' %}" target="_blank" class="font-bold underline hover:text-indigo-500 transition-colors {% if randevu.business.is_premium %}hover:text-amber-400{% endif %}">Mesafeli Satış Sözleşmesi</a>'ni okudum, onaylıyorum.
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-center gap-3 mb-4">
+                            <div class="h-px flex-1 {% if randevu.business.is_premium %}bg-[#27272a]{% else %}bg-slate-200{% endif %}"></div>
+                            <span class="text-[10px] font-black uppercase tracking-widest px-2 {% if randevu.business.is_premium %}text-slate-500 bg-[#18181b]{% else %}text-slate-400 bg-white{% endif %}">Kart Bilgileri</span>
+                            <div class="h-px flex-1 {% if randevu.business.is_premium %}bg-[#27272a]{% else %}bg-slate-200{% endif %}"></div>
+                        </div>
+
+                        <div id="iyzipay-checkout-form" class="w-full transition-all relative z-10">
+                            {{ iyzico_html|safe }}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes blob { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(20px, -30px) scale(1.1); } 66% { transform: translate(-10px, 10px) scale(0.9); } 100% { transform: translate(0, 0) scale(1); } }
+    .animate-blob { animation: blob 10s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+</style>
+{% endblock %}

@@ -4,16 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:;">
     <title>{% block title %}T-Randevu SaaS{% endblock %}</title>
 
     <link rel="icon" type="image/png" href="{% static 'logo.png' %}">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style type="text/tailwindcss">
         body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+    </style>
+    <style>
+        :root {
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Net, şık ve hissedilebilir mikro etkileşimler */
+        .interactive-card {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+        .interactive-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .interactive-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+        .interactive-btn:active {
+            transform: scale(0.96);
+        }
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -80,6 +106,7 @@
         {% endblock %}
     </main>
 
+    {% block footer %}
     <footer class="bg-slate-950 pt-12 pb-8 border-t border-slate-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left mb-8">
@@ -108,11 +135,14 @@
                         <li><a href="{% url 'iletisim' %}" class="hover:text-indigo-400 transition-colors">İletişim</a></li>
                     </ul>
                 </div>
+
                 <div>
                     <h4 class="text-white font-bold mb-4">Gizlilik & Kullanım Koşulları</h4>
                     <ul class="space-y-2 text-sm text-slate-400">
                         <li><a href="{% url 'kosullar' %}" class="hover:text-indigo-400 transition-colors">Kullanım Koşulları</a></li>
                         <li><a href="{% url 'gizlilik' %}" class="hover:text-indigo-400 transition-colors">Gizlilik Politikası</a></li>
+                        <li><a href="{% url 'on_bilgilendirme' %}" class="hover:text-indigo-400 transition-colors">Ön Bilgilendirme Koşulları</a></li>
+                        <li><a href="{% url 'mesafeli_satis' %}" class="hover:text-indigo-400 transition-colors">Mesafeli Satış Sözleşmesi</a></li>
                     </ul>
                 </div>
             </div>
@@ -121,6 +151,7 @@
             </div>
         </div>
     </footer>
+    {% endblock footer %}
 
     {% block extra_js %}{% endblock %}
 
@@ -151,23 +182,24 @@
             const iconMuted = document.getElementById('icon-muted');
             const btn = document.getElementById('music-toggle-btn');
 
-            audio.volume = 0.15;
+            if (audio) {
+                audio.volume = 0.15;
+                const isMusicMuted = localStorage.getItem('tRandevuMusicMuted') === 'true';
 
-            const isMusicMuted = localStorage.getItem('tRandevuMusicMuted') === 'true';
-
-            if (isMusicMuted) {
-                // Sessiz durumu
-                iconPlaying.classList.add('hidden');
-                iconMuted.classList.remove('hidden');
-                btn.classList.add('opacity-50');
-            } else {
-                const startMusicInteraction = function() {
-                    if (localStorage.getItem('tRandevuMusicMuted') !== 'true') {
-                        audio.play().catch(e => console.log("Otomatik oynatma engellendi."));
-                    }
-                    document.removeEventListener('click', startMusicInteraction);
-                };
-                document.addEventListener('click', startMusicInteraction);
+                if (isMusicMuted) {
+                    // Sessiz durumu
+                    iconPlaying.classList.add('hidden');
+                    iconMuted.classList.remove('hidden');
+                    btn.classList.add('opacity-50');
+                } else {
+                    const startMusicInteraction = function() {
+                        if (localStorage.getItem('tRandevuMusicMuted') !== 'true') {
+                            audio.play().catch(e => console.log("Otomatik oynatma engellendi."));
+                        }
+                        document.removeEventListener('click', startMusicInteraction);
+                    };
+                    document.addEventListener('click', startMusicInteraction);
+                }
             }
         });
 

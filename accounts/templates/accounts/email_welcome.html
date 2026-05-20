@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Randevu'ya Hoş Geldiniz!</title>
+    <style>
+        body {
+            font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #334155;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .header {
+            background-color: #0f172a; border-bottom: 3px solid #f59e0b;
+            padding: 48px 32px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+            position: relative;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            color: #0f172a;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header p {
+            margin: 8px 0 0 0;
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 32px;
+        }
+        .greeting {
+            font-size: 20px;
+            font-weight: 800;
+            color: #f59e0b;
+            margin-bottom: 16px;
+        }
+        .lead {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin-bottom: 32px;
+        }
+        .steps {
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        .step-item {
+            margin-bottom: 20px;
+        }
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+        .step-num {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            border-radius: 50%;
+            background-color: #f59e0b;
+            color: #0f172a;
+            font-weight: 800;
+            text-align: left;
+            margin-right: 12px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        .step-text {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 15px;
+            font-weight: 600;
+            color: #e2e8f0;
+            width: calc(100% - 48px);
+        }
+        .button-wrapper {
+            text-align: left;
+            margin: 40px 0;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #0f172a; border-bottom: 3px solid #f59e0b;
+            color: #0f172a !important;
+            text-decoration: none;
+            padding: 16px 36px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+            box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
+            transition: all 0.2s ease;
+        }
+        .footer {
+            background-color: #090d16;
+            padding: 32px;
+            text-align: left;
+            border-top: 1px solid #334155;
+        }
+        .footer p {
+            margin: 0;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .footer a {
+            color: #f59e0b;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>T-RANDEVU</h1>
+            <p>Yönetim Merkezine Hoş Geldiniz, Patron!</p>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <div class="greeting">Merhaba, {{ user.username }}! </div>
+            <p class="lead">
+                Harika bir karar verdiniz! <strong>{{ isletme_adi }}</strong> işletmenizi dijital dünyaya başarıyla taşıdınız. Artık randevu karmaşasına, defter karalamalarına ve telefon meşgullerine son verme zamanı geldi.
+            </p>
+
+            <div class="greeting">Başlamak İçin 3 Basit Adım </div>
+            <div class="steps">
+                <div class="step-item">
+                    <span class="step-num">1</span>
+                    <span class="step-text"><strong>Çalışanlarınızı Tanımlayın:</strong> Panele girerek uzman ekibinizi ekleyin ve çalışma saatlerini belirleyin.</span>
+                </div>
+                <div class="step-item">
+                    <span class="step-num">2</span>
+                    <span class="step-text"><strong>Hizmetleri Belirleyin:</strong> Saç kesimi, SPA, makyaj vb. sunduğunuz hizmetleri fiyat ve süreleriyle kaydedin.</span>
+                </div>
+                <div class="step-item">
+                    <span class="step-num">3</span>
+                    <span class="step-text"><strong>Vitrin Linkinizi Paylaşın:</strong> Size özel oluşturulan rezervasyon linkini Instagram ve web sitenize ekleyerek anında online ödemeli randevular almaya başlayın!</span>
+                </div>
+            </div>
+
+            <div class="button-wrapper">
+                <a href="{{ site_url }}/hesap/giris/" class="btn">Kontrol Paneline Git </a>
+            </div>
+
+            <p class="lead" style="margin-bottom: 0; font-size: 15px; text-align: left; color: #94a3b8;">
+                Sorularınız mı var? Ekibimiz her zaman yardıma hazır. Bu e-postaya yanıt yazarak bize dilediğiniz zaman ulaşabilirsiniz.
+            </p>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>© 2026 T-Randevu Teknolojileri A.Ş. Tüm hakları saklıdır.</p>
+            <p style="margin-top: 8px;"><a href="{{ site_url }}">T-Randevu</a> • Dijital Salon Yönetim Sistemi</p>
+        </div>
+    </div>
+</body>
+</html>

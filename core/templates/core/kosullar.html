@@ -3,104 +3,266 @@
 {% block title %}Kullanım Koşulları | T-Randevu{% endblock %}
 
 {% block content %}
-<div class="bg-slate-50 min-h-screen pb-24 font-sans">
-    <div class="bg-slate-950 pt-36 pb-36 border-b border-slate-800 relative overflow-hidden">
+<!-- 🌟 OKUMA İLERLEME ÇUBUĞU (Reading Progress Bar) -->
+<div class="fixed top-0 left-0 w-full h-1 bg-slate-800 z-50">
+    <div id="progressBar" class="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 w-0 transition-all duration-150"></div>
+</div>
 
+<div class="bg-slate-900 min-h-screen font-sans text-slate-100 overflow-hidden selection:bg-amber-500 selection:text-slate-950 pb-24">
+    
+    <!-- 🌟 HERO BÖLÜMÜ (ULTRA-PREMIUM DARK MESH GRADIENT) -->
+    <div class="relative pt-36 pb-32 bg-slate-950 border-b border-slate-800/80 shadow-2xl overflow-hidden">
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-amber-600/20 rounded-full blur-[100px] animate-blob"></div>
-            <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-orange-500/10 rounded-full blur-[80px] animate-blob animation-delay-2000"></div>
+            <div class="absolute top-10 left-1/4 w-[500px] h-[500px] bg-amber-600/20 rounded-full blur-[140px] animate-pulse"></div>
+            <div class="absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-orange-500/15 rounded-full blur-[120px] animate-blob animation-delay-2000"></div>
         </div>
 
-        <div class="max-w-4xl mx-auto px-4 text-center relative z-10 animate-[fadeSlideUp_0.8s_ease-out_forwards]">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-amber-200 text-xs font-bold mb-6 backdrop-blur-md shadow-lg shadow-amber-500/10">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+        <!-- İnce Grid Deseni -->
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-25"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10 animate-[fadeSlideUp_0.8s_ease-out_forwards]">
+            <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900/90 border border-amber-500/30 text-amber-300 text-xs font-extrabold mb-8 backdrop-blur-xl shadow-[0_0_25px_rgba(251,191,36,0.15)] tracking-wide uppercase">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
                 Yasal Bilgilendirme
             </div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight drop-shadow-lg">
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white mb-6 tracking-tight font-display drop-shadow-2xl">
                 Kullanım Koşulları
             </h1>
-            <p class="text-base md:text-lg text-slate-400 font-medium">Son Güncelleme: <span class="text-amber-400 font-bold">19 Mart 2026</span></p>
+            <p class="text-base sm:text-xl lg:text-2xl text-slate-400 font-medium max-w-2xl mx-auto">
+                Son Güncelleme: <span class="text-amber-400 font-bold">19 Mart 2026</span>
+            </p>
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 -mt-24 relative z-20">
-        <div class="bg-white p-8 md:p-14 rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 relative overflow-hidden transition-all duration-500 hover:shadow-amber-500/5">
-
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>
-
-            <div class="space-y-4">
-
-                <div class="group p-6 -mx-6 rounded-3xl hover:bg-slate-50 transition-colors duration-300">
-                    <h3 class="text-xl font-black text-slate-900 mb-3 flex items-center gap-4">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 text-sm font-black shadow-inner border border-amber-100/50 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300 shrink-0">1</span>
-                        Taraflar ve Kabul
-                    </h3>
-                    <p class="text-slate-600 leading-relaxed pl-14 font-medium">
-                        Bu kullanım koşulları, T-Randevu (SaaS Platformu) ile platforma kayıt olan "İşletme" ve platformu randevu almak için kullanan "Müşteri" arasındaki hukuki ilişkiyi düzenler. Platformu kullanan her birey veya kurum, bu koşulları peşinen kabul etmiş sayılır.
-                    </p>
-                </div>
-
-                <div class="group p-6 -mx-6 rounded-3xl hover:bg-slate-50 transition-colors duration-300">
-                    <h3 class="text-xl font-black text-slate-900 mb-3 flex items-center gap-4">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 text-sm font-black shadow-inner border border-amber-100/50 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300 shrink-0">2</span>
-                        Hizmetin Tanımı ve Sınırları
-                    </h3>
-                    <p class="text-slate-600 leading-relaxed pl-14 font-medium">
-                        T-Randevu, işletmelere dijital bir randevu takip ve müşteri yönetimi (CRM) altyapısı sunan bir yazılımdır. Platform, işletme ile müşteri arasında gerçekleşen hizmet kalitesinden, ödemelerden veya ortaya çıkabilecek uyuşmazlıklardan sorumlu tutulamaz. T-Randevu yalnızca bir teknik altyapı sağlayıcısıdır.
-                    </p>
-                </div>
-
-                <div class="group p-6 -mx-6 rounded-3xl hover:bg-slate-50 transition-colors duration-300">
-                    <h3 class="text-xl font-black text-slate-900 mb-3 flex items-center gap-4">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 text-sm font-black shadow-inner border border-amber-100/50 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300 shrink-0">3</span>
-                        Abonelik ve Ödemeler
-                    </h3>
-                    <p class="text-slate-600 leading-relaxed pl-14 font-medium">
-                        Premium üyelik satın alan işletmeler, seçtikleri paket dahilindeki özellikleri kullanma hakkına sahip olur. Abonelik ücretleri, aksi belirtilmedikçe iade edilemez. Sistem üzerinden alınan online randevu ödemelerinde uygulanan komisyon oranları ve işlem bedelleri, ödeme sayfasında işletmeye şeffaf bir şekilde gösterilir.
-                    </p>
-                </div>
-
-                <div class="group p-6 -mx-6 rounded-3xl hover:bg-slate-50 transition-colors duration-300">
-                    <h3 class="text-xl font-black text-slate-900 mb-3 flex items-center gap-4">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 text-sm font-black shadow-inner border border-amber-100/50 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300 shrink-0">4</span>
-                        Hesap Güvenliği ve İptal
-                    </h3>
-                    <p class="text-slate-600 leading-relaxed pl-14 font-medium">
-                        Kullanıcılar, hesap şifrelerinin güvenliğinden kendileri sorumludur. T-Randevu, yasadışı, ahlaka aykırı veya platformun güvenliğini tehdit eden kullanımlarda önceden haber vermeksizin hesapları dondurma veya iptal etme hakkını saklı tutar.
-                    </p>
-                </div>
-
-                <div class="group p-6 -mx-6 rounded-3xl hover:bg-slate-50 transition-colors duration-300">
-                    <h3 class="text-xl font-black text-slate-900 mb-3 flex items-center gap-4">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 text-sm font-black shadow-inner border border-amber-100/50 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300 shrink-0">5</span>
-                        Kesintiler ve Güncellemeler
-                    </h3>
-                    <p class="text-slate-600 leading-relaxed pl-14 font-medium">
-                        Platform, %99.9 çalışma süresi (uptime) hedeflemekle birlikte; bakım, güncelleme veya mücbir sebeplerden kaynaklı kısa süreli erişim kesintilerinden sorumlu tutulamaz. Sistem güncellemeleri, kullanıcı deneyimini iyileştirmek amacıyla düzenli olarak yapılır.
-                    </p>
-                </div>
+    <!-- 🌟 İÇERİK GRID YAPISI (Sticky TOC + Madde Alanı) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 -mt-16 relative z-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- SOL KOLON: Sayfayla Kayan İçindekiler Menüsü (Sticky TOC) -->
+            <div class="lg:col-span-4 sticky top-8 bg-slate-950/90 backdrop-blur-2xl p-6 sm:p-8 rounded-[2rem] border border-slate-800 shadow-2xl hidden lg:block">
+                <h4 class="text-sm font-extrabold text-white font-display uppercase tracking-widest mb-6 flex items-center gap-3">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    Hızlı Gezinme
+                </h4>
+                <nav class="space-y-2 text-sm font-medium" id="tocNav">
+                    <a href="#madde-1" class="toc-link block py-2.5 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition-all">1. Taraflar ve Kabul</a>
+                    <a href="#madde-2" class="toc-link block py-2.5 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition-all">2. Hizmetin Tanımı ve Sınırları</a>
+                    <a href="#madde-3" class="toc-link block py-2.5 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition-all">3. Abonelik ve Ödemeler</a>
+                    <a href="#madde-4" class="toc-link block py-2.5 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition-all">4. Hesap Güvenliği ve İptal</a>
+                    <a href="#madde-5" class="toc-link block py-2.5 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition-all">5. Kesintiler ve Güncellemeler</a>
+                    <a href="#madde-6" class="toc-link block py-2.5 px-4 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition-all">6. Güvenlik ve Kara Liste</a>
+                </nav>
             </div>
 
-            <div class="mt-8 bg-amber-50 border border-amber-100 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    </div>
-                    <div>
-                        <h4 class="text-amber-900 font-bold text-sm">Sorularınız mı var?</h4>
-                        <p class="text-amber-700 text-xs font-medium mt-0.5">Platform kuralları hakkında aklınıza takılan her şeyi bize sorabilirsiniz.</p>
-                    </div>
-                </div>
-                <a href="{% url 'iletisim' %}" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-xl transition-all shadow-md hover:shadow-lg whitespace-nowrap w-full sm:w-auto text-center">
-                    İletişime Geç
-                </a>
-            </div>
+            <!-- SAĞ KOLON: Metin İçeriği (Main Content) -->
+            <div class="lg:col-span-8 bg-slate-950/90 backdrop-blur-2xl p-8 sm:p-14 rounded-[2.5rem] border border-slate-800 shadow-2xl relative overflow-hidden transition-all" id="mainContentArea">
 
+                <!-- Ambient Glow inside container -->
+                <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+                <div class="space-y-8">
+
+                    <!-- Madde 1 -->
+                    <div id="madde-1" class="interactive-card scroll-mt-24 bg-slate-900/40 p-6 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-amber-500/30 transition-all group relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl sm:text-2xl font-black text-white font-display flex items-center gap-4 tracking-tight">
+                                <span class="flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 text-base font-black border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shrink-0 shadow-sm">1</span>
+                                Taraflar ve Kabul
+                            </h3>
+                            <button onclick="copyAnchorLink('madde-1')" class="opacity-0 group-hover:opacity-100 p-2.5 text-slate-500 hover:text-amber-400 transition-all rounded-xl hover:bg-slate-900" title="Bağlantıyı Kopyala">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-300 leading-relaxed pl-4 sm:pl-16 font-medium text-base sm:text-lg resize-text">
+                            Bu kullanım koşulları, T-Randevu (SaaS Platformu) ile platforma kayıt olan "İşletme" ve platformu randevu almak için kullanan "Müşteri" arasındaki hukuki ilişkiyi düzenler. Platformu kullanan her birey veya kurum, bu koşulları peşinen kabul etmiş sayılır.
+                        </p>
+                    </div>
+
+                    <!-- Madde 2 -->
+                    <div id="madde-2" class="interactive-card scroll-mt-24 bg-slate-900/40 p-6 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-amber-500/30 transition-all group relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl sm:text-2xl font-black text-white font-display flex items-center gap-4 tracking-tight">
+                                <span class="flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 text-base font-black border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shrink-0 shadow-sm">2</span>
+                                Hizmetin Tanımı ve Sınırları
+                            </h3>
+                            <button onclick="copyAnchorLink('madde-2')" class="opacity-0 group-hover:opacity-100 p-2.5 text-slate-500 hover:text-amber-400 transition-all rounded-xl hover:bg-slate-900" title="Bağlantıyı Kopyala">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-300 leading-relaxed pl-4 sm:pl-16 font-medium text-base sm:text-lg resize-text">
+                            T-Randevu, işletmelere dijital bir randevu takip ve müşteri yönetimi (CRM) altyapısı sunan bir yazılımdır. Platform, işletme ile müşteri arasında gerçekleşen hizmet kalitesinden, ödemelerden veya ortaya çıkabilecek uyuşmazlıklardan sorumlu tutulamaz. T-Randevu yalnızca bir teknik altyapı sağlayıcısıdır.
+                        </p>
+                    </div>
+
+                    <!-- Madde 3 -->
+                    <div id="madde-3" class="interactive-card scroll-mt-24 bg-slate-900/40 p-6 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-amber-500/30 transition-all group relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl sm:text-2xl font-black text-white font-display flex items-center gap-4 tracking-tight">
+                                <span class="flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 text-base font-black border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shrink-0 shadow-sm">3</span>
+                                Abonelik ve Ödemeler
+                            </h3>
+                            <button onclick="copyAnchorLink('madde-3')" class="opacity-0 group-hover:opacity-100 p-2.5 text-slate-500 hover:text-amber-400 transition-all rounded-xl hover:bg-slate-900" title="Bağlantıyı Kopyala">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-300 leading-relaxed pl-4 sm:pl-16 font-medium text-base sm:text-lg resize-text">
+                            Premium üyelik satın alan işletmeler, seçtikleri paket dahilindeki özellikleri kullanma hakkına sahip olur. Premium abonelikler, aksi iptal edilmediği sürece her fatura döneminde (aylık/yıllık) otomatik olarak yenilenir. İşletme dilediği an aboneliğini iptal edebilir; iptal durumunda dönem sonuna kadar özellikleri kullanmaya devam eder ancak yeni dönem için ücret çekilmez. Abonelik ücretleri, aksi belirtilmedikçe iade edilemez. Sistem üzerinden alınan online randevu ödemelerinde uygulanan komisyon oranları ve işlem bedelleri, ödeme sayfasında işletmeye şeffaf bir şekilde gösterilir.
+                        </p>
+                    </div>
+
+                    <!-- Madde 4 -->
+                    <div id="madde-4" class="interactive-card scroll-mt-24 bg-slate-900/40 p-6 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-amber-500/30 transition-all group relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl sm:text-2xl font-black text-white font-display flex items-center gap-4 tracking-tight">
+                                <span class="flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 text-base font-black border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shrink-0 shadow-sm">4</span>
+                                Hesap Güvenliği ve İptal
+                            </h3>
+                            <button onclick="copyAnchorLink('madde-4')" class="opacity-0 group-hover:opacity-100 p-2.5 text-slate-500 hover:text-amber-400 transition-all rounded-xl hover:bg-slate-900" title="Bağlantıyı Kopyala">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-300 leading-relaxed pl-4 sm:pl-16 font-medium text-base sm:text-lg resize-text">
+                            Kullanıcılar, hesap şifrelerinin güvenliğinden kendileri sorumludur. T-Randevu, yasadışı, ahlaka aykırı veya platformun güvenliğini tehdit eden kullanımlarda önceden haber vermeksizin hesapları dondurma veya iptal etme hakkını saklı tutar.
+                        </p>
+                    </div>
+
+                    <!-- Madde 5 -->
+                    <div id="madde-5" class="interactive-card scroll-mt-24 bg-slate-900/40 p-6 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-amber-500/30 transition-all group relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl sm:text-2xl font-black text-white font-display flex items-center gap-4 tracking-tight">
+                                <span class="flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 text-base font-black border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shrink-0 shadow-sm">5</span>
+                                Kesintiler ve Güncellemeler
+                            </h3>
+                            <button onclick="copyAnchorLink('madde-5')" class="opacity-0 group-hover:opacity-100 p-2.5 text-slate-500 hover:text-amber-400 transition-all rounded-xl hover:bg-slate-900" title="Bağlantıyı Kopyala">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-300 leading-relaxed pl-4 sm:pl-16 font-medium text-base sm:text-lg resize-text">
+                            Platform, %99.9 çalışma süresi (uptime) hedeflemekle birlikte; bakım, güncelleme veya mücbir sebeplerden kaynaklı kısa süreli erişim kesintilerinden sorumlu tutulamaz. Sistem güncellemeleri, kullanıcı deneyimini iyileştirmek amacıyla düzenli olarak yapılır.
+                        </p>
+                    </div>
+
+                    <!-- Madde 6 -->
+                    <div id="madde-6" class="interactive-card scroll-mt-24 bg-slate-900/40 p-6 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-amber-500/30 transition-all group relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl sm:text-2xl font-black text-white font-display flex items-center gap-4 tracking-tight">
+                                <span class="flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 text-base font-black border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all shrink-0 shadow-sm">6</span>
+                                Güvenlik ve Kara Liste
+                            </h3>
+                            <button onclick="copyAnchorLink('madde-6')" class="opacity-0 group-hover:opacity-100 p-2.5 text-slate-500 hover:text-amber-400 transition-all rounded-xl hover:bg-slate-900" title="Bağlantıyı Kopyala">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-300 leading-relaxed pl-4 sm:pl-16 font-medium text-base sm:text-lg resize-text">
+                            Platform üzerinden sunulan indirim kuponlarının, kampanya kodlarının veya fırsatların kötüye kullanılması, hileli yollarla birden multiple kez aktive edilmesi, asılsız veya spam rezervasyonlar oluşturulması kesinlikle yasaktır. Bu gibi durumlarda ilgili işletmeler veya T-Randevu platformu, şüpheli telefon numaralarını tek taraflı olarak <strong class="text-white font-bold">"lokal olarak engelleme"</strong> veya <strong class="text-white font-bold">"global kara listeye (ban) alma"</strong> hakkına sahiptir. Engellenen telefon numaraları platform üzerinden hiçbir dükkan için randevu oluşturamaz.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Destek Afişi -->
+                <div class="mt-12 bg-amber-500/5 border border-amber-500/20 rounded-2xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center shrink-0 border border-amber-500/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-black font-display text-lg tracking-tight">Sorularınız mı var?</h4>
+                            <p class="text-slate-400 text-sm font-medium mt-1 leading-relaxed">Platform kuralları hakkında aklınıza takılan her şeyi bize sorabilirsiniz.</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'iletisim' %}" class="interactive-btn px-8 py-4 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-sm rounded-2xl shadow-lg shadow-amber-500/20 whitespace-nowrap w-full sm:w-auto text-center">
+                        İletişime Geç
+                    </a>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
+
+<!-- 🔎 BOYUT AYARLAYICI (Floating Accessibility Widget) -->
+<div class="fixed bottom-6 right-6 z-50 flex items-center gap-1.5 p-2 bg-slate-950/90 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl">
+    <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider px-2">Boyut:</span>
+    <button onclick="changeTextSize(-1)" class="w-8 h-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold flex items-center justify-center text-xs transition-all" title="Küçült">A-</button>
+    <button onclick="changeTextSize(0)" class="w-8 h-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold flex items-center justify-center text-xs transition-all" title="Sıfırla">A</button>
+    <button onclick="changeTextSize(1)" class="w-8 h-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold flex items-center justify-center text-xs transition-all" title="Büyüt">A+</button>
+</div>
+
+<!-- 🍞 TOAST NOTIFICATION -->
+<div id="toastNotification" class="fixed bottom-6 left-6 z-50 flex items-center gap-3 bg-slate-950 border border-slate-800 px-6 py-4 rounded-2xl shadow-2xl opacity-0 translate-y-5 transition-all duration-300 pointer-events-none">
+    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
+    <span class="text-sm font-bold text-white" id="toastText">Bağlantı kopyalandı!</span>
+</div>
+
+{% block extra_js %}
+<script>
+    // Okuma İlerleme Çubuğu & ScrollSpy
+    document.addEventListener("scroll", function() {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById("progressBar").style.width = scrolled + "%";
+
+        // ScrollSpy
+        const sections = document.querySelectorAll(".interactive-card[id]");
+        const tocLinks = document.querySelectorAll(".toc-link");
+
+        let currentSection = "";
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 150;
+            if (winScroll >= sectionTop) {
+                currentSection = section.getAttribute("id");
+            }
+        });
+
+        tocLinks.forEach(link => {
+            link.classList.remove("bg-slate-900", "text-amber-400", "font-bold");
+            if (link.getAttribute("href") === "#" + currentSection) {
+                link.classList.add("bg-slate-900", "text-amber-400", "font-bold");
+            }
+        });
+    });
+
+    // Bağlantı Kopyalama
+    function copyAnchorLink(anchorId) {
+        const url = window.location.origin + window.location.pathname + "#" + anchorId;
+        navigator.clipboard.writeText(url).then(() => {
+            showToast("Madde bağlantısı kopyalandı!");
+        });
+    }
+
+    function showToast(text) {
+        const toast = document.getElementById("toastNotification");
+        document.getElementById("toastText").innerText = text;
+        toast.classList.remove("opacity-0", "translate-y-5");
+        toast.classList.add("opacity-100", "translate-y-0");
+
+        setTimeout(() => {
+            toast.classList.remove("opacity-100", "translate-y-0");
+            toast.classList.add("opacity-0", "translate-y-5");
+        }, 300);
+    }
+
+    // Metin Boyutu Ayarlama
+    let currentScale = 0;
+    function changeTextSize(step) {
+        const elements = document.querySelectorAll(".resize-text");
+        if (step === 0) {
+            currentScale = 0;
+        } else {
+            currentScale += step;
+            if (currentScale < -2) currentScale = -2;
+            if (currentScale > 3) currentScale = 3;
+        }
+
+        elements.forEach(el => {
+            el.style.fontSize = (18 + currentScale * 2) + "px";
+        });
+        showToast(step === 0 ? "Metin boyutu sıfırlandı." : (step > 0 ? "Metin büyütüldü." : "Metin küçültüldü."));
+    }
+</script>
+{% endblock %}
 
 <style>
     @keyframes fadeSlideUp {
@@ -109,11 +271,11 @@
     }
     @keyframes blob {
         0% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(20px, -30px) scale(1.1); }
-        66% { transform: translate(-10px, 10px) scale(0.9); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
         100% { transform: translate(0, 0) scale(1); }
     }
-    .animate-blob { animation: blob 10s infinite; }
+    .animate-blob { animation: blob 12s infinite; }
     .animation-delay-2000 { animation-delay: 2s; }
 </style>
 {% endblock %}

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:;">
     <title>{% block title %}VIP Panel{% endblock %} | {{ isletme.name }}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -35,6 +36,49 @@
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; border: 2px solid #09090b; }
         ::-webkit-scrollbar-thumb:hover { background: #eab308; }
+
+        /* ── PREMIUM GLOW BUTTON ── */
+        .premium-glow-btn {
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            background: linear-gradient(135deg, #fbbf24, #d97706) !important;
+            color: #08080f !important;
+            box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.4), 0 0 0 0 rgba(251, 191, 36, 0) !important;
+            @apply font-black;
+        }
+
+        .premium-glow-btn:hover {
+            transform: translateY(-3px) scale(1.02) !important;
+            box-shadow: 0 20px 35px -8px rgba(217, 119, 6, 0.5), 0 0 25px rgba(251, 191, 36, 0.4) !important;
+        }
+
+        .premium-glow-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: rotate(30deg);
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+
+        .premium-glow-btn:hover::after {
+            left: 140%;
+        }
+
+        @keyframes gold-float-glow {
+            0%, 100% { box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.4), 0 0 15px rgba(251, 191, 36, 0.2); }
+            50% { box-shadow: 0 15px 40px -5px rgba(217, 119, 6, 0.6), 0 0 35px rgba(251, 191, 36, 0.5); }
+        }
+
+        .premium-glow-animate {
+            animation: gold-float-glow 3s ease-in-out infinite;
+        }
 
         .premium-card {
             @apply bg-card border border-border rounded-2xl transition-all duration-300;
@@ -102,6 +146,94 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+    </style>
+
+    <style>
+        /* ── RAW CSS PREMIUM OVERRIDES ── */
+        select, .premium-select {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23eab308' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 1.25rem center !important;
+            background-size: 1rem !important;
+            background-color: #09090b !important;
+            border: 1px solid #27272a !important;
+            color: #ffffff !important;
+            padding: 0.875rem 3rem 0.875rem 1.25rem !important;
+            border-radius: 1rem !important;
+            font-weight: 700 !important;
+            font-size: 0.875rem !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+            cursor: pointer !important;
+            width: 100% !important;
+            outline: none !important;
+        }
+
+        select:focus, .premium-select:focus {
+            border-color: #eab308 !important;
+            box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        input[type="number"], .premium-number {
+            background-color: #09090b !important;
+            border: 1px solid #27272a !important;
+            color: #ffffff !important;
+            padding: 0.875rem 1.25rem !important;
+            border-radius: 1rem !important;
+            font-weight: 800 !important;
+            outline: none !important;
+            transition: all 0.3s !important;
+        }
+
+        input[type="number"]:focus {
+            border-color: #eab308 !important;
+            box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2) !important;
+        }
+
+        /* Clickable Cards */
+        .premium-clickable-card {
+            background: linear-gradient(145deg, #11111d, #0d0d1a) !important;
+            border: 1px solid #27272a !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            cursor: pointer !important;
+        }
+        .premium-clickable-card:hover {
+            border-color: #eab308 !important;
+            transform: translateY(-4px) !important;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5) !important;
+        }
+
+        input[type="checkbox"].premium-checkbox {
+            appearance: none !important;
+            width: 1.5rem !important;
+            height: 1.5rem !important;
+            border: 2px solid #27272a !important;
+            border-radius: 0.5rem !important;
+            background-color: #09090b !important;
+            cursor: pointer !important;
+            position: relative !important;
+        }
+        input[type="checkbox"].premium-checkbox:checked {
+            background-color: #eab308 !important;
+            border-color: #eab308 !important;
+        }
+        input[type="checkbox"].premium-checkbox:checked::after {
+            content: '✓' !important;
+            position: absolute !important;
+            inset: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #000 !important;
+            font-weight: 900 !important;
+        }
+    </style>
+
+    <style type="text/tailwindcss">
 
         /* Spotify Çalıyor Ses Dalgaları */
         .playing-bar {
@@ -136,15 +268,21 @@
     </style>
 </head>
 
-<body class="bg-background text-white flex h-screen overflow-hidden font-sans antialiased">
+<body class="bg-[#09090b] text-white flex h-screen overflow-hidden font-sans antialiased relative z-0">
+    <!-- 🔥 Ambient Fixed Dark Gold / Amber Luxury Backdrop 🔥 -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-950/20 via-[#09090b]/95 to-[#09090b] pointer-events-none -z-10"></div>
 
-    <aside class="w-[280px] bg-background border-r border-border flex flex-col hidden md:flex z-40 relative h-screen {% if request.resolver_match.url_name == 'dashboard' %}dash-anim-left{% endif %}">
+    <aside class="w-[280px] bg-[#09090b]/80 backdrop-blur-2xl border-r border-border flex flex-col hidden md:flex z-40 relative h-screen {% if request.resolver_match.url_name == 'dashboard' %}dash-anim-left{% endif %}">
 
         <div class="flex-1 overflow-y-auto hide-scrollbar flex flex-col pt-6 pb-2 px-6">
 
             <div class="flex items-center gap-3 mb-6 shrink-0">
-                <div class="w-10 h-10 rounded-lg bg-accent text-black flex items-center justify-center font-bold text-xl">
-                    {{ isletme.name|make_list|first|upper }}
+                <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-accent text-black font-bold text-xl shadow-inner">
+                    {% if isletme.logo %}
+                        <img src="{{ isletme.logo.url }}" class="w-full h-full object-cover">
+                    {% else %}
+                        {{ isletme.name|make_list|first|upper }}
+                    {% endif %}
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight text-white">T-Randevu</h1>
@@ -153,8 +291,11 @@
             </div>
 
             <div class="mb-5 flex flex-col items-start gap-2 shrink-0">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(234,179,8,0.1)]">
-                    👑 VİP İŞLETME
+                <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 text-[11px] font-black uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                    <svg class="w-4 h-4 text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.25 18h19.5v2.25H2.25V18zm2.03-12.75L6.75 12l5.25-7.5L17.25 12l2.47-6.75a.75.75 0 011.43.51l-3 8.25H5.85l-3-8.25a.75.75 0 011.43-.51z"/>
+                    </svg>
+                    VIP İŞLETME
                 </div>
 
                 {% if isletme.premium_end_date %}
@@ -171,7 +312,6 @@
                 {% endif %}
             </div>
 
-            <!-- Menü Linkleri -->
             <nav class="space-y-2 mt-2">
                 <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'dashboard' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
@@ -181,6 +321,11 @@
                 <a href="{% url 'isletme_analiz' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_analiz' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     İşletme Analizi
+                </a>
+
+                <a href="{% url 'isletme_giderler' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_giderler' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>
+                    Gider & Finans
                 </a>
 
                 <a href="{% url 'isletme_randevular' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_randevular' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
@@ -196,6 +341,16 @@
                 <a href="{% url 'isletme_hizmetler' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_hizmetler' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" /></svg>
                     Hizmetler
+                </a>
+
+                <a href="{% url 'isletme_urunler' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_urunler' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                    Ürünler & Ekstralar
+                </a>
+
+                <a href="{% url 'isletme_adisyonlar' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_adisyonlar' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" /></svg>
+                    Adisyon Geçmişi
                 </a>
 
                 <a href="{% url 'isletme_personeller' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium {% if request.resolver_match.url_name == 'isletme_personeller' %}bg-accent/10 text-accent font-semibold border border-accent/20{% else %}text-gray-400 hover:text-white hover:bg-card{% endif %}">
@@ -225,12 +380,8 @@
             </nav>
         </div>
 
-        <!-- ========================================== -->
-        <!-- 🎵 SPOTIFY DJ KABİNİ (SOL ALT KÖŞE) 🎵 -->
-        <!-- ========================================== -->
         <div class="px-4 py-4 border-t border-border bg-background/95 backdrop-blur shrink-0 relative z-20" id="spotifyPlayerContainer">
             {% if not isletme.spotify_refresh_token %}
-                <!-- Spotify Bağlı Değilse -->
                 <a href="{% url 'spotify_bagla' %}" class="flex items-center justify-between w-full px-4 py-3 bg-[#1DB954]/10 hover:bg-[#1DB954]/20 border border-[#1DB954]/30 rounded-xl transition-all group">
                     <div class="flex items-center gap-3">
                         <svg class="w-6 h-6 text-[#1DB954] group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.54.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
@@ -241,14 +392,11 @@
                     </div>
                 </a>
             {% else %}
-                <!-- Spotify Bağlıysa (Canlı Veri JavaScript ile Doldurulacak) -->
                 <div class="bg-card border border-border rounded-xl p-3 shadow-lg relative group">
                     <div class="absolute inset-0 bg-gradient-to-r from-[#1DB954]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
                     <div class="flex items-center gap-3 relative z-10" id="spotifyNowPlaying">
-                        <!-- Albüm Kapağı -->
                         <div class="w-10 h-10 rounded-lg bg-slate-800 shrink-0 overflow-hidden relative shadow-md" id="spotifyAlbumCover">
-                            <!-- JS buraya resim koyacak -->
                             <div class="absolute inset-0 flex items-end justify-center gap-[2px] pb-[6px] opacity-0 transition-opacity" id="spotifyBars">
                                 <div class="playing-bar h-1/2"></div>
                                 <div class="playing-bar h-full"></div>
@@ -257,7 +405,6 @@
                             </div>
                         </div>
 
-                        <!-- Şarkı Bilgisi -->
                         <div class="flex-1 overflow-hidden min-w-0">
                             <div class="marquee-container w-full h-5">
                                 <h4 class="text-sm font-bold text-white leading-tight truncate" id="spotifyTrackName">Bağlanıyor...</h4>
@@ -266,7 +413,6 @@
                         </div>
 
                         <div class="flex items-center">
-                            <!-- Çalma Listesi Butonu -->
                             <div class="relative" id="spotifyPlaylistDropdown">
                                 <button onclick="togglePlaylists()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-[#1DB954] text-gray-400 hover:text-white flex items-center justify-center shrink-0 transition-all border border-slate-700 hover:border-[#1DB954] shadow-sm mr-1">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
@@ -282,26 +428,23 @@
                                 </div>
                             </div>
 
-                            <!-- Durdur / Başlat Butonu -->
                             <button onclick="toggleSpotifyPlayPause()" id="spotifyPlayPauseBtn" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-[#1DB954] text-gray-400 hover:text-white flex items-center justify-center shrink-0 transition-all border border-slate-700 hover:border-[#1DB954] shadow-sm mr-1" data-playing="false">
-                                <!-- Çal İkonu (Başlangıçta Gizli) -->
                                 <svg class="w-4 h-4" id="playIcon" fill="currentColor" viewBox="0 0 24 24" style="display:none;"><path d="M8 5v14l11-7z"/></svg>
-                                <!-- Durdur İkonu (Başlangıçta Görünür) -->
                                 <svg class="w-4 h-4" id="pauseIcon" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                             </button>
 
-                            <!-- İleri Sar Butonu -->
                             <button onclick="skipSpotifyTrack()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-[#1DB954] text-gray-400 hover:text-white flex items-center justify-center shrink-0 transition-all border border-slate-700 hover:border-[#1DB954] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1DB954]/50">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
                             </button>
+
+                            <a href="{% url 'spotify_kopar' %}" title="Spotify Bağlantısını Kes" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-500 text-gray-400 hover:text-white flex items-center justify-center shrink-0 transition-all border border-slate-700 hover:border-rose-500 shadow-sm ml-1">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </a>
                         </div>
                     </div>
                 </div>
             {% endif %}
         </div>
-        <!-- ========================================== -->
-
-        <!-- ALT KISIM (Sabit) -->
         <div class="p-6 pt-4 border-t border-border bg-background shrink-0 z-10">
             <a href="{% url 'isletme_detay' slug=isletme.slug %}" target="_blank" class="flex items-center justify-between px-4 py-3 mb-4 rounded-xl border border-accent/50 text-accent hover:bg-accent hover:text-black transition-all duration-300 font-bold shadow-[0_0_15px_rgba(234,179,8,0.15)] hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] group">
                 <span>Vitrinimi Gör</span>
@@ -324,6 +467,19 @@
 
         <div class="flex items-center gap-6">
 
+            <a href="{% url 'takvim_gorunumu' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900/50 text-gray-400 hover:text-accent hover:bg-slate-800 hover:border-slate-700 transition-all text-sm font-semibold mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
+                 </svg>
+                Takvim Görünümü
+            </a>
+
+            <a href="{% url 'isletme_degerlendirmeler' %}" class="relative text-gray-400 hover:text-accent transition-colors focus:outline-none" title="Müşteri Değerlendirmeleri">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+            </a>
+
             <div class="relative" id="notificationDropdown">
                 <button onclick="toggleNotifications()" class="relative text-gray-400 hover:text-white transition-colors focus:outline-none">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
@@ -334,48 +490,54 @@
                 <div id="notificationMenu" class="absolute right-0 mt-4 w-[350px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible transform scale-95 transition-all duration-200 z-50 overflow-hidden">
 
                     <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
-                        <h3 class="font-bold text-white flex items-center gap-2">🔔 Bildirimler</h3>
+                        <h3 class="font-bold text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-accent animate-bounce-3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                            </svg>
+                            Bildirimler
+                        </h3>
                         <button onclick="markAllAsRead()" class="text-[10px] text-indigo-400 hover:text-white font-bold px-2.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/40 rounded-lg transition-colors border border-indigo-500/20">
-                            Tümünü Okundu Say ✔
+                            Tümünü Okundu Say
                         </button>
                     </div>
 
                     <div class="p-2 max-h-[350px] overflow-y-auto hide-scrollbar flex flex-col gap-1.5" id="notificationList">
 
-                        <div class="p-6 text-center text-sm text-slate-500" id="emptyNotification">
-                            Şu an yeni bildiriminiz yok. 🎉
+                        <div class="p-6 text-center text-sm text-slate-500 flex flex-col items-center gap-3" id="emptyNotification">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-gray-600 mb-1">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0110 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0114 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                            </svg>
+                            <span>Şu an yeni bildiriminiz yok.</span>
                         </div>
 
-                        {% for randevu in isletme.appointments.all|dictsortreversed:"id"|slice:":5" %}
+                        {% for randevu in isletme.recent_appointments_for_notif %}
                             <a href="{% url 'isletme_randevular' %}" data-notif-id="randevu_{{ randevu.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-indigo-500/30">
-                                    📅
+                                <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 mt-0.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 </div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-indigo-300 transition-colors">Yeni Randevu Oluşturuldu!</h4>
+                                    <h4 class="text-sm font-bold text-white mb-0.5">Yeni Randevu Talebi!</h4>
                                     <p class="text-[11px] text-slate-300 leading-relaxed">
                                         <strong class="text-indigo-400">{{ randevu.customer.first_name|default:"Müşteri" }} {{ randevu.customer.last_name|default:"" }}</strong> adlı kişi randevu oluşturdu.
                                     </p>
                                     <span class="text-[10px] text-slate-500 mt-1 block">Tarih: {{ randevu.date_time|date:"d M Y - H:i" }}</span>
                                 </div>
                             </a>
-                        {% endfor %}
+                            {% endfor %}
 
-                        {% for personel in isletme.staff_members.all|dictsortreversed:"id"|slice:":3" %}
-                            {% if personel.is_approved %}
+                            {% for personel in isletme.recent_staff_for_notif %}
                             <a href="{% url 'isletme_personeller' %}" data-notif-id="personel_{{ personel.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-emerald-500/30">
-                                    ✅
+                                <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 </div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-emerald-300 transition-colors">Personel Onaylandı</h4>
+                                    <h4 class="text-sm font-bold text-white mb-0.5">Personel Onaylandı</h4>
                                     <p class="text-[11px] text-slate-300 leading-relaxed">
                                         <strong class="text-emerald-400">{{ personel.name }}</strong> adlı uzmanınız sistem tarafından onaylandı.
                                     </p>
                                 </div>
                             </a>
-                            {% endif %}
-                        {% endfor %}
+                            {% endfor %}
 
                     </div>
                 </div>
@@ -383,30 +545,81 @@
 
             <div class="h-8 w-px bg-border"></div>
 
-            <div class="flex items-center gap-3 cursor-pointer group">
-                <div class="w-9 h-9 rounded-full bg-accent text-black flex items-center justify-center font-bold">
-                    {{ isletme.name|make_list|first|upper }}
+            <div class="relative" id="workspaceDropdownContainer">
+                <button onclick="toggleWorkspaceMenu()" class="flex items-center gap-3 cursor-pointer group focus:outline-none">
+                    <div class="w-9 h-9 rounded-full overflow-hidden bg-accent text-black flex items-center justify-center font-bold shadow-md group-hover:scale-105 transition-transform shrink-0">
+                        {% if isletme.logo %}
+                            <img src="{{ isletme.logo.url }}" class="w-full h-full object-cover">
+                        {% else %}
+                            {{ isletme.name|make_list|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="hidden sm:block text-right">
+                        <div class="text-sm font-semibold text-white group-hover:text-accent transition-colors flex items-center gap-1 justify-end">
+                            {{ isletme.name|truncatechars:15 }}
+                            <svg class="w-4 h-4 text-gray-400 group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                        <div class="text-xs text-gray-400">Premium Plan</div>
+                    </div>
+                </button>
+
+                <div id="workspaceMenu" class="absolute right-0 mt-4 w-64 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible transform scale-95 transition-all duration-200 z-50 overflow-hidden">
+                    <div class="p-3 border-b border-slate-800 bg-slate-800/30">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Çalışma Alanlarım</p>
+                        <div class="space-y-1 max-h-48 overflow-y-auto hide-scrollbar">
+                            {% for b in request.user.businesses.all %}
+                                <form method="POST" action="{% url 'isletme_sec' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="isletme_id" value="{{ b.id }}">
+                                    <button type="submit" class="w-full flex items-center gap-3 p-2 rounded-xl transition-colors {% if b.id == isletme.id %}bg-accent/10 border border-accent/20{% else %}hover:bg-slate-800 border border-transparent{% endif %}">
+                                        <div class="w-7 h-7 rounded-lg overflow-hidden {% if b.id == isletme.id %}bg-accent text-black{% else %}bg-slate-700 text-gray-300{% endif %} flex items-center justify-center text-xs font-bold shrink-0 shadow-sm">
+                                            {% if b.logo %}
+                                                <img src="{{ b.logo.url }}" class="w-full h-full object-cover">
+                                            {% else %}
+                                                {{ b.name|make_list|first|upper }}
+                                            {% endif %}
+                                        </div>
+                                        <span class="text-sm font-medium {% if b.id == isletme.id %}text-accent{% else %}text-gray-300{% endif %} truncate">{{ b.name }}</span>
+                                    </button>
+                                </form>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="p-2 border-b border-slate-800">
+                        {% if not isletme.is_premium %}
+                            <div class="p-3 text-xs text-slate-400 font-medium text-center bg-slate-800/30 rounded-xl">
+                                Şube eklemek için <a href="{% url 'isletme_abonelik' %}" class="text-accent hover:underline font-bold">Premium'a geçin</a>.
+                            </div>
+                        {% elif request.user.businesses.count >= 3 %}
+                            <div class="p-3 text-[11px] text-rose-400 font-bold text-center bg-rose-500/10 border border-rose-500/20 rounded-xl">
+                                Maksimum şube limitine (3) ulaştınız.
+                            </div>
+                        {% else %}
+                            <a href="{% url 'yeni_sube_ekle' %}" class="flex items-center justify-center gap-2 p-2.5 text-sm font-bold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-xl transition-colors">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                Yeni Şube Ekle
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="p-2">
+                        <a href="{% url 'isletme_sec' %}" class="flex items-center gap-3 p-2.5 text-sm font-medium text-gray-300 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                            Tüm Şubeleri Gör
+                        </a>
+                        <a href="{% url 'cikis' %}" class="flex items-center gap-3 p-2.5 text-sm font-medium text-red-400 hover:bg-red-400/10 hover:text-red-300 rounded-xl transition-colors">
+                            <svg class="w-5 h-5 text-red-500/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                            Güvenli Çıkış Yap
+                        </a>
+                    </div>
                 </div>
-                <div class="hidden sm:block text-right">
-                    <div class="text-sm font-semibold text-white group-hover:text-accent transition-colors">{{ isletme.name }}</div>
-                    <div class="text-xs text-gray-400">Premium Plan</div>
-                </div>
-                <a href="{% url 'cikis' %}" class="ml-2 text-gray-500 hover:text-red-400 transition-colors" title="Çıkış Yap">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                </a>
             </div>
-        </div>
+            </div>
     </header>
 
         <div class="flex-1 overflow-y-auto p-8 {% if request.resolver_match.url_name != 'dashboard' %}animate-fade-in{% endif %} relative z-20">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-6 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-accent text-sm font-medium flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+
 
         {% block content %}{% endblock %}
     </div>
@@ -429,11 +642,78 @@
 
 </main>
 
+<!-- 🔥 PREMIUM TOAST BİLDİRİM SİSTEMİ (Jukebox Style) 🔥 -->
+<div id="premiumToastContainer" class="fixed bottom-6 right-6 z-[99999] flex flex-col gap-3 pointer-events-none"></div>
+
+{% if messages %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toastMessages = [
+        {% for message in messages %}
+        { text: "{{ message|escapejs }}", type: "{{ message.tags }}" },
+        {% endfor %}
+    ];
+    toastMessages.forEach((msg, index) => {
+        setTimeout(() => window.showPremiumToast(msg.text, msg.type), index * 400);
+    });
+});
+</script>
+{% endif %}
+
     {% block extra_js %}{% endblock %}
 
-    <!-- GÜNCELLENEN GERÇEK ZAMANLI JS BLOĞU -->
     <script>
-        // Bildirim menüsünü aç/kapat
+    // ==========================================
+    // 🔥 PREMIUM TOAST BİLDİRİM SİSTEMİ 🔥
+    // ==========================================
+    window.showPremiumToast = function(text, type) {
+        const container = document.getElementById('premiumToastContainer');
+        if (!container) return;
+
+        // Strip emojis from text for ultra-premium look
+        const cleanText = text.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{2600}-\u{26FF}]|[\u{1F1E0}-\u{1F1FF}]/gu, '');
+
+        const isError = type && type.includes('error');
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto flex items-center gap-3.5 px-5 py-4 rounded-2xl border text-white shadow-2xl transform translate-y-12 opacity-0 transition-all duration-500 ease-out max-w-sm';
+        toast.style.cssText = isError
+            ? 'background: rgba(15, 23, 42, 0.97); border-color: rgba(244, 63, 94, 0.35); box-shadow: 0 20px 50px rgba(244, 63, 94, 0.15);'
+            : 'background: rgba(15, 23, 42, 0.97); border-color: rgba(234, 179, 8, 0.35); box-shadow: 0 20px 50px rgba(234, 179, 8, 0.15);';
+
+        const iconColor = isError ? 'text-rose-400' : 'text-amber-400';
+        const iconBg = isError ? 'bg-rose-500/15 border-rose-500/30' : 'bg-amber-500/15 border-amber-500/30';
+        const iconSvg = isError
+            ? '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />'
+            : '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+
+        toast.innerHTML = `
+            <div class="w-9 h-9 rounded-full ${iconBg} ${iconColor} flex items-center justify-center shrink-0 border">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">${iconSvg}</svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold tracking-tight leading-snug">${cleanText}</p>
+            </div>
+            <button onclick="this.closest('.pointer-events-auto').remove()" class="shrink-0 text-slate-500 hover:text-white transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        `;
+
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-y-12', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+        });
+
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-12', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    };
+    </script>
+
+    <script>
         function toggleNotifications() {
             const menu = document.getElementById('notificationMenu');
             menu.classList.toggle('invisible');
@@ -443,12 +723,26 @@
             menu.classList.toggle('scale-100');
         }
 
-        // Dışarı tıklanınca kapat
+        function toggleWorkspaceMenu() {
+            const menu = document.getElementById('workspaceMenu');
+            menu.classList.toggle('invisible');
+            menu.classList.toggle('opacity-0');
+            menu.classList.toggle('scale-95');
+        }
+
         document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('notificationDropdown');
-            if (dropdown && !dropdown.contains(event.target)) {
-                const menu = document.getElementById('notificationMenu');
-                if(menu && !menu.classList.contains('invisible')) {
+            const wsDropdown = document.getElementById('workspaceDropdownContainer');
+            if (wsDropdown && !wsDropdown.contains(event.target)) {
+                const wsMenu = document.getElementById('workspaceMenu');
+                if(wsMenu && !wsMenu.classList.contains('invisible')) {
+                    toggleWorkspaceMenu();
+                }
+            }
+
+            const notifDropdown = document.getElementById('notificationDropdown');
+            if (notifDropdown && !notifDropdown.contains(event.target)) {
+                const notifMenu = document.getElementById('notificationMenu');
+                if(notifMenu && !notifMenu.classList.contains('invisible')) {
                     toggleNotifications();
                 }
             }
@@ -458,7 +752,6 @@
         // 1. OKUNDU SAYMA VE HAFIZA SİSTEMİ
         // ==========================================
         function getReadNotifs() {
-            // Tarayıcıdan daha önce okunanların ID listesini al
             return JSON.parse(localStorage.getItem('readNotifs_{{ request.user.username }}') || '[]');
         }
 
@@ -471,21 +764,19 @@
                 if (id && !readNotifs.includes(id)) {
                     readNotifs.push(id);
                 }
-                item.remove(); // Ekrandan anında sil
+                item.remove();
             });
 
-            // Yeni okunanları tarayıcıya kaydet
             localStorage.setItem('readNotifs_{{ request.user.username }}', JSON.stringify(readNotifs));
-            updateNotificationUI(); // Arayüzü güncelle (Boş mesajını göster vb)
+            updateNotificationUI();
         }
 
         // ==========================================
-        // 2. BİLDİRİMLERİ FİLTRELE VE PREMIUM UYARIYI EKLE
+        // 2. BİLDİRİMLERİ FİLTRELE VE UYARILARI EKLE
         // ==========================================
         function processNotifications(listElement) {
             let readNotifs = getReadNotifs();
 
-            // Okunmuş (silinmiş) bildirimleri ekrandan gizle
             const items = listElement.querySelectorAll('.notif-item');
             items.forEach(item => {
                 const id = item.getAttribute('data-notif-id');
@@ -503,12 +794,11 @@
                     const diffDays = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
 
                     if (diffDays >= 0 && diffDays <= 7) {
-                        // Eğer uyarı zaten eklenmemişse ekle (Çoğalmasını engeller)
                         if (!listElement.querySelector('.premium-warning-notif')) {
                             listElement.insertAdjacentHTML('afterbegin', `
                                 <div class="premium-warning-notif flex gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl mb-1 shadow-lg shadow-red-500/5">
                                     <div class="text-red-400 mt-0.5 animate-bounce-3">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     </div>
                                     <div>
                                         <h4 class="text-sm font-bold text-red-400 mb-1">Aboneliğiniz Bitiyor!</h4>
@@ -524,16 +814,68 @@
                 }
             {% endif %}
 
+            // 🔥 VİTRİN BOOST AKTİF VE BİTİŞ UYARISI 🔥
+            {% if isletme.boost_end_date %}
+                const boostEndStr = "{{ isletme.boost_end_date|date:'c' }}";
+                if (boostEndStr) {
+                    const bEndDate = new Date(boostEndStr);
+                    const bNow = new Date();
+                    // Kalan süreyi DAKİKA cinsinden hesapla
+                    const bDiffMins = Math.ceil((bEndDate - bNow) / (1000 * 60));
+
+                    if (bDiffMins > 0) {
+                        // Eğer bitmesine 60 dakikadan az kaldıysa Kırmızı Alarm ver! (15 dk altıysa metin daha agresif olur)
+                        if (bDiffMins <= 60) {
+                            if (!listElement.querySelector('.boost-warning-notif')) {
+                                let aciliyetMesaji = bDiffMins <= 15 ? `Sadece <strong>${bDiffMins} dakika</strong> kaldı! Rakiplerin gerisine düşmeyin!` : `Bitmesine <strong>${bDiffMins} dakika</strong> kaldı.`;
+
+                                listElement.insertAdjacentHTML('afterbegin', `
+                                    <div class="boost-warning-notif flex gap-3 p-3 bg-violet-500/10 border border-violet-500/30 rounded-xl mb-1 shadow-lg shadow-violet-500/5">
+                                        <div class="text-violet-400 mt-0.5 animate-bounce-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-violet-400 mb-1">Vitrin Süreniz Bitiyor!</h4>
+                                            <p class="text-[11px] text-slate-300 leading-relaxed mb-2">${aciliyetMesaji}</p>
+                                            <a href="{% url 'isletme_abonelik' %}" class="inline-flex items-center gap-1 px-3 py-1 bg-violet-500/20 text-violet-300 text-[10px] font-bold rounded-lg hover:bg-violet-500/30 transition-colors">
+                                                Süreyi Uzat
+                                            </a>
+                                        </div>
+                                    </div>
+                                `);
+                            }
+                        }
+                        // Eğer 60 dakikadan fazlaysa ve kullanıcı bu bildirimi henüz okumadıysa (Tebrik Bildirimi)
+                        else if (!readNotifs.includes('boost_active_notif')) {
+                            if (!listElement.querySelector('.boost-active-notif')) {
+                                listElement.insertAdjacentHTML('afterbegin', `
+                                    <a href="{% url 'isletme_abonelik' %}" class="notif-item boost-active-notif flex gap-3 p-3 bg-slate-800/40 border border-violet-500/30 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group" data-notif-id="boost_active_notif">
+                                        <div class="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-inner shadow-violet-500/30">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.143-7.714L1 12l6.857-2.143L11 3z"/></svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-white mb-0.5 group-hover:text-violet-300 transition-colors">Vitrin Boost Aktif!</h4>
+                                            <p class="text-[11px] text-slate-300 leading-relaxed">
+                                                İşletmeniz Keşfet'te <strong>zirvede</strong> listeleniyor. Bol kazançlar dileriz!
+                                            </p>
+                                        </div>
+                                    </a>
+                                `);
+                            }
+                        }
+                    }
+                }
+            {% endif %}
+
             return listElement;
         }
 
         // ==========================================
-        // 3. ARAYÜZ (UI) GÜNCELLEMELERİ VE CANLI BAĞLANTI (HEARTBEAT)
+        // 3. ARAYÜZ (UI) GÜNCELLEMELERİ VE CANLI BAĞLANTI
         // ==========================================
         function updateNotificationUI() {
             const notifList = document.getElementById('notificationList');
-            // Premium uyarı VEYA okunmamış bildirim varsa Kırmızı Noktayı yak!
-            const hasUnread = notifList.querySelectorAll('.notif-item').length > 0 || notifList.querySelectorAll('.premium-warning-notif').length > 0;
+            const hasUnread = notifList.querySelectorAll('.notif-item').length > 0 || notifList.querySelectorAll('.premium-warning-notif').length > 0 || notifList.querySelectorAll('.boost-warning-notif').length > 0;
 
             if (hasUnread) {
                 document.getElementById('notificationBadge').classList.remove('hidden');
@@ -557,22 +899,19 @@
                     let newNotifList = doc.getElementById('notificationList');
 
                     if (newNotifList) {
-                        // Yeni gelen listeyi bizim filtreden (Okunanları sil, Premiumu ekle) geçir
                         newNotifList = processNotifications(newNotifList);
                         document.getElementById('notificationList').innerHTML = newNotifList.innerHTML;
 
-                        // Sadece yeni gelen Randevu/Personel sayısını say (Premium uyarıyı sayma ki her 15sn'de bir ses çalmasın)
                         const unreadCount = newNotifList.querySelectorAll('.notif-item').length;
                         updateNotificationUI();
 
-                        // EĞER GERÇEKTEN YENİ BİR ŞEY GELDİYSE SES ÇAL!
                         if (currentNotificationCount !== -1 && unreadCount > currentNotificationCount) {
                             const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
                             audio.play().catch(e => console.log("Tarayıcı sese izin vermedi."));
 
                             if (Notification.permission === "granted") {
                                 new Notification("T-Randevu: Yeni Bildirim!", {
-                                    body: "Hesabınızda yeni bir hareket var (Randevu / Onay).",
+                                    body: "Hesabınızda yeni bir hareket var.",
                                     icon: "https://cdn-icons-png.flaticon.com/512/2875/2875394.png"
                                 });
                             }
@@ -582,14 +921,11 @@
                 });
         }
 
-        // BAŞLANGIÇ AYARLARI
         document.addEventListener('DOMContentLoaded', function() {
-            // Tarayıcı İzni
             if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
                 Notification.requestPermission();
             }
 
-            // Sayfa ilk yüklendiğinde filtrelemeyi hemen yap
             const list = document.getElementById('notificationList');
             if (list) {
                 processNotifications(list);
@@ -597,8 +933,7 @@
                 currentNotificationCount = list.querySelectorAll('.notif-item').length;
             }
 
-            // Hayalet Sistemi Başlat (Her 15 saniyede bir sessizce güncelle)
-            setInterval(checkRealTimeNotifications, 15000);
+           // setInterval(checkRealTimeNotifications, 15000);
         });
 
         // ==========================================
@@ -640,7 +975,6 @@
         }
 
         function skipSpotifyTrack() {
-            // Tıklanınca bekleme hissi vermemek için butona basılma efekti yapabiliriz
             document.getElementById('spotifyTrackName').innerText = 'Geçiliyor...';
 
             fetch('{% url "spotify_skip_track" %}', {
@@ -653,13 +987,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Şarkı atlandı, yeni şarkıyı çekmek için 1 saniye bekle
                     setTimeout(updateSpotifyPlayer, 1000);
                 }
             });
         }
 
-        // YENİ: Playlist Menüsünü Aç/Kapat ve Listeleri Çek
         function togglePlaylists() {
             const menu = document.getElementById('playlistMenu');
             menu.classList.toggle('invisible');
@@ -667,7 +999,6 @@
             menu.classList.toggle('translate-y-2');
 
             if (!menu.classList.contains('invisible') && document.getElementById('playlistContainer').innerHTML.includes('Yükleniyor')) {
-                // Menü ilk açıldığında listeleri API'den çek
                 fetch('{% url "spotify_get_playlists" %}')
                     .then(res => res.json())
                     .then(data => {
@@ -686,10 +1017,9 @@
             }
         }
 
-        // YENİ: Tıklanan Listeyi Spotify'da Çalmaya Başlat
         function playPlaylist(uri) {
             document.getElementById('spotifyTrackName').innerText = 'Liste başlatılıyor...';
-            togglePlaylists(); // Menüyü kapat
+            togglePlaylists();
 
             fetch('{% url "spotify_play_playlist" %}', {
                 method: 'POST',
@@ -702,26 +1032,27 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'no_device') {
-                    alert(data.message); // Cihaz kapalıysa uyar
+                    alert(data.message);
                 } else {
-                    setTimeout(updateSpotifyPlayer, 1500); // 1.5 saniye sonra ekranı güncelle
+                    setTimeout(updateSpotifyPlayer, 1500);
                 }
             });
         }
 
-        // Her 8 saniyede bir şarkıyı arka planda sessizce kontrol et
-        setInterval(updateSpotifyPlayer, 8000);
-        // Sayfa ilk yüklendiğinde anında kontrol et
+        // Sadece sekme aktifken ve 60 saniyede bir sorgula (terminal log spamini azaltmak için)
+        setInterval(() => {
+            if (!document.hidden) {
+                updateSpotifyPlayer();
+            }
+        }, 60000);
         updateSpotifyPlayer();
         {% endif %}
 
-        // YENİ: Müziği Durdur veya Başlat
         function toggleSpotifyPlayPause() {
             const btn = document.getElementById('spotifyPlayPauseBtn');
             const isPlaying = btn.getAttribute('data-playing') === 'true';
             const action = isPlaying ? 'pause' : 'play';
 
-            // Kullanıcıya bekleme hissi vermemek için ikonu ve dalgaları anında değiştir
             if (action === 'pause') {
                 document.getElementById('spotifyBars').style.opacity = '0';
                 btn.setAttribute('data-playing', 'false');
@@ -734,7 +1065,6 @@
                 document.getElementById('pauseIcon').style.display = 'block';
             }
 
-            // Spotify'a komutu gönder
             fetch('{% url "spotify_toggle_playback" %}', {
                 method: 'POST',
                 headers: {
@@ -747,11 +1077,406 @@
             .then(data => {
                 if (data.status === 'no_device') {
                     alert(data.message);
-                    updateSpotifyPlayer(); // Hata varsa eski haline döndür
+                    updateSpotifyPlayer();
                 }
             });
         }
+    </script>
+    {% if show_premium_welcome %}
+    <!-- 🔥 PREMIUM VIP WELCOME MODAL 🔥 -->
+    <div id="premiumSwitchModal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-[#09090b]/60 backdrop-blur-xl transition-all duration-700 opacity-0 pointer-events-none">
+        <div class="relative bg-gradient-to-b from-slate-900 to-[#09090b] border border-amber-500/30 rounded-[2.5rem] p-12 max-w-lg w-full text-center shadow-[0_0_100px_rgba(245,158,11,0.15)] transform scale-75 transition-all duration-700 opacity-0" id="premiumSwitchContent">
+            
+            <!-- Ambient Glow -->
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/20 rounded-full blur-[80px]"></div>
+            
+            <!-- Icon / Logo Area -->
+            <div class="relative mb-8">
+                <div class="w-24 h-24 bg-gradient-to-tr from-amber-500 to-yellow-300 rounded-3xl mx-auto flex items-center justify-center text-black shadow-[0_0_30px_rgba(245,158,11,0.4)] animate-bounce-3">
+                    <svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 16C5 17.6569 8.13401 19 12 19C15.866 19 19 17.6569 19 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <!-- Ambient Glow -->
+                <div class="absolute inset-0 animate-pulse bg-amber-500/10 blur-xl rounded-full"></div>
+            </div>
 
+            <h3 class="text-3xl font-black text-white mb-4 tracking-tighter">
+                Hoş Geldiniz, <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200">Patron!</span>
+            </h3>
+            
+            <p class="text-lg text-slate-300 font-medium leading-relaxed mb-8">
+                <strong class="text-white">{{ show_premium_welcome }}</strong> işletmenize başarıyla giriş yaptınız. 
+                <span class="block mt-2 text-amber-500/80 italic font-bold">
+                    Keyifli ve bol kazançlı çalışmalar dileriz! 
+                    <svg class="w-6 h-6 inline-block ml-1 -mt-1 text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </span>
+            </p>
+
+            <div class="flex items-center justify-center gap-3">
+                <div class="h-1 w-12 bg-gradient-to-r from-transparent to-amber-500 rounded-full"></div>
+                <div class="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em]">VIP SİSTEM AKTİF</div>
+                <div class="h-1 w-12 bg-gradient-to-l from-transparent to-amber-500 rounded-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = document.getElementById('premiumSwitchModal');
+            const content = document.getElementById('premiumSwitchContent');
+            
+            if (modal && content) {
+                // Giriş Animasyonu
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0', 'pointer-events-none');
+                    content.classList.remove('scale-75', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                    
+                    // Giriş Sesi (Opsiyonel - Çok tatlı bir bip sesi)
+                    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+                    audio.volume = 0.3;
+                    audio.play().catch(() => {});
+                }, 100);
+
+                // Otomatik Kapanış (3.5 Saniye sonra)
+                setTimeout(() => {
+                    content.classList.remove('scale-100', 'opacity-100');
+                    content.classList.add('scale-110', 'opacity-0');
+                    modal.classList.add('opacity-0');
+                    
+                    setTimeout(() => {
+                        modal.remove();
+                    }, 700);
+                }, 3500);
+            }
+        });
+    </script>
+    {% endif %}
+
+    <!-- 🔥 PREMIUM FLOATING CALCULATOR WIDGET (Abyssal Gold, Emojiless, Real SVGs) 🔥 -->
+    <div id="premiumCalculatorContainer" class="fixed bottom-28 right-8 z-[9999]">
+        <!-- Floating Trigger Bubble -->
+        <button id="premiumCalcToggleBtn" onclick="togglePremiumCalculator()"
+                class="flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 rounded-full shadow-[0_10px_25px_-5px_rgba(217,119,6,0.4)] hover:scale-110 transition-all duration-300 relative group"
+                title="Hesap Makinesi">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-3-10.5h.008v.008H12.75V7.5zm0 3h.008v.008H12.75v-.008zm0 3h.008v.008H12.75v-.008zm0 3h.008v.008H12.75V15.75zm-3-6h.008v.008H9.75V9.75zm0 3h.008v.008H9.75v-.008zm0 3h.008v.008H9.75v-.008zm-3-6h.008v.008H6.75V9.75zm0 3h.008v.008H6.75v-.008zm0 3h.008v.008H6.75v-.008zm-3-3.75h.008v.008H3.75V12.75zm0 3h.008v.008H3.75v-.008zm1.5-12h12.75c1.242 0 2.25 1.008 2.25 2.25v10.5c0 1.242-1.008 2.25-2.25 2.25H4.5c-1.242 0-2.25-1.008-2.25-2.25V7.5c0-1.242 1.008-2.25 2.25-2.25z" />
+            </svg>
+            <span class="absolute right-16 px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-xl border border-slate-700">
+                Hesap Makinesi
+                <div class="absolute w-2 h-2 bg-slate-800 border-r border-b border-slate-700 transform rotate-45 top-1/2 -mt-1 -right-1"></div>
+            </span>
+        </button>
+
+        <!-- Calculator Panel Interface -->
+        <div id="premiumCalcPanel" class="absolute bottom-20 right-0 w-80 bg-slate-950/95 backdrop-blur-2xl border border-slate-800 rounded-3xl p-5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] transition-all duration-300 transform scale-95 opacity-0 pointer-events-none flex flex-col gap-4">
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-900 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></div>
+                    <span class="text-xs font-black tracking-wider uppercase text-amber-500">Premium Hesap</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleCalcHistory()" class="text-slate-400 hover:text-amber-400 p-1.5 hover:bg-slate-900 rounded-lg transition-colors" title="Geçmiş">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </button>
+                    <button onclick="togglePremiumCalculator()" class="text-slate-500 hover:text-white p-1.5 hover:bg-slate-900 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Screen Area -->
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-right flex flex-col gap-1 min-h-[90px] justify-end relative overflow-hidden">
+                <div id="calcSecondaryScreen" class="text-xs font-bold text-slate-500 tracking-wide min-h-[16px] truncate"></div>
+                <div id="calcMainScreen" class="text-3xl font-black text-white tracking-tight truncate leading-none">0</div>
+            </div>
+
+            <!-- History Panel (Slides from top inside) -->
+            <div id="calcHistoryDrawer" class="absolute top-[65px] left-5 right-5 bottom-5 bg-slate-950 border border-slate-900 rounded-2xl p-4 shadow-xl z-20 transition-all duration-300 opacity-0 pointer-events-none flex flex-col gap-3">
+                <div class="flex items-center justify-between border-b border-slate-900 pb-2">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-amber-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        İşlem Geçmişi
+                    </span>
+                    <button onclick="clearCalcHistory()" class="text-xs font-bold text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                        </svg>
+                        Temizle
+                    </button>
+                </div>
+                <div id="calcHistoryList" class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-1.5 py-1 text-right">
+                    <!-- Loaded dynamically -->
+                </div>
+                <button onclick="toggleCalcHistory()" class="w-full py-2 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white text-xs font-bold rounded-xl transition-all">
+                    Kapat
+                </button>
+            </div>
+
+            <!-- Keypad Area -->
+            <div class="grid grid-cols-4 gap-2.5">
+                <!-- Row 1 -->
+                <button onclick="calcPressKey('C')" class="h-12 bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/5 font-black text-sm rounded-xl transition-all select-none">C</button>
+                <button onclick="calcPressKey('BACK')" class="h-12 bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white flex items-center justify-center font-bold rounded-xl transition-all select-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
+                    </svg>
+                </button>
+                <button onclick="calcPressKey('%')" class="h-12 bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white font-black text-sm rounded-xl transition-all select-none">%</button>
+                <button onclick="calcPressKey('/')" class="h-12 bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-black font-black text-lg rounded-xl transition-all select-none">/</button>
+
+                <!-- Row 2 -->
+                <button onclick="calcPressKey('7')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">7</button>
+                <button onclick="calcPressKey('8')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">8</button>
+                <button onclick="calcPressKey('9')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">9</button>
+                <button onclick="calcPressKey('*')" class="h-12 bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-black font-black text-lg rounded-xl transition-all select-none">×</button>
+
+                <!-- Row 3 -->
+                <button onclick="calcPressKey('4')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">4</button>
+                <button onclick="calcPressKey('5')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">5</button>
+                <button onclick="calcPressKey('6')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">6</button>
+                <button onclick="calcPressKey('-')" class="h-12 bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-black font-black text-lg rounded-xl transition-all select-none">-</button>
+
+                <!-- Row 4 -->
+                <button onclick="calcPressKey('1')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">1</button>
+                <button onclick="calcPressKey('2')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">2</button>
+                <button onclick="calcPressKey('3')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">3</button>
+                <button onclick="calcPressKey('+')" class="h-12 bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-black font-black text-lg rounded-xl transition-all select-none">+</button>
+
+                <!-- Row 5 -->
+                <button onclick="calcPressKey('0')" class="col-span-2 h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">0</button>
+                <button onclick="calcPressKey('.')" class="h-12 bg-slate-900/40 border border-slate-800/80 text-white hover:bg-slate-800 font-extrabold text-lg rounded-xl transition-all select-none">.</button>
+                <button onclick="calcPressKey('=')" class="h-12 bg-gradient-to-tr from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xl rounded-xl shadow-lg transition-all select-none">=</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let calcInput = "";
+        let calcPrevInput = "";
+        let calcOperation = null;
+        let calcIsEvaluated = false;
+
+        function togglePremiumCalculator() {
+            const panel = document.getElementById('premiumCalcPanel');
+            if (!panel) return;
+
+            const isHidden = panel.classList.contains('pointer-events-none');
+            if (isHidden) {
+                // Open panel
+                panel.classList.remove('pointer-events-none', 'scale-95', 'opacity-0');
+                panel.classList.add('scale-100', 'opacity-100');
+                // Play audio beep softly
+                try {
+                    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+                    audio.volume = 0.15;
+                    audio.play().catch(() => {});
+                } catch(e) {}
+            } else {
+                // Close panel
+                panel.classList.remove('scale-100', 'opacity-100');
+                panel.classList.add('pointer-events-none', 'scale-95', 'opacity-0');
+                // Close history drawer too
+                const drawer = document.getElementById('calcHistoryDrawer');
+                if (drawer) {
+                    drawer.classList.add('pointer-events-none', 'opacity-0');
+                }
+            }
+        }
+
+        function updateCalcScreen() {
+            const mainScreen = document.getElementById('calcMainScreen');
+            const secScreen = document.getElementById('calcSecondaryScreen');
+            if (!mainScreen || !secScreen) return;
+
+            mainScreen.innerText = calcInput || "0";
+
+            if (calcOperation) {
+                secScreen.innerText = calcPrevInput + " " + calcOperation;
+            } else {
+                secScreen.innerText = "";
+            }
+        }
+
+        function calcPressKey(key) {
+            // Soft key press tick sound
+            try {
+                const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+                audio.volume = 0.05;
+                audio.play().catch(() => {});
+            } catch(e) {}
+
+            if (calcIsEvaluated && !['+', '-', '*', '/', '%'].includes(key) && key !== '=') {
+                calcInput = "";
+                calcIsEvaluated = false;
+            }
+
+            if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(key)) {
+                if (calcInput === "0") {
+                    calcInput = key;
+                } else {
+                    calcInput += key;
+                }
+            } else if (key === '.') {
+                if (!calcInput.includes('.')) {
+                    calcInput += calcInput === "" ? "0." : ".";
+                }
+            } else if (key === 'C') {
+                calcInput = "";
+                calcPrevInput = "";
+                calcOperation = null;
+                calcIsEvaluated = false;
+            } else if (key === 'BACK') {
+                calcInput = calcInput.slice(0, -1);
+            } else if (['+', '-', '*', '/'].includes(key)) {
+                if (calcInput === "" && calcPrevInput !== "") {
+                    calcOperation = key;
+                } else if (calcInput !== "") {
+                    if (calcPrevInput !== "" && calcOperation) {
+                        evaluateCalc();
+                    }
+                    calcPrevInput = calcInput;
+                    calcOperation = key;
+                    calcInput = "";
+                }
+            } else if (key === '%') {
+                if (calcInput !== "") {
+                    calcInput = (parseFloat(calcInput) / 100).toString();
+                }
+            } else if (key === '=') {
+                evaluateCalc();
+            }
+
+            updateCalcScreen();
+        }
+
+        function evaluateCalc() {
+            if (calcPrevInput === "" || calcInput === "" || !calcOperation) return;
+
+            const prev = parseFloat(calcPrevInput);
+            const current = parseFloat(calcInput);
+            let result = 0;
+
+            switch (calcOperation) {
+                case '+': result = prev + current; break;
+                case '-': result = prev - current; break;
+                case '*': result = prev * current; break;
+                case '/': 
+                    result = current === 0 ? "Error" : prev / current; 
+                    break;
+            }
+
+            if (result !== "Error") {
+                // Round up to 8 decimal places if necessary to avoid binary precision leaks
+                result = Math.round(result * 100000000) / 100000000;
+            }
+
+            // Save to History Log
+            const rawExpr = `${calcPrevInput} ${calcOperation} ${calcInput}`;
+            saveCalcHistory(rawExpr, result);
+
+            calcInput = result.toString();
+            calcPrevInput = "";
+            calcOperation = null;
+            calcIsEvaluated = true;
+        }
+
+        // ==========================================
+        // 💾 PERSISTENT HISTORY MANAGEMENT
+        // ==========================================
+        function getCalcHistory() {
+            return JSON.parse(localStorage.getItem('premium_calc_history_{{ isletme.id }}') || '[]');
+        }
+
+        function saveCalcHistory(expression, result) {
+            let history = getCalcHistory();
+            history.unshift({ expression, result, date: new Date().toLocaleTimeString() });
+            if (history.length > 5) history.pop(); // Keep last 5
+            localStorage.setItem('premium_calc_history_{{ isletme.id }}', JSON.stringify(history));
+            loadCalcHistoryUI();
+        }
+
+        function clearCalcHistory() {
+            localStorage.removeItem('premium_calc_history_{{ isletme.id }}');
+            loadCalcHistoryUI();
+        }
+
+        function loadCalcHistoryUI() {
+            const list = document.getElementById('calcHistoryList');
+            if (!list) return;
+
+            const history = getCalcHistory();
+            if (history.length === 0) {
+                list.innerHTML = `<div class="text-xs text-center text-slate-600 py-8">İşlem geçmişiniz boş.</div>`;
+                return;
+            }
+
+            let html = "";
+            history.forEach(item => {
+                html += `
+                <button onclick="restoreCalcResult('${item.result}')" class="w-full text-right p-2.5 hover:bg-slate-900 rounded-xl transition-all border border-transparent hover:border-slate-800 group">
+                    <div class="text-[10px] text-slate-500 leading-none mb-1 group-hover:text-slate-400">${item.expression} =</div>
+                    <div class="text-sm font-black text-amber-400 group-hover:text-amber-300 leading-none">${item.result}</div>
+                </button>`;
+            });
+            list.innerHTML = html;
+        }
+
+        function restoreCalcResult(val) {
+            calcInput = val;
+            calcPrevInput = "";
+            calcOperation = null;
+            calcIsEvaluated = false;
+            updateCalcScreen();
+            toggleCalcHistory();
+        }
+
+        function toggleCalcHistory() {
+            const drawer = document.getElementById('calcHistoryDrawer');
+            if (!drawer) return;
+
+            const isHidden = drawer.classList.contains('pointer-events-none');
+            if (isHidden) {
+                loadCalcHistoryUI();
+                drawer.classList.remove('pointer-events-none', 'opacity-0');
+            } else {
+                drawer.classList.add('pointer-events-none', 'opacity-0');
+            }
+        }
+
+        // ==========================================
+        // ⌨️ KEYBOARD INPUT LISTENER
+        // ==========================================
+        document.addEventListener('keydown', function(event) {
+            const panel = document.getElementById('premiumCalcPanel');
+            if (!panel || panel.classList.contains('pointer-events-none')) return;
+
+            const key = event.key;
+            if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '%', '+', '-', '*','/'].includes(key)) {
+                event.preventDefault();
+                calcPressKey(key);
+            } else if (key === 'Enter') {
+                event.preventDefault();
+                calcPressKey('=');
+            } else if (key === 'Backspace') {
+                event.preventDefault();
+                calcPressKey('BACK');
+            } else if (key === 'Escape') {
+                event.preventDefault();
+                togglePremiumCalculator();
+            }
+        });
     </script>
 </body>
 </html>

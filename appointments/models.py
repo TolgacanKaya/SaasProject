@@ -6,10 +6,11 @@ import uuid
 
 class Appointment(models.Model):
     STATUS_CHOICES = (
+        ('payment_pending', 'Ödeme Bekleniyor'),  # Müşteri ödeme sayfasında
         ('pending', 'Bekliyor'),
         ('confirmed', 'Onaylandı'),
         ('cancelled', 'İptal Edildi (İşletme)'),
-        ('customer_cancelled', 'İptal Edildi (Müşteri)'),  # YENİ EKLENDİ!
+        ('customer_cancelled', 'İptal Edildi (Müşteri)'),
         ('completed', 'Tamamlandı'),
     )
 
@@ -25,8 +26,8 @@ class Appointment(models.Model):
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, verbose_name="Hizmet")
     staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Personel")
 
-    date_time = models.DateTimeField(verbose_name="Randevu Tarihi ve Saati")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="Durum")
+    date_time = models.DateTimeField(db_index=True, verbose_name="Randevu Tarihi ve Saati")
+    status = models.CharField(db_index=True, max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="Durum")
     chosen_location = models.CharField(max_length=20, choices=LOCATION_CHOICES, default='in_store',
                                        verbose_name="Seçilen Konum")
 
@@ -58,6 +59,19 @@ class Appointment(models.Model):
 
     is_reviewed = models.BooleanField(default=False, verbose_name="Değerlendirildi mi?")
     created_at = models.DateTimeField(auto_now_add=True)
+
+    is_reminder_sent = models.BooleanField(default=False, verbose_name="Hatırlatıcı Gönderildi mi?")
+
+    is_business_modified = models.BooleanField(default=False, verbose_name="İşletme Tarafından Zorla Değiştirildi")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['staff', 'date_time'],
+                condition=~models.Q(status__in=['cancelled', 'customer_cancelled', 'payment_pending']),
+                name='unique_active_appointment_for_staff'
+            )
+        ]
 
     def __str__(self):
         return f"{self.customer} - {self.date_time.strftime('%d.%m.%Y %H:%M')}"

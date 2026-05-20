@@ -1,31 +1,53 @@
 {% extends 'base.html' %}
+
 {% block title %}E-Posta Gönderildi | T-Randevu{% endblock %}
 
 {% block content %}
-<div class="relative min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+<div class="relative min-h-screen flex items-center justify-center pt-36 pb-12 px-4 sm:px-6 lg:px-8 bg-slate-50 overflow-hidden font-sans">
 
-    <!-- Lofi Arka Plan Işıkları -->
-    <div class="absolute inset-0 z-0 pointer-events-none flex justify-center items-center">
-        <div class="absolute w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px] animate-pulse"></div>
-    </div>
+    <div class="absolute top-20 left-1/4 w-96 h-96 bg-emerald-400/20 rounded-full blur-[100px] animate-blob pointer-events-none"></div>
+    <div class="absolute bottom-10 right-1/4 w-96 h-96 bg-teal-300/20 rounded-full blur-[100px] animate-blob animation-delay-2000 pointer-events-none"></div>
 
-    <div class="relative z-10 w-full max-w-md bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white p-8 sm:p-10 text-center transform transition-all duration-500 hover:-translate-y-1">
+    <div class="relative z-10 w-full max-w-md bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(16,185,129,0.1)] border border-slate-100 p-8 sm:p-12 text-center animate-[fadeSlideUp_0.6s_ease-out_forwards]">
 
-        <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-emerald-100">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+        <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shadow-sm border border-emerald-100/50 relative group">
+            <div class="absolute inset-0 bg-emerald-200/50 rounded-[1.5rem] blur group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10 relative z-10">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
             </svg>
         </div>
 
-        <h2 class="text-3xl font-extrabold text-slate-900 mb-4 tracking-tight">E-Postanızı Kontrol Edin</h2>
-        <p class="text-slate-500 mb-8 font-medium leading-relaxed">
-            Şifre sıfırlama talimatlarını içeren bir bağlantı e-posta adresinize gönderildi. Eğer mail kutunuzda göremiyorsanız <strong class="text-slate-700">Spam (Gereksiz)</strong> klasörünü kontrol etmeyi unutmayın.
-        </p>
+        <h2 class="text-3xl font-black text-slate-900 mb-4 tracking-tight">E-Postanızı Kontrol Edin</h2>
+        <div class="bg-emerald-50/50 border border-emerald-100/50 rounded-2xl p-5 mb-8">
+            <p class="text-slate-500 font-medium leading-relaxed text-sm">
+                Şifre sıfırlama talimatlarını içeren bir bağlantı e-posta adresinize gönderildi.
+            </p>
+            <p class="text-emerald-700 font-bold text-[11px] mt-3 pt-3 border-t border-emerald-100/50 flex items-center justify-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                Spam (Gereksiz) klasörünü de kontrol etmeyi unutmayın.
+            </p>
+        </div>
 
-        <a href="{% url 'giris' %}" class="inline-flex w-full py-4 items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-lg rounded-2xl shadow-xl shadow-slate-900/20 transition-all hover:-translate-y-0.5">
+        <a href="{% url 'giris' %}" class="group w-full flex justify-center items-center gap-2 py-4 px-4 rounded-2xl text-sm font-black text-white bg-slate-900 hover:bg-emerald-500 transition-all duration-300 transform active:scale-[0.98] shadow-lg hover:shadow-emerald-500/25">
             Giriş Sayfasına Dön
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 group-hover:translate-x-1 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
         </a>
+
     </div>
 </div>
+
+<style>
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes blob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(20px, -30px) scale(1.1); }
+        66% { transform: translate(-10px, 10px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-blob { animation: blob 10s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+</style>
 {% endblock %}

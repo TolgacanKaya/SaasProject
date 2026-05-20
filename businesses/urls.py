@@ -1,9 +1,14 @@
 from django.urls import path
 from . import views
+from .views_gdpr import isletme_veri_export
 
 urlpatterns = [
+    path('isletme-sec/', views.isletme_sec, name='isletme_sec'),
+    path('yeni-sube/', views.yeni_sube_ekle, name='yeni_sube_ekle'),
+
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/ayarlar/', views.isletme_ayarlar, name='isletme_ayarlar'),
+    path('dashboard/hizli-kayit/', views.isletme_hizli_kayit, name='isletme_hizli_kayit'),
     # YENİ: Hesap Silme Rotası
     path('dashboard/hesap-sil/', views.hesap_sil, name='hesap_sil'),
 
@@ -12,6 +17,7 @@ urlpatterns = [
     path('dashboard/hizmet-sil/<int:id>/', views.hizmet_sil, name='hizmet_sil'),
 
     path('dashboard/analiz/', views.isletme_analiz, name='isletme_analiz'),
+    path('analiz-raporu-indir/', views.analiz_raporu_indir, name='analiz_raporu_indir'),
 
     # ==========================================
     # YENİ: PERSONEL YÖNETİMİ URL'LERİ
@@ -30,18 +36,11 @@ urlpatterns = [
     path('dashboard/abonelik/', views.isletme_abonelik, name='isletme_abonelik'),
     path('dashboard/pro-yap/', views.pro_yap, name='pro_yap'),
     path('dashboard/musteriler/indir/', views.musterileri_indir_csv, name='musterileri_indir_csv'),
+    path('dashboard/verilerimi-indir/', isletme_veri_export, name='isletme_veri_export'),
+    path('dashboard/musteriler/engelle/<int:id>/', views.musteri_engelle, name='musteri_engelle'),
 
-    # MÜŞTERİ ÖDEME / SİPARİŞ ÖZETİ EKRANI
-    path('randevu/odeme-ozeti/<int:randevu_id>/', views.randevu_odeme_ozeti, name='randevu_odeme_ozeti'),
-    # YENİ: İyzico Geri Dönüş Rotası
-    path('dashboard/randevu/odeme-sonuc/<int:randevu_id>/', views.randevu_odeme_sonuc, name='randevu_odeme_sonuc'),
-
-    path('degerlendir/<uuid:token>/', views.degerlendirme_yap, name='degerlendirme_yap'),
-
-    path('api/available-times/<slug:slug>/', views.get_available_times, name='api_available_times'),
-
-    path('google/login/', views.google_takvim_bagla, name='google_takvim_bagla'),
-    path('google/callback/', views.google_takvim_callback, name='google_takvim_callback'),
+    path('giderler/', views.isletme_giderler, name='isletme_giderler'),
+    path('gider-raporu-indir/', views.gider_raporu_indir, name='gider_raporu_indir'),
 
     path('spotify/login/', views.spotify_bagla, name='spotify_bagla'),
     path('spotify/callback/', views.spotify_callback, name='spotify_callback'),
@@ -53,12 +52,26 @@ urlpatterns = [
     path('spotify/play-playlist/', views.spotify_play_playlist, name='spotify_play_playlist'),
 
     path('spotify/toggle-playback/', views.spotify_toggle_playback, name='spotify_toggle_playback'),
+    path('spotify/kopar/', views.spotify_kopar, name='spotify_kopar'),
+
+    path('dashboard/degerlendirmeler/', views.isletme_degerlendirmeler, name='isletme_degerlendirmeler'),
 
     # Mevcut yollarının arasına şu satırı ekle:
     path('api/canli-arama/', views.canli_arama_api, name='canli_arama_api'),
+    path('api/spotify/current-track/<slug:slug>/', views.public_spotify_current_track, name='public_spotify_current_track'),
+    path('isletme-spotify/<slug:slug>/', views.public_spotify_jukebox, name='public_spotify_jukebox'),
+    path('api/spotify/search/<slug:slug>/', views.public_spotify_search, name='public_spotify_search'),
+    path('api/spotify/add-to-queue/<slug:slug>/', views.public_spotify_add_to_queue, name='public_spotify_add_to_queue'),
+    path('api/spotify/play-playlist/<slug:slug>/', views.public_spotify_play_playlist, name='public_spotify_play_playlist'),
+    path('api/spotify/verify-customer/<slug:slug>/', views.public_spotify_verify_customer, name='public_spotify_verify_customer'),
+
+    path('qr-indir/', views.isletme_qr_indir, name='isletme_qr_indir'),
+    path('qr-yazdir/', views.isletme_qr_yazdir, name='isletme_qr_yazdir'),
 
     path('ayarlar/galeri-sil/<int:id>/', views.galeri_resim_sil, name='galeri_resim_sil'),
 
     # DİKKAT: Slug her zaman en altta olmalıdır!
+    path('<slug:slug>/rezervasyon/', views.booking_wizard, name='booking_wizard'),
+    path('<slug:slug>/yorumlar/', views.isletme_yorumlar, name='isletme_yorumlar'),
     path('<slug:slug>/', views.isletme_detay, name='isletme_detay'),
 ]

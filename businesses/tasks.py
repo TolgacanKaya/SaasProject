@@ -1,47 +1,79 @@
+import requests
 from celery import shared_task
-from django.core.mail import send_mail
-from django.conf import settings
-from django.urls import reverse
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+import logging
 
+logger = logging.getLogger('trandevu')
 
-@shared_task
-def send_review_email_task(appointment_id, domain):
-    from appointments.models import Appointment
-
+@shared_task(bind=True, max_retries=3)
+def geocode_business_task(self, business_id):
+    from businesses.models import Business
     try:
-        randevu = Appointment.objects.get(id=appointment_id)
+        business = Business.objects.get(id=business_id)
+        
+        # Adres parçalarını birleştir (Örn: Moda Cad. No:21, Kadıköy, İstanbul)
+        parts = []
+        if business.address:
+            parts.append(business.address.strip())
+        if business.district:
+            parts.append(business.district.strip())
+        if business.city:
+            parts.append(business.city.strip())
+            
+        if not parts:
+            return "Adres bilgisi eksik, geocoding yapılamadı."
+            
+        query = ", ".join(parts)
+        
+        url = "https://nominatim.openstreetmap.org/search"
+        params = {
+            'q': query,
+            'format': 'json',
+            'limit': 1
+        }
+        headers = {
+            'User-Agent': 'TRandevuApp/1.0'
+        }
+        
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+        
+        # 2. Deneme: Mahalle filtrelemesi (Nominatim karmaşık sokak/no'ları bulamayabiliyor)
+        if response.status_code == 200 and not response.json():
+            import re
+            match = re.search(r'([A-Za-zçÇğĞıİöÖşŞüÜ\s]+Mahallesi)', business.address, re.IGNORECASE)
+            if match and business.district and business.city:
+                mahalle = match.group(1).strip()
+                params['q'] = f"{mahalle}, {business.district.strip()}, {business.city.strip()}"
+                response = requests.get(url, params=params, headers=headers, timeout=10)
 
-        if not randevu.customer.email or randevu.is_reviewed:
-            return "İptal: E-posta yok veya zaten değerlendirilmiş."
+        # 3. Deneme: En kötü ihtimalle sadece İlçe + Şehir (İşletmeleri ilçe merkezine atar)
+        if response.status_code == 200 and not response.json():
+            fallback_parts = []
+            if business.district:
+                fallback_parts.append(business.district.strip())
+            if business.city:
+                fallback_parts.append(business.city.strip())
+            
+            if fallback_parts:
+                params['q'] = ", ".join(fallback_parts)
+                response = requests.get(url, params=params, headers=headers, timeout=10)
 
-        # Değerlendirme linkini oluşturuyoruz
-        path = reverse('degerlendirme_yap', kwargs={'token': randevu.review_token})
-        review_url = f"http://{domain}{path}"
-
-        subject = f"{randevu.business.name} - Hizmet Değerlendirmesi"
-
-        # 1. HTML Tasarımı yükle ve değişkenleri (isim, link vb.) içine bas
-        html_message = render_to_string('businesses/email_degerlendirme.html', {
-            'randevu': randevu,
-            'review_url': review_url,
-        })
-
-        # 2. Eskiden kalma, HTML desteklemeyen cihazlar için düz metin versiyonu
-        plain_message = strip_tags(html_message)
-
-        # GERÇEK MAİL GÖNDERİM KODU
-        send_mail(
-            subject=subject,
-            message=plain_message,  # Düz metin (Yedek)
-            html_message=html_message,  # Havalı HTML Tasarımı (Ana)
-            from_email=settings.EMAIL_HOST_USER if hasattr(settings,
-                                                           'EMAIL_HOST_USER') else settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[randevu.customer.email],
-            fail_silently=False
-        )
-        return f"Başarılı: {randevu.customer.email} adresine HTML değerlendirme maili gönderildi!"
-
-    except Appointment.DoesNotExist:
-        return "Hata: Randevu bulunamadı."
+        if response.status_code == 200:
+            data = response.json()
+            if data:
+                lat = float(data[0]['lat'])
+                lon = float(data[0]['lon'])
+                
+                # Sinyalleri tekrar tetiklememek için update() kullanıyoruz
+                Business.objects.filter(id=business_id).update(latitude=lat, longitude=lon)
+                return f"Başarılı: {business.name} -> {lat}, {lon}"
+            else:
+                return f"Bulunamadı: {query}"
+        else:
+            logger.error(f"Nominatim API Hatası: {response.status_code}")
+            raise self.retry(countdown=10)
+            
+    except Business.DoesNotExist:
+        return "İşletme silinmiş."
+    except Exception as e:
+        logger.error(f"Geocoding hatası: {e}")
+        raise self.retry(exc=e, countdown=10)

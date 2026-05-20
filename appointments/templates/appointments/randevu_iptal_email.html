@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <title>Randevunuz İptal Edildi</title>
 </head>
-<body style="background-color: #f8fafc; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 40px 20px; color: #334155; -webkit-font-smoothing: antialiased;">
+<body style="background-color: #fcfcfc; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 40px 20px; color: #334155; -webkit-font-smoothing: antialiased;">
 
-    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #f1f5f9;">
 
-        <div style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); padding: 40px 30px; text-align: center;">
+        <div style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); padding: 40px 30px; text-align: left;">
             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">{{ randevu.business.name }}</h1>
             <p style="color: #ffe4e6; margin: 8px 0 0 0; font-size: 15px; font-weight: 500;">Randevu İptal Bilgilendirmesi</p>
         </div>
@@ -27,19 +27,19 @@
             </p>
 
             {% if randevu.business.phone %}
-            <div style="text-align: center; margin: 35px 0;">
-                <a href="tel:{{ randevu.business.phone }}" style="background-color: #0f172a; color: #ffffff; padding: 16px 36px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2);">
+            <div style="text-align: left; margin: 35px 0;">
+                <a href="tel:{{ randevu.business.phone }}" style="background-color: #0f172a; color: #ffffff; padding: 16px 36px; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2);">
                     İşletmeyi Ara ({{ randevu.business.phone }})
                 </a>
             </div>
             {% else %}
-            <div style="text-align: center; margin: 35px 0; background-color: #f8fafc; padding: 20px; border-radius: 8px;">
+            <div style="text-align: left; margin: 35px 0; background-color: #fcfcfc; padding: 20px; border-radius: 8px;">
                 <p style="color: #64748b; font-size: 14px; margin: 0;">İletişim için işletmeyi ziyaret edebilir veya sistem üzerinden mesaj atabilirsiniz.</p>
             </div>
             {% endif %}
         </div>
 
-        <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+        <div style="background-color: #fcfcfc; padding: 20px; text-align: left; border-top: 1px solid #e2e8f0;">
             <p style="font-size: 13px; font-weight: 600; color: #94a3b8; margin: 0;">T-Randevu © 2026 SaaS Platformu</p>
         </div>
     </div>

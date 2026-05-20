@@ -1,0 +1,669 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ isletme.name }} | Canlı DJ Kabini{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --bg-abyss:     #050508;
+    --bg-surface:   #090910;
+    --bg-card:      #0e0e18;
+    --spotify-green:#1DB954;
+    --gold-500:     #eab308;
+    --text-bright:  #f8fafc;
+    --text-mid:     #94a3b8;
+    --text-dim:     #475569;
+}
+
+body {
+    background-color: var(--bg-abyss) !important;
+    color: var(--text-bright) !important;
+    font-family: 'Inter', sans-serif !important;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(234, 179, 8, 0.05) 0%, transparent 45%);
+    background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: 'Inter', sans-serif !important;
+}
+
+.spotify-glass {
+    background: rgba(14, 14, 24, 0.65);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.search-input-glow:focus {
+    box-shadow: 0 0 25px rgba(29, 185, 84, 0.25);
+    border-color: var(--spotify-green) !important;
+}
+
+/* ── Spotify Vinyl & Wave Animations ── */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.animate-vinyl-spin {
+    animation: spin 5s linear infinite !important;
+}
+
+@keyframes wave {
+    0%, 100% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1.3); }
+}
+.animate-wave-1 { animation: wave 1s ease-in-out infinite; }
+.animate-wave-2 { animation: wave 0.8s ease-in-out infinite 0.2s; }
+.animate-wave-3 { animation: wave 1.2s ease-in-out infinite 0.4s; }
+
+@keyframes floatNote {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0; }
+}
+.floating-note {
+    position: absolute;
+    color: var(--spotify-green);
+    font-size: 16px;
+    animation: floatNote 2.5s ease-out forwards;
+    pointer-events: none;
+}
+
+/* Custom Scrollbar */
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--spotify-green);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8 md:py-12">
+    
+    <!-- ÜST BAŞLIK / SALON ADI -->
+    <div class="text-center mb-10 animate-float-up">
+        <a href="{% url 'isletme_detay' isletme.slug %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold text-slate-300 transition-all mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            {{ isletme.name }} Vitrinine Geri Dön
+        </a>
+        <h1 class="text-3xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400 mt-2">
+            Müşteri DJ Kabini
+        </h1>
+        <p class="text-sm md:text-base text-slate-400 max-w-lg mx-auto mt-2.5 font-medium leading-relaxed">
+            Salonda o an çalan şarkıyı görün, sıraya en sevdiğiniz şarkıyı ekleyin veya salon çalma listelerini keşfedin!
+        </p>
+    </div>
+
+    {% if not spotify_connected %}
+    <!-- BAĞLANTI YOK ALANI -->
+    <div class="spotify-glass rounded-[2rem] p-10 text-center max-w-md mx-auto border border-red-500/20 shadow-[0_20px_50px_rgba(239,68,68,0.1)]">
+        <div class="w-16 h-16 bg-red-500/10 text-red-400 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.49 17.3c-.22.36-.68.49-1.05.26-2.99-1.83-6.75-2.25-11.19-1.24-.41.1-.83-.16-.92-.57-.1-.41.16-.83.57-.92 4.88-1.12 9.03-.64 12.37 1.4.37.23.49.69.22 1.07zm1.47-3.26c-.28.45-.87.6-1.32.32-3.42-2.1-8.64-2.71-12.68-1.48-.51.15-1.04-.14-1.19-.65-.15-.51.14-1.04.65-1.19 4.62-1.4 10.37-.71 14.28 1.69.45.28.6.87.32 1.32zm.12-3.41c-.34.56-1.05.73-1.6.38-4.1-2.44-10.87-2.66-14.78-1.48-.63.2-1.3-.17-1.48-.8-.2-.63.17-1.3.8-1.48 4.66-1.41 12.14-1.14 16.9 1.69.54.33.72 1.04.38 1.6z"/></svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Bağlantı Aktif Değil</h3>
+        <p class="text-slate-400 text-xs font-medium leading-relaxed">
+            Bu salon şu anda Spotify entegrasyonunu aktif etmemiş veya işletme hesabı geçici olarak çevrimdışı. Lütfen daha sonra tekrar deneyin.
+        </p>
+    </div>
+    {% else %}
+
+    <!-- SPLIT DASHBOARD LAYOUT (GRID ON LARGE SCREENS) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-6">
+        
+        <!-- LEFT COLUMN: Physical Vinyl Player & Info Manual (5 columns) -->
+        <div class="lg:col-span-5 space-y-6">
+            <!-- CANLI ÇALAN ŞARKI KARTI -->
+            <div id="spotify-jukebox-player" class="spotify-glass rounded-[2rem] p-6 md:p-8 border border-white/[0.05] shadow-2xl relative overflow-hidden transition-all duration-500">
+                <div class="absolute -right-16 -top-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="flex flex-col sm:flex-row lg:flex-col items-center gap-6 relative z-10">
+                    <!-- Dönen Plak Görseli -->
+                    <div class="relative w-36 h-36 shrink-0 select-none">
+                        <!-- Vinyl Disc Outer Ring -->
+                        <div id="jukebox-vinyl" class="w-36 h-36 rounded-full bg-neutral-950 border-4 border-neutral-800 shadow-2xl relative flex items-center justify-center transition-transform duration-1000">
+                            <div class="absolute inset-1.5 rounded-full border border-neutral-800/60"></div>
+                            <div class="absolute inset-3.5 rounded-full border border-neutral-800/40"></div>
+                            <div class="absolute inset-5.5 rounded-full border border-neutral-800/20"></div>
+                            <div class="absolute inset-7.5 rounded-full border border-neutral-900/40"></div>
+                            <div class="absolute inset-9.5 rounded-full border border-neutral-900/60"></div>
+                            
+                            <!-- Album Image Label -->
+                            <img id="jukebox-album-cover" src="" class="absolute w-14 h-14 rounded-full border-2 border-black/80 object-cover z-10 transition-all duration-500" style="animation: none;">
+                            
+                            <!-- Spindle Center Hole -->
+                            <div class="absolute w-4 h-4 bg-neutral-900 border border-neutral-800 rounded-full z-20 flex items-center justify-center">
+                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                            </div>
+                        </div>
+                        <!-- Floating notes container -->
+                        <div id="jukebox-notes-container" class="absolute inset-0 pointer-events-none z-30"></div>
+                    </div>
+
+                    <!-- Şarkı & Çalma Detayları -->
+                    <div class="flex-1 text-center sm:text-left lg:text-center min-w-0 w-full">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/35 uppercase tracking-widest mb-3">
+                            <span class="flex gap-0.5 items-end h-2.5">
+                                <span class="w-0.5 h-2 bg-emerald-400 rounded-full inline-block origin-bottom animate-wave-1"></span>
+                                <span class="w-0.5 h-3 bg-emerald-400 rounded-full inline-block origin-bottom animate-wave-2"></span>
+                                <span class="w-0.5 h-1.5 bg-emerald-400 rounded-full inline-block origin-bottom animate-wave-3"></span>
+                            </span>
+                            Salonda Şu An Çalıyor
+                        </div>
+                        <h2 id="jukebox-track-name" class="text-lg md:text-xl font-black truncate tracking-tight text-white">Şarkı Yükleniyor...</h2>
+                        <p id="jukebox-artist-name" class="text-xs md:text-sm text-slate-400 mt-1 truncate font-semibold">Sanatçı</p>
+                        
+                        <!-- Playback Progress Bar -->
+                        <div class="w-full h-1.5 bg-white/10 rounded-full mt-6 overflow-hidden">
+                            <div id="jukebox-progress" class="h-full bg-emerald-500 rounded-full transition-all duration-1000" style="width: 35%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DJ KABİNİ BİLGİLENDİRME KARTI -->
+            <div class="spotify-glass rounded-[2rem] p-6 border border-white/[0.04] shadow-md relative overflow-hidden">
+                <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl"></div>
+                <h4 class="font-extrabold text-xs mb-3.5 text-slate-200 flex items-center gap-2 tracking-wide uppercase">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Jukebox Nasıl Çalışır?
+                </h4>
+                <ul class="text-xs text-slate-400 space-y-3 leading-relaxed font-semibold">
+                    <li class="flex gap-2.5">
+                        <span class="text-emerald-400 font-black">1.</span>
+                        <span>Yan paneldeki arama barından dilediğiniz şarkıyı, albümü veya sanatçıyı aratın.</span>
+                    </li>
+                    <li class="flex gap-2.5">
+                        <span class="text-emerald-400 font-black">2.</span>
+                        <span>Listelenen şarkıların yanındaki <strong>"Ekle"</strong> tuşuna dokunarak salondaki sıraya gönderin.</span>
+                    </li>
+                    <li class="flex gap-2.5">
+                        <span class="text-emerald-400 font-black">3.</span>
+                        <span>Şarkınız <strong>Canlı Kuyruk</strong> listesinin sonuna eklenir ve sırası gelince tüm salonda çalmaya başlar!</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Search Bar, Results, and Live Queue (7 columns) -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- ── ŞARKI ARAMA ALANI (INSTANT SEARCH / DOĞRULAMA) ── -->
+            {% if is_verified %}
+            <div class="spotify-glass rounded-[2rem] p-6 border border-white/[0.04] shadow-md animate-float-up">
+                <h3 class="text-base font-extrabold mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Salona İstediğin Şarkıyı Gönder
+                </h3>
+                
+                <div class="relative">
+                    <input type="text" id="jukebox-search-input" placeholder="Şarkı adı, sanatçı veya albüm arayın..." 
+                           class="w-full py-5 pl-14 pr-12 rounded-2xl bg-white/10 border border-white/15 text-white placeholder-slate-500 text-sm font-semibold search-input-glow transition-all duration-300 focus:bg-white/15 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50">
+                    <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    
+                    <button id="search-clear-btn" class="hidden absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 rounded-full bg-white/10 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Arama Sonuçları Listesi -->
+                <div id="search-results-panel" class="hidden mt-4 bg-white/[0.02] rounded-2xl p-4 border border-white/[0.04] max-h-[350px] overflow-y-auto custom-scroll animate-float-up">
+                    <div id="search-results-list" class="divide-y divide-white/[0.05] space-y-2">
+                        <!-- Dinamik Sonuçlar -->
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- GÜVENLİK/DOĞRULAMA PANELİ (JUKEBOX VERIFICATION) -->
+            <div id="jukebox-auth-panel" class="spotify-glass rounded-[2rem] p-8 border border-white/[0.04] shadow-md text-center animate-float-up">
+                <div class="w-14 h-14 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto mb-5 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                </div>
+                <h3 class="text-base font-black text-white mb-2">Salondaki Müzik Akışına Katılın!</h3>
+                <p class="text-xs text-slate-400 font-medium max-w-sm mx-auto mb-6 leading-relaxed">
+                    Salonda çalacak şarkıları seçmek için lütfen bugün bu salonda randevu aldığınız telefon numaranızı girerek kimliğinizi doğrulayın.
+                </p>
+                
+                <div class="relative max-w-xs mx-auto mb-4">
+                    <input type="text" id="jukebox-auth-phone" placeholder="05XX XXX XX XX" 
+                           class="w-full py-4 pl-12 pr-4 rounded-2xl bg-white/10 border border-white/15 text-white placeholder-slate-500 text-sm font-bold text-center tracking-wider transition-all duration-300 focus:bg-white/15 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <button id="jukebox-auth-btn" class="w-full max-w-xs px-6 py-4 font-black text-[11px] bg-emerald-500 text-black hover:bg-emerald-400 rounded-2xl transition-all uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.35)]">
+                    Doğrula ve Kabine Katıl
+                </button>
+                
+                <div id="jukebox-auth-error" class="hidden mt-4 text-xs font-bold text-red-400 max-w-xs mx-auto"></div>
+            </div>
+            {% endif %}
+
+            <!-- ── CANLI ÇALMA KUYRUĞU (UPCOMING QUEUE) ── -->
+            <div id="spotify-upcoming-queue-section" class="hidden animate-float-up">
+                <h3 class="text-base font-extrabold mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg>
+                    Sırada Çalacak Şarkılar (Canlı Kuyruk)
+                </h3>
+                <div class="spotify-glass rounded-[2rem] p-5 border border-white/[0.04] shadow-md">
+                    <div id="upcoming-queue-list" class="divide-y divide-white/[0.05] space-y-3">
+                        <!-- Dinamik Kuyruk Elemanları -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- BAŞARI BİLDİRİM MODALI (TOAST-STYLE NOTIFICATION) -->
+<div id="jukebox-success-toast" class="fixed bottom-6 right-6 z-[99999] hidden flex items-center gap-3.5 px-5 py-4 rounded-2xl bg-slate-900 border border-emerald-500/30 text-white shadow-2xl shadow-emerald-500/10 transform translate-y-12 opacity-0 transition-all duration-300">
+    <div class="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+        <h5 class="text-sm font-black tracking-tight" id="toast-title">Başarıyla Eklendi</h5>
+        <p class="text-[11px] text-slate-400 font-semibold mt-0.5" id="toast-body">Sıradaki şarkı salon kuyruğunda!</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const slug = "{{ isletme.slug }}";
+    
+    // Elements
+    const vinyl = document.getElementById('jukebox-vinyl');
+    const cover = document.getElementById('jukebox-album-cover');
+    const trackName = document.getElementById('jukebox-track-name');
+    const artistName = document.getElementById('jukebox-artist-name');
+    const progressLine = document.getElementById('jukebox-progress');
+    const notesContainer = document.getElementById('jukebox-notes-container');
+    
+    const searchInput = document.getElementById('jukebox-search-input');
+    const clearBtn = document.getElementById('search-clear-btn');
+    const resultsPanel = document.getElementById('search-results-panel');
+    const resultsList = document.getElementById('search-results-list');
+    
+    const toast = document.getElementById('jukebox-success-toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastBody = document.getElementById('toast-body');
+
+    let pollInterval = null;
+    let fakeProgressInterval = null;
+    let progressPercent = 35;
+    let searchDebounce = null;
+
+    // ──────────────────────────────────────────
+    // NOTALAR (PARTICLE EFFECT)
+    // ──────────────────────────────────────────
+    function createFloatingNote() {
+        if (!notesContainer || document.hidden) return;
+        const noteChars = ['🎵', '🎶', '♩', '♪', '♫', '♬'];
+        const note = document.createElement('div');
+        note.className = 'floating-note';
+        note.textContent = noteChars[Math.floor(Math.random() * noteChars.length)];
+        
+        const dx = (Math.random() * 120 - 60) + 'px';
+        const dy = -(Math.random() * 100 + 40) + 'px';
+        note.style.setProperty('--dx', dx);
+        note.style.setProperty('--dy', dy);
+        
+        note.style.left = '60px';
+        note.style.top = '60px';
+        
+        notesContainer.appendChild(note);
+        setTimeout(() => note.remove(), 2500);
+    }
+
+    let noteTimer = null;
+    function startNoteAnimation() {
+        if (!noteTimer) {
+            noteTimer = setInterval(createFloatingNote, 1300);
+        }
+    }
+    function stopNoteAnimation() {
+        if (noteTimer) {
+            clearInterval(noteTimer);
+            noteTimer = null;
+        }
+    }
+
+    // ──────────────────────────────────────────
+    // CANLI ŞARKI POLLING
+    // ──────────────────────────────────────────
+    function checkSpotify() {
+        fetch(`/api/spotify/current-track/${slug}/?_=${Date.now()}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'playing' && data.is_playing) {
+                    trackName.textContent = data.track_name;
+                    artistName.textContent = data.artist_name;
+                    if (data.album_cover) cover.src = data.album_cover;
+                    
+                    vinyl.classList.add('animate-vinyl-spin');
+                    startNoteAnimation();
+                    
+                    if (!fakeProgressInterval) {
+                        fakeProgressInterval = setInterval(() => {
+                            progressPercent = (progressPercent + 0.4) % 100;
+                            if (progressPercent < 5) progressPercent = 5;
+                            if (progressLine) progressLine.style.width = progressPercent + '%';
+                        }, 1000);
+                    }
+                } else {
+                    if (data.status === 'playing') {
+                        trackName.textContent = data.track_name;
+                        artistName.textContent = data.artist_name + " (Duraklatıldı)";
+                        if (data.album_cover) cover.src = data.album_cover;
+                        vinyl.classList.remove('animate-vinyl-spin');
+                        stopNoteAnimation();
+                    } else {
+                        trackName.textContent = "Salon Çalma Listesi Çalıyor";
+                        artistName.textContent = "Şu an arka planda salon şarkıları açık.";
+                        cover.src = "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=300&auto=format&fit=crop";
+                        vinyl.classList.remove('animate-vinyl-spin');
+                        stopNoteAnimation();
+                    }
+                    if (fakeProgressInterval) {
+                        clearInterval(fakeProgressInterval);
+                        fakeProgressInterval = null;
+                    }
+                }
+
+                // Canlı Kuyruk Güncelleme
+                const upcomingSection = document.getElementById('spotify-upcoming-queue-section');
+                const upcomingList = document.getElementById('upcoming-queue-list');
+                if (upcomingSection && upcomingList) {
+                    upcomingList.innerHTML = '';
+                    if (data.queue && data.queue.length > 0) {
+                        upcomingSection.classList.remove('hidden');
+                        data.queue.forEach((item, index) => {
+                            const row = document.createElement('div');
+                            row.className = 'flex items-center justify-between py-3 border-b border-white/[0.02] last:border-0 hover:bg-white/[0.01] px-2 rounded-xl transition-all duration-200';
+                            row.innerHTML = `
+                                <div class="flex items-center gap-3.5 min-w-0">
+                                    <div class="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[10px] text-slate-400 font-extrabold shrink-0">
+                                        ${index + 1}
+                                    </div>
+                                    <img src="${item.album_cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=100&auto=format&fit=crop'}" class="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/5">
+                                    <div class="min-w-0">
+                                        <h5 class="font-extrabold text-xs text-white truncate">${item.name}</h5>
+                                        <p class="text-[10px] text-slate-400 font-medium truncate mt-0.5">${item.artists}</p>
+                                    </div>
+                                </div>
+                                <div class="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-md uppercase tracking-wider font-extrabold">
+                                    Sırada
+                                </div>
+                            `;
+                            upcomingList.appendChild(row);
+                        });
+                    } else {
+                        upcomingSection.classList.add('hidden');
+                    }
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+    function startPolling() {
+        if (!pollInterval) {
+            checkSpotify();
+            pollInterval = setInterval(checkSpotify, 6000);
+        }
+    }
+
+    function stopPolling() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+        }
+    }
+
+    // Tab aktifse polling'i başlat, gizliyse başlatma
+    if (!document.hidden) {
+        startPolling();
+    }
+
+    // Sekme değiştirildiğinde veya tarayıcı arka plana alındığında dinle
+    document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+            stopPolling();
+        } else {
+            startPolling();
+        }
+    });
+
+    // ──────────────────────────────────────────
+    // ARANAN ŞARKILAR (SEARCH)
+    // ──────────────────────────────────────────
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = searchInput.value.trim();
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+                resultsPanel.classList.add('hidden');
+                return;
+            }
+
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                fetch(`/api/spotify/search/${slug}/?q=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        resultsList.innerHTML = '';
+                        if (data.tracks && data.tracks.length > 0) {
+                            resultsPanel.classList.remove('hidden');
+                            data.tracks.forEach(t => {
+                                const row = document.createElement('div');
+                                row.className = 'flex items-center justify-between gap-4 py-3 border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02] px-2 rounded-xl transition-all duration-200';
+                                row.innerHTML = `
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <img src="${t.album_cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=100&auto=format&fit=crop'}" class="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/5">
+                                        <div class="min-w-0">
+                                            <h5 class="font-extrabold text-xs text-white truncate">${t.name}</h5>
+                                            <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">${t.artists}</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="addToQueue('${t.uri}', '${t.name.replace(/'/g, "\\'")}')" class="shrink-0 px-3.5 py-2 font-black text-[10px] bg-emerald-500 text-black hover:bg-emerald-400 rounded-xl transition-all uppercase tracking-wider flex items-center gap-1 hover:shadow-[0_0_15px_rgba(29,185,84,0.4)]">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                        Ekle
+                                    </button>
+                                `;
+                                resultsList.appendChild(row);
+                            });
+                        } else {
+                            resultsPanel.classList.remove('hidden');
+                            resultsList.innerHTML = `<div class="text-center py-6 text-slate-500 font-bold text-xs">Aradığınız şarkı bulunamadı.</div>`;
+                        }
+                    })
+                    .catch(err => console.error(err));
+            }, 350);
+        });
+
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            clearBtn.classList.add('hidden');
+            resultsPanel.classList.add('hidden');
+        });
+    }
+
+    // ──────────────────────────────────────────
+    // KUYRUĞA EKLEME İŞLEMİ
+    // ──────────────────────────────────────────
+    window.addToQueue = function(uri, trackName) {
+        fetch(`/api/spotify/add-to-queue/${slug}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ uri: uri })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast("Şarkı Sıraya Eklendi!", `'${trackName}' başarıyla salonun çalma kuyruğuna gönderildi.`);
+                searchInput.value = '';
+                clearBtn.classList.add('hidden');
+                resultsPanel.classList.add('hidden');
+                
+                // Kuyruğu anında güncelle
+                setTimeout(checkSpotify, 1000);
+            } else {
+                alert("Hata: " + data.message);
+            }
+        })
+        .catch(err => console.error(err));
+    };
+
+    // ──────────────────────────────────────────
+    // PLAYLIST ÇALDIRMA İŞLEMİ
+    // ──────────────────────────────────────────
+    window.playPlaylist = function(uri, playlistName) {
+        if (!confirm(`'${playlistName}' çalma listesini salonda başlatmak istiyor musunuz?`)) return;
+        
+        fetch(`/api/spotify/play-playlist/${slug}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ uri: uri })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast("Oynatılıyor!", `'${playlistName}' çalma listesi salonda başlatıldı.`);
+                setTimeout(checkSpotify, 1500);
+            } else {
+                alert("Hata: " + data.message);
+            }
+        })
+        .catch(err => console.error(err));
+    };
+
+    // ──────────────────────────────────────────
+    // GÜVENLİK/DOĞRULAMA (JUKEBOX VERIFICATION)
+    // ──────────────────────────────────────────
+    const authPhoneInput = document.getElementById('jukebox-auth-phone');
+    const authBtn = document.getElementById('jukebox-auth-btn');
+    const authError = document.getElementById('jukebox-auth-error');
+
+    if (authPhoneInput && authBtn) {
+        // Telefon formatlama: 05XX XXX XX XX
+        authPhoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            let formatted = "";
+            if (value.length > 0) {
+                if (value.startsWith('0')) {
+                    formatted = '0';
+                    if (value.length > 1) formatted += '5' + value.slice(2, 4);
+                    else formatted += '5';
+                } else {
+                    formatted = '05' + value.slice(0, 2);
+                }
+                
+                let rest = value.startsWith('0') ? value.slice(4) : value.slice(2);
+                if (rest.length > 0) {
+                    formatted += ' ' + rest.slice(0, 3);
+                    if (rest.length > 3) {
+                        formatted += ' ' + rest.slice(3, 5);
+                        if (rest.length > 5) {
+                            formatted += ' ' + rest.slice(5, 7);
+                        }
+                    }
+                }
+            }
+            e.target.value = formatted;
+        });
+
+        authBtn.addEventListener('click', function() {
+            const phone = authPhoneInput.value.trim();
+            if (!phone) {
+                authError.textContent = "Lütfen telefon numaranızı giriniz.";
+                authError.classList.remove('hidden');
+                return;
+            }
+
+            authError.classList.add('hidden');
+            authBtn.disabled = true;
+            authBtn.textContent = "Doğrulanıyor...";
+
+            fetch(`/api/spotify/verify-customer/${slug}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ phone: phone })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Başarılı doğrulama! Sayfayı yenileyelim
+                    window.location.reload();
+                } else {
+                    authError.textContent = data.message;
+                    authError.classList.remove('hidden');
+                    authBtn.disabled = false;
+                    authBtn.textContent = "Doğrula ve Kabine Katıl";
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                authError.textContent = "Bir hata oluştu. Lütfen tekrar deneyin.";
+                authError.classList.remove('hidden');
+                authBtn.disabled = false;
+                authBtn.textContent = "Doğrula ve Kabine Katıl";
+            });
+        });
+    }
+
+    // ──────────────────────────────────────────
+    // TOAST BİLDİRİM GÖSTERİMİ
+    // ──────────────────────────────────────────
+    function showToast(title, body) {
+        toastTitle.textContent = title;
+        toastBody.textContent = body;
+        toast.classList.remove('hidden');
+        
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-y-12', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+        });
+        
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-12', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 300);
+        }, 4000);
+    }
+});
+</script>
+{% endblock %}

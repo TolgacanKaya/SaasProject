@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Sistem Hatası (500) | T-Randevu{% endblock %}
+
+{% block content %}
+<div class="bg-slate-900 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans text-slate-100 selection:bg-amber-500 selection:text-slate-950 pb-24 pt-36">
+    
+    <!-- Arka Plan Dinamik Işık Küreleri (System Alert & Floating Orbs) -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-amber-600/20 rounded-full blur-[140px] animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[120px] animate-blob animation-delay-2000"></div>
+        
+        <!-- Çökmüş Radar Dalgaları (Warning Rings) -->
+        <div class="absolute w-[600px] h-[600px] border border-amber-500/15 rounded-full animate-[ping_6s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+        <div class="absolute w-[900px] h-[900px] border border-red-500/10 rounded-full animate-[ping_10s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+    </div>
+
+    <!-- İnce Grid Deseni -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-25"></div>
+
+    <div class="text-center max-w-3xl mx-auto relative z-10 bg-slate-950/90 backdrop-blur-2xl p-10 sm:p-20 rounded-[3rem] border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden group">
+        
+        <!-- Ambient Glow inside container -->
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px] pointer-events-none group-hover:bg-amber-500/10 transition-colors duration-700"></div>
+
+        <!-- 500 Glitch & Parlama Tipografisi -->
+        <div class="relative mb-8">
+            <div class="absolute inset-0 blur-2xl opacity-50 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 text-transparent bg-clip-text font-black text-8xl sm:text-9xl tracking-tighter select-none">
+                500
+            </div>
+            <h1 class="text-8xl sm:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-amber-300 to-red-400 drop-shadow-2xl select-none tracking-tighter font-display relative z-10">
+                500
+            </h1>
+        </div>
+
+        <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-extrabold mb-6 backdrop-blur-xl shadow-inner tracking-widest uppercase">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            Sunucu Aşırı Yüklendi
+        </div>
+
+        <h2 class="text-3xl md:text-5xl font-black text-white mb-6 tracking-tight font-display">
+            Beklenmeyen Bir Hata Oluştu
+        </h2>
+
+        <p class="text-base sm:text-xl text-slate-400 mb-12 leading-relaxed font-medium max-w-2xl mx-auto">
+            Sunucularımızda anlık bir yoğunluk veya geçici bir altyapı arızası meydana geldi. Mühendislerimiz durumdan haberdar ve sistemi kurtarmak için çalışıyor.
+        </p>
+
+        <!-- Etkileşimli Kurtarma Butonları -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-5 relative z-10">
+            <button onclick="window.location.reload();" class="interactive-btn w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 text-white text-sm font-black rounded-2xl shadow-lg shadow-amber-500/25 flex items-center justify-center gap-3 transform hover:scale-105 transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 animate-spin"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                <span>Sayfayı Yenile</span>
+            </button>
+            <a href="/" class="interactive-btn w-full sm:w-auto px-10 py-5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 text-sm font-black rounded-2xl shadow-inner flex items-center justify-center gap-3 transform hover:scale-105 transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-amber-400"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                <span>Ana Sayfaya Dön</span>
+            </a>
+        </div>
+
+        <!-- Alt Yardım Satırı -->
+        <div class="mt-12 pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 font-bold gap-4">
+            <span>Sistem Kodu: ERR_500_INTERNAL_SERVER_ERROR</span>
+            <a href="{% url 'iletisim' %}" class="text-amber-400 hover:text-amber-300 underline underline-offset-4 transition-colors">Acil Destek Birimi</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes blob {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-blob { animation: blob 12s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+</style>
+{% endblock %}

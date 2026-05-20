@@ -1,7 +1,44 @@
-venv/
-db.sqlite3
+# --- PYTHON & DJANGO ---
 __pycache__/
-.idea/
-media/
+*.py[cod]
+*$py.class
+*.so
+.python-version
+
+# --- SANAL ORTAMLAR (VIRTUAL ENVIRONMENTS) ---
+.venv/
+venv/
+env/
+ENV/
+.env/
+
+# --- ÇEVRESEL DEĞİŞKENLER (SECRETS & ENVS) ---
 .env
-static/
+.env.local
+.env.*
+!.env.example
+
+# --- VERİTABANLARI (DATABASES) ---
+db.sqlite3
+db.sqlite3-journal
+
+# --- MEDYA & DİNAMİK YÜKLEMELER (USER MEDIA UPLOADS) ---
+# Kullanıcıların yüklediği resim/belgelerin Git'e gitmesini engelleriz
+media/
+staticfiles/
+
+# --- LOGLAR & RAPORLAR (LOGS & CACHES) ---
+*.log
+logs/
+celerybeat-schedule*
+.webassets-cache/
+
+# --- IDE & EDİTÖR AYARLARI ---
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~

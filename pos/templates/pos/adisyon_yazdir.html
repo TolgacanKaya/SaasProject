@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiş #{{ adisyon.fis_no }}</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            width: 300px; /* 80mm termal yazıcı genişliği */
+            margin: 0 auto;
+            color: #000;
+            background: #fff;
+            font-size: 12px;
+            padding: 20px 10px;
+        }
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+        .line { border-bottom: 1px dashed #000; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 4px 0; font-size: 12px; }
+        .right { text-align: right; }
+
+        .header-title { font-size: 18px; margin-bottom: 5px; font-weight: 900; }
+        .footer-text { font-size: 10px; margin-top: 20px; text-align: center; }
+
+        /* SADECE YAZICIDA ÇALIŞACAK AYARLAR */
+        @media print {
+            body { width: 100%; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body onload="window.print();">
+
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">🖨️ Tekrar Yazdır</button>
+        <button onclick="window.close()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Kapat</button>
+    </div>
+
+    <div class="center">
+        <div class="header-title">{{ isletme.name }}</div>
+        <div>{{ isletme.phone }}</div>
+        <div>{{ isletme.district|default:"" }} / {{ isletme.city|default:"" }}</div>
+    </div>
+
+    <div class="line"></div>
+
+    <div>
+        <div><span class="bold">Tarih:</span> {{ adisyon.created_at|date:"d.m.Y H:i" }}</div>
+        <div><span class="bold">Fiş No:</span> #{{ adisyon.fis_no }}</div>
+        <div><span class="bold">Müşteri:</span> {{ adisyon.appointment.customer.first_name }} {{ adisyon.appointment.customer.last_name }}</div>
+        <div><span class="bold">Kasiyer:</span> {{ request.user.first_name }}</div>
+    </div>
+
+    <div class="line"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Ürün/Hizmet</th>
+                <th class="center">Adet</th>
+                <th class="right">Tutar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ adisyon.appointment.service.name }}</td>
+                <td class="center">1</td>
+                <td class="right">{{ adisyon.online_paid_amount|floatformat:2 }}</td>
+            </tr>
+            {% for item in adisyon.items.all %}
+            <tr>
+                <td>{{ item.item_name|truncatechars:15 }}</td>
+                <td class="center">{{ item.quantity }}</td>
+                <td class="right">{{ item.total_price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="line"></div>
+
+    <table>
+        <tr>
+            <td class="bold">ARA TOPLAM:</td>
+            <td class="right bold">{{ adisyon.grand_total|floatformat:2 }} TL</td>
+        </tr>
+        <tr>
+            <td>Online Ödenen:</td>
+            <td class="right">- {{ adisyon.online_paid_amount|floatformat:2 }} TL</td>
+        </tr>
+        <tr>
+            <td class="bold" style="font-size: 14px;">KALAN TUTAR:</td>
+            <td class="right bold" style="font-size: 14px;">{{ adisyon.remaining_balance|floatformat:2 }} TL</td>
+        </tr>
+    </table>
+
+    <div class="line"></div>
+
+    <div class="center bold uppercase">
+        {% if adisyon.payment_method == 'cash' %}NAKİT TAHSİL EDİLDİ
+        {% elif adisyon.payment_method == 'cc' %}KREDİ KARTI İLE TAHSİL EDİLDİ
+        {% elif adisyon.payment_method == 'online' %}ONLİNE ÖDENMİŞTİR
+        {% else %}ÖDEME BEKLENİYOR...{% endif %}
+    </div>
+
+    <div class="footer-text">
+        Bizi tercih ettiğiniz için teşekkür ederiz!<br>
+        T-Randevu POS Sistemi
+    </div>
+
+</body>
+</html>

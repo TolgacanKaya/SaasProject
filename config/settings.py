@@ -22,11 +22,34 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: Sadece .env'de True yazıyorsa True olur.
 DEBUG = os.getenv('DJANGO_DEBUG') == 'True'
 
-ALLOWED_HOSTS = ['*'] # Geliştirme aşamasında her yerden erişime izin ver
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+
+
+# --- PRODUCTION SECURITY SETTINGS ---
+if not DEBUG:
+    # 🛡️ Güvenlik Başlıkları (Security Headers)
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000 # 1 Yıl
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True # HTTPS zorunluluğu
+
+    # 🍪 Çerez Güvenliği (Cookie Security)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+else:
+    # Geliştirme ortamında kolaylık
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
 
 
 # Application definition
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +61,7 @@ INSTALLED_APPS = [
     'businesses',    # Dükkan, hizmetler, müşteriler
     'appointments',  # Randevular, takvim, saatler
     'payments',      # Ödeme İşlemleri
+    'pos'            # POS(Adisyon) Sistemi
 ]
 
 MIDDLEWARE = [
@@ -48,7 +72,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'businesses.middleware.PremiumStatusMiddleware', # Müşteri Premium Kontrolü
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -74,8 +97,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'trandevu_db'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
@@ -96,6 +123,72 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+JAZZMIN_SETTINGS = {
+    "site_title": "T-Randevu Admin",
+    "site_header": "T-Randevu",
+    "site_brand": "Sistem Yönetimi",
+    "welcome_sign": "T-Randevu Yönetim Merkezine Hoş Geldiniz, Patron!",
+    "copyright": "T-Randevu Inc.",
+    "search_model": ["businesses.Business", "auth.User"],
+    "show_ui_builder": False,
+
+    # --- Görsel İyileştirmeler ---
+    "changeform_format": "single",
+    "language_chooser": False,
+    "related_modal_active": False,
+
+    # --- Sol Menü İkonları (Uygulamalarına Özel) ---
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user-shield",
+        "auth.Group": "fas fa-users",
+        "appointments.Appointment": "fas fa-calendar-alt",
+        "businesses.Business": "fas fa-building",
+        "businesses.Category": "fas fa-tags",
+        "businesses.Service": "fas fa-concierge-bell",
+        "businesses.Staff": "fas fa-user-tie",
+        "businesses.Customer": "fas fa-user-friends",
+        "businesses.Coupon": "fas fa-ticket-alt",
+        "businesses.Review": "fas fa-star",
+        "pos.Adisyon": "fas fa-receipt",
+        "pos.Product": "fas fa-box-open",
+    },
+    "hide_apps": [],
+    "custom_css": "css/premium_admin.css",
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-dark",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": True,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": True,
+    "theme": "slate",
+    "dark_mode_theme": "slate",
+    "actions_sticky_top": False,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
 
 # Internationalization
 LANGUAGE_CODE = 'tr'
@@ -106,8 +199,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-# YENİ EKLENDİ: Ana dizindeki static klasörünü tanıması için
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Medya Dosyaları (Kullanıcı logoları, fotolar vb.)
 MEDIA_URL = '/media/'
@@ -121,14 +214,16 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-# YENİ EKLENDİ: Maillerin spam klasörüne düşmemesi ve views.py hatasını önlemek için
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# --- WEB SITE ALAN ADI AYARI ---
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
 
 # --- GOOGLE CALENDAR API AYARLARI ---
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 
-# Şifre sıfırlama linki geçerlilik süresi (Saniye cinsinden). 7200 saniye = 2 Saat
+# Şifre sıfırlama linki geçerlilik süresi
 PASSWORD_RESET_TIMEOUT = 7200
 
 # --- CELERY & REDIS AYARLARI ---
@@ -136,6 +231,37 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
+# --- CACHE AYARLARI ---
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://localhost:6379/1',
+    }
+}
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'randevu-hatirlaticilari-kontrol-et': {
+        'task': 'appointments.tasks.send_24_hour_reminders',
+        'schedule': crontab(minute=0),
+    },
+    'premium-surelerini-kontrol-et': {
+        'task': 'appointments.tasks.check_all_premium_statuses_task',
+        'schedule': crontab(hour=0, minute=1),
+    },
+    'gunluk-sabah-ajandasi': {
+        'task': 'appointments.tasks.send_daily_morning_agenda_task',
+        'schedule': crontab(hour=8, minute=0),
+    },
+    'odeme-bekleyen-randevulari-temizle': {
+        'task': 'appointments.tasks.cleanup_stale_payment_pending_task',
+        'schedule': crontab(minute='*/10'),
+    },
+}
+
+# --- GÜVENLİK VE ŞİFRELEME AYARLARI ---
+FIELD_ENCRYPTION_KEY = os.getenv('FIELD_ENCRYPTION_KEY')
 
 # --- IYZICO ÖDEME AYARLARI ---
 IYZICO_API_KEY = os.getenv('IYZICO_API_KEY')
@@ -145,3 +271,9 @@ IYZICO_BASE_URL = os.getenv('IYZICO_BASE_URL')
 # --- SPOTIFY API AYARLARI ---
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
+
+# --- GİRİŞ VE YÖNLENDİRME AYARLARI ---
+LOGIN_URL = '/hesap/giris/'
+LOGIN_REDIRECT_URL = 'isletme_sec'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -1,56 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Şifre Sıfırlama</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifre Sıfırlama | T-Randevu</title>
 </head>
-<body style="background-color: #f8fafc; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 40px 20px; color: #334155; -webkit-font-smoothing: antialiased;">
+<body style="margin: 0; padding: 40px 20px; background-color: #fcfcfc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #334155;">
 
-    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
+    <div style="max-width: 540px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.05);">
 
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); padding: 40px 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">T-Randevu</h1>
-            <p style="color: #e0e7ff; margin: 8px 0 0 0; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">İşletme Yönetim Paneli</p>
+        <div style="padding: 40px 40px 20px 40px; text-align: left;">
+            <div style="display: inline-block; background-color: #0f172a; color: #ffffff; padding: 10px 20px; border-radius: 100px; font-weight: 900; letter-spacing: 0.5px; font-size: 15px; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);">
+                <span style="color: #6366f1; margin-right: 4px;">T</span>Randevu
+            </div>
         </div>
 
-        <!-- Content -->
-        <div style="padding: 40px 30px; text-align: center;">
+        <div style="padding: 0 40px 40px 40px; text-align: left;">
 
-            <div style="margin-bottom: 25px;">
-                <span style="font-size: 40px; background-color: #eef2ff; color: #4f46e5; width: 80px; height: 80px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid #e0e7ff;">🔐</span>
+            <div style="width: 72px; height: 72px; background-color: #eef2ff; border-radius: 20px; margin: 0 auto 24px auto; display: inline-block; border: 2px solid #c7d2fe; line-height: 72px; font-size: 32px;">
+                <span style="display: inline-block; vertical-align: middle;"></span>
             </div>
 
-            <h2 style="margin: 0 0 16px 0; font-size: 24px; font-weight: 700; color: #0f172a; tracking-tight: -0.5px;">Şifre Sıfırlama Talebi</h2>
+            <h2 style="margin: 0 0 16px 0; font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">
+                Şifre Sıfırlama Talebi
+            </h2>
 
-            <p style="margin: 0 0 35px 0; font-size: 16px; line-height: 1.6; color: #475569; text-align: left;">
+            <p style="margin: 0 0 32px 0; font-size: 16px; line-height: 1.6; color: #475569;">
                 Merhaba,<br><br>
-                İşletme hesabınız için bir şifre sıfırlama talebi aldık. Güvenliğinizi sağlamak için aşağıdaki butona tıklayarak yeni şifrenizi anında belirleyebilirsiniz:
+                İşletme hesabınızın şifresini sıfırlamak için bir talep aldık. Hesabınıza yeniden erişim sağlamak ve yeni şifrenizi belirlemek için aşağıdaki butona tıklayabilirsiniz.
             </p>
 
-            <!-- Call to Action Button -->
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 40px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px;">
                 <tr>
                     <td align="center">
-                        <a href="{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}" style="display: inline-block; padding: 16px 36px; background-color: #4f46e5; color: #ffffff; font-size: 16px; font-weight: 700; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.25);">
+                        <a href="{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}"
+                           style="display: inline-block; padding: 18px 40px; background-color: #4f46e5; color: #ffffff; font-size: 16px; font-weight: 800; text-decoration: none; border-radius: 8px; box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.3);">
                             Yeni Şifremi Belirle
                         </a>
                     </td>
                 </tr>
             </table>
 
-            <!-- Warning Box -->
-            <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; text-align: left;">
+            <div style="background-color: #fcfcfc; border-radius: 8px; padding: 20px; border: 1px solid #e2e8f0; text-align: left;">
                 <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.6;">
-                    Eğer bu talebi siz <strong>yapmadıysanız</strong>, lütfen bu e-postayı güvenle görmezden gelin. Siz yukarıdaki butona tıklayana kadar şifreniz asla değişmeyecektir.
+                    <strong style="color: #e11d48;">Güvenlik Uyarısı:</strong> Eğer bu şifre sıfırlama talebini siz oluşturmadıysanız, lütfen bu e-postayı görmezden gelin. Siz yukarıdaki bağlantıya tıklayıp yeni şifre girene kadar hesabınız tamamen güvendedir.
                 </p>
             </div>
 
         </div>
 
-        <!-- Brand Footer -->
-        <div style="background-color: #f1f5f9; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
-            <p style="font-size: 12px; font-weight: 500; color: #94a3b8; margin: 0;">© 2026 T-Randevu SaaS Projesi. Tüm hakları saklıdır.</p>
+        <div style="background-color: #fcfcfc; padding: 24px 40px; text-align: left; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 13px; font-weight: 600; color: #94a3b8; margin: 0 0 8px 0;">
+                T-Randevu İşletme Yönetimi
+            </p>
+            <p style="font-size: 12px; font-weight: 500; color: #cbd5e1; margin: 0;">
+                © 2026 Tüm hakları saklıdır.
+            </p>
         </div>
     </div>
 

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Randevu E-Posta Önizleme İstasyonu </title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --bg-card: #131a2e;
+            --bg-hover: #1e294b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-amber: #f59e0b;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            box-sizing: border-box;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo h1 {
+            font-size: 20px;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-logo span {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .header-actions .btn-back {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .header-actions .btn-back:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-secondary);
+        }
+
+        /* MAIN WRAPPER */
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 70px);
+            overflow: hidden;
+        }
+
+        /* SIDEBAR (LEFT) */
+        .sidebar {
+            width: 320px;
+            background-color: #0d1323;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0 0 6px 0;
+        }
+
+        .sidebar-header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .template-list {
+            list-style: none;
+            padding: 12px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .template-item {
+            padding: 16px;
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .template-item:hover {
+            background-color: rgba(30, 41, 59, 0.5);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .template-item.active {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border-color: var(--accent-amber);
+            box-shadow: 0 4px 20px -5px rgba(245, 158, 11, 0.15);
+        }
+
+        .template-item .tpl-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .template-item.active .tpl-name {
+            color: var(--accent-amber);
+        }
+
+        .template-item .tpl-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* VIEWPORT (RIGHT) */
+        .viewport {
+            flex: 1;
+            background-color: #070a12;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .viewport-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .viewport-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .viewport-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-green);
+        }
+
+        .viewport-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .iframe-container {
+            flex: 1;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d1323;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-logo">
+            <h1>T-RANDEVU</h1>
+            <span>E-POSTA LABORATUVARI</span>
+        </div>
+        <div class="header-actions">
+            <a href="/dashboard" class="btn-back">← Panele Dön</a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Şablon Kataloğu</h2>
+                <p>Sistemdeki 10 adet aktif e-posta şablonunu ve stillerini canlı olarak test edin.</p>
+            </div>
+            
+            <ul class="template-list">
+                {% for tpl in templates_list %}
+                <li class="template-item {% if forloop.first %}active{% endif %}" 
+                    data-key="{{ tpl.key }}" 
+                    data-name="{{ tpl.name }}"
+                    onclick="loadTemplate(this, '{{ tpl.key }}')">
+                    <div class="tpl-name">
+                        {{ tpl.name }}
+                    </div>
+                    <p class="tpl-desc">{{ tpl.desc }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- VIEWPORT -->
+        <div class="viewport">
+            <div class="viewport-header">
+                <div class="viewport-title" id="active-title">Yükleniyor...</div>
+                <div class="viewport-info">Görünüm: Mobil & Masaüstü Uyumlu (Duyarlı)</div>
+            </div>
+            
+            <div class="iframe-container">
+                <iframe id="preview-iframe" src=""></iframe>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT FOR INTERACTION -->
+    <script>
+        function loadTemplate(element, key) {
+            // Aktif sınıfını güncelle
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            // Başlığı güncelle
+            const name = element.getAttribute('data-name');
+            document.getElementById('active-title').innerText = name;
+
+            // Iframe adresini değiştir (URL'yi render endpoint'ine çek)
+            const iframe = document.getElementById('preview-iframe');
+            iframe.src = `/hesap/mail-onizleme/${key}/`;
+        }
+
+        // İlk açılışta ilk şablonu yükle
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstItem = document.querySelector('.template-item');
+            if (firstItem) {
+                loadTemplate(firstItem, firstItem.getAttribute('data-key'));
+            }
+        });
+    </script>
+</body>
+</html>

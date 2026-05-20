@@ -1,0 +1,302 @@
+{% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
+
+{% block page_title %}Kasa / Adisyon{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-[calc(100vh-100px)]">
+    <div class="flex justify-between items-center mb-6 shrink-0">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %} flex items-center gap-2">
+                💳 Kasa | Adisyon #{{ adisyon.fis_no }}
+            </h2>
+            <p class="{% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %} font-medium mt-1 text-sm sm:text-base">
+                Müşteri: <strong class="{% if isletme.is_premium %}text-amber-400{% else %}text-indigo-600{% endif %}">{{ randevu.customer.first_name }} {{ randevu.customer.last_name }}</strong> &bull; Ana Hizmet: {{ randevu.service.name }}
+            </p>
+        </div>
+        <a href="{% url 'isletme_randevular' %}" class="px-5 py-2.5 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-2
+            {% if isletme.is_premium %}bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white
+            {% else %}bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm{% endif %}">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Geri Dön
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+
+        <div class="lg:col-span-2 {% if isletme.is_premium %}bg-slate-900 border border-slate-800{% else %}bg-white border border-slate-200{% endif %} rounded-2xl p-6 shadow-sm flex flex-col h-full">
+            <h3 class="font-extrabold mb-4 flex items-center gap-2 {% if isletme.is_premium %}text-slate-200{% else %}text-slate-700{% endif %}">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Ekstralar (Ürün veya Hizmet Ekle)
+            </h3>
+
+            <div class="mb-5 relative shrink-0">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 {% if isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <input type="text" id="posSearch" onkeyup="filterPOS()" placeholder="Ürün veya hizmet ara (Örn: Sakal Tıraşı)..." autocomplete="off"
+                    class="w-full pl-12 pr-4 py-3.5 rounded-xl outline-none font-bold transition-all shadow-sm
+                    {% if isletme.is_premium %}bg-slate-950 border border-slate-700 text-white focus:border-amber-400 focus:ring-1 focus:ring-amber-500/50
+                    {% else %}bg-slate-50 border border-slate-200 text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20{% endif %}">
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-4 overflow-y-auto hide-scrollbar pb-4 pr-2">
+
+                {% for hizmet in hizmetler %}
+                <div class="pos-card flex flex-col p-4 rounded-2xl transition-all duration-200 border relative overflow-hidden
+                    {% if isletme.is_premium %}bg-slate-800/40 border-indigo-500/30 hover:border-indigo-400{% else %}bg-indigo-50 border-indigo-100 hover:border-indigo-300{% endif %}">
+
+                    <div class="absolute top-0 right-0 px-2 py-0.5 rounded-bl-lg text-[9px] font-black tracking-widest uppercase
+                        {% if isletme.is_premium %}bg-indigo-500/20 text-indigo-400{% else %}bg-indigo-100 text-indigo-600{% endif %}">
+                        ✂️ Hizmet
+                    </div>
+
+                    <div class="flex-1 mt-2">
+                        <div class="font-black text-xl mb-1 {% if isletme.is_premium %}text-emerald-400{% else %}text-emerald-600{% endif %}">
+                            {% if hizmet.has_campaign %}
+                                {{ hizmet.discounted_price|floatformat:2 }} ₺
+                                <span class="text-xs line-through text-rose-500 font-medium ml-1 opacity-70">{{ hizmet.price|floatformat:0 }} ₺</span>
+                            {% else %}
+                                {{ hizmet.price|floatformat:2 }} ₺
+                            {% endif %}
+                        </div>
+
+                        <div class="item-title font-bold text-sm {% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %} leading-tight mb-2">{{ hizmet.name }}</div>
+                        <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Stoksuz / Sınırsız</div>
+                    </div>
+
+                    <div class="mt-4 flex items-center gap-2">
+                        <div class="flex items-center bg-background rounded-lg border {% if isletme.is_premium %}border-slate-700 bg-slate-950{% else %}border-slate-300 bg-white{% endif %} overflow-hidden w-24 shrink-0">
+                            <button type="button" onclick="changeQty('srv_{{ hizmet.id }}', -1)" class="w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-200 {% if isletme.is_premium %}text-slate-300 hover:bg-slate-700{% endif %}">-</button>
+                            <input type="number" id="qty_srv_{{ hizmet.id }}" value="1" min="1" class="w-8 h-8 text-center bg-transparent font-bold text-sm outline-none border-none hide-arrows {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}" readonly>
+                            <button type="button" onclick="changeQty('srv_{{ hizmet.id }}', 1)" class="w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-200 {% if isletme.is_premium %}text-slate-300 hover:bg-slate-700{% endif %}">+</button>
+                        </div>
+                        <button type="button" onclick="addCartService({{ hizmet.id }})" class="flex-1 py-1.5 rounded-lg font-bold text-xs transition-all
+                            {% if isletme.is_premium %}bg-indigo-500 text-white hover:bg-indigo-600{% else %}bg-indigo-600 text-white hover:bg-indigo-700{% endif %}">EKLE</button>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% for urun in urunler %}
+                <div class="pos-card flex flex-col p-4 rounded-2xl transition-all duration-200 border relative overflow-hidden
+                    {% if isletme.is_premium %}bg-slate-800/40 border-slate-700 hover:border-amber-500/50{% else %}bg-slate-50 border-slate-200 hover:border-amber-400{% endif %}">
+
+                    <div class="absolute top-0 right-0 px-2 py-0.5 rounded-bl-lg text-[9px] font-black tracking-widest uppercase
+                        {% if isletme.is_premium %}bg-slate-700 text-slate-400{% else %}bg-slate-200 text-slate-600{% endif %}">
+                        📦 Ürün
+                    </div>
+
+                    <div class="flex-1 mt-2">
+                        <div class="font-black text-xl mb-1 {% if isletme.is_premium %}text-emerald-400{% else %}text-emerald-600{% endif %}">{{ urun.price|floatformat:2 }} ₺</div>
+
+                        <div class="item-title font-bold text-sm {% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %} leading-tight mb-2">{{ urun.name }}</div>
+
+                        <div class="text-[10px] font-semibold uppercase tracking-wider {% if urun.stock == 0 %}text-rose-500{% elif isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">
+                            {% if urun.stock != None %}STOK: {{ urun.stock }}{% else %}SINIRSIZ{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex items-center gap-2">
+                        <div class="flex items-center bg-background rounded-lg border {% if isletme.is_premium %}border-slate-700 bg-slate-950{% else %}border-slate-300 bg-white{% endif %} overflow-hidden w-24 shrink-0">
+                            <button type="button" onclick="changeQty('prd_{{ urun.id }}', -1)" class="w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-200 {% if isletme.is_premium %}text-slate-300 hover:bg-slate-700{% endif %}">-</button>
+                            <input type="number" id="qty_prd_{{ urun.id }}" value="1" min="1" max="{% if urun.stock != None %}{{ urun.stock }}{% endif %}" class="w-8 h-8 text-center bg-transparent font-bold text-sm outline-none border-none hide-arrows {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}" readonly>
+                            <button type="button" onclick="changeQty('prd_{{ urun.id }}', 1)" class="w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-slate-200 {% if isletme.is_premium %}text-slate-300 hover:bg-slate-700{% endif %}">+</button>
+                        </div>
+                        <button type="button" onclick="addCartProduct({{ urun.id }})" {% if urun.stock == 0 %}disabled{% endif %} class="flex-1 py-1.5 rounded-lg font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                            {% if isletme.is_premium %}bg-amber-500 text-slate-900 hover:bg-amber-400{% else %}bg-amber-400 text-slate-900 hover:bg-amber-500{% endif %}">
+                            {% if urun.stock == 0 %}TÜKENDİ{% else %}EKLE{% endif %}
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="receipt-container" class="lg:col-span-1 {% if isletme.is_premium %}bg-slate-900 border border-slate-800 shadow-[0_0_30px_rgba(0,0,0,0.5)]{% else %}bg-white border border-slate-200 shadow-xl{% endif %} rounded-2xl flex flex-col h-full relative overflow-hidden transition-opacity duration-300">
+
+            <div class="p-5 border-b {% if isletme.is_premium %}border-slate-800 bg-slate-900/80{% else %}border-slate-100 bg-slate-50{% endif %} flex justify-between items-center z-10 relative shrink-0">
+                <h3 class="font-extrabold text-lg flex items-center gap-2 {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}">
+                    <svg class="w-5 h-5 {% if isletme.is_premium %}text-amber-400{% else %}text-indigo-500{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    Adisyon Fişi
+                </h3>
+            </div>
+
+            <div id="receipt-items" class="flex-1 overflow-y-auto p-4 space-y-2 hide-scrollbar bg-opacity-50 {% if isletme.is_premium %}bg-[#09090b]{% else %}bg-slate-50/50{% endif %}">
+                <div class="flex justify-between items-center p-3 rounded-xl border {% if isletme.is_premium %}bg-slate-800/40 border-emerald-500/20 shadow-[inset_0_0_15px_rgba(16,185,129,0.05)]{% else %}bg-emerald-50 border-emerald-100{% endif %}">
+                    <div>
+                        <p class="font-bold text-sm {% if isletme.is_premium %}text-slate-200{% else %}text-slate-800{% endif %}">{{ randevu.service.name }}</p>
+                        <p class="text-[10px] uppercase font-extrabold tracking-wider mt-0.5 {% if isletme.is_premium %}text-emerald-400{% else %}text-emerald-600{% endif %}">✓ Online Ödendi</p>
+                    </div>
+                    <div class="font-extrabold {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %} line-through decoration-2">{{ adisyon.online_paid_amount|floatformat:2 }} ₺</div>
+                </div>
+
+                {% for item in adisyon.items.all %}
+                <div class="flex justify-between items-center p-3 rounded-xl border transition-all hover:scale-[1.02] {% if isletme.is_premium %}bg-slate-800 border-slate-700{% else %}bg-white border-slate-200 shadow-sm{% endif %}">
+                    <div class="flex-1 pr-2">
+                        <p class="font-bold text-sm {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %} leading-tight mb-0.5">{{ item.item_name }}</p>
+                        <p class="text-xs font-medium {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">{{ item.quantity }} adet x {{ item.unit_price|floatformat:2 }} ₺</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-black text-base {% if isletme.is_premium %}text-amber-400{% else %}text-indigo-600{% endif %}">{{ item.total_price|floatformat:2 }} ₺</span>
+                        <button type="button" onclick="removeCartItem({{ item.id }})" class="text-rose-500 hover:text-white hover:bg-rose-500 p-1.5 rounded-lg transition-all shrink-0">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div id="receipt-totals" class="p-5 border-t z-10 relative shrink-0 {% if isletme.is_premium %}border-slate-800 bg-slate-900/95 backdrop-blur-md{% else %}border-slate-200 bg-white{% endif %}">
+                <div class="space-y-1 mb-4 pb-4 border-b border-dashed {% if isletme.is_premium %}border-slate-700{% else %}border-slate-200{% endif %}">
+                    <div class="flex justify-between text-xs font-bold uppercase tracking-wider {% if isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">
+                        <span>Randevu Tutarı</span>
+                        <span>{{ adisyon.online_paid_amount|floatformat:2 }} ₺</span>
+                    </div>
+                    <div class="flex justify-between text-xs font-bold uppercase tracking-wider {% if isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">
+                        <span>Ekstra Toplam</span>
+                        <span>{{ adisyon.extra_items_total|floatformat:2 }} ₺</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-widest {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %} block mb-1">Kasada Alınacak Tutar</span>
+                        <span class="text-3xl font-black {% if isletme.is_premium %}text-white{% else %}text-slate-900{% endif %} leading-none">{{ adisyon.remaining_balance|floatformat:2 }} <span class="text-xl {% if isletme.is_premium %}text-amber-400{% else %}text-indigo-600{% endif %}">₺</span></span>
+                    </div>
+                </div>
+
+                {% if adisyon.status == 'closed' %}
+                    <div class="mb-4 p-4 rounded-xl {% if isletme.is_premium %}bg-emerald-500/10 border border-emerald-500/20{% else %}bg-emerald-50 border border-emerald-200{% endif %} text-center">
+                        <p class="text-sm font-bold {% if isletme.is_premium %}text-emerald-400{% else %}text-emerald-600{% endif %} flex items-center justify-center gap-2 mb-1">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            Ödeme Başarıyla Alındı
+                        </p>
+                        <p class="text-xs {% if isletme.is_premium %}text-emerald-500{% else %}text-emerald-700{% endif %} font-medium">Bu adisyon kapatılmış ve randevu tamamlanmıştır.</p>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <a href="{% url 'adisyon_yazdir' adisyon.id %}" target="_blank" class="w-full py-4 rounded-xl font-extrabold uppercase tracking-widest transition-all duration-300 flex justify-center items-center gap-2
+                            {% if isletme.is_premium %}bg-amber-500 text-slate-900 hover:bg-amber-400{% else %}bg-slate-800 text-white hover:bg-slate-700{% endif %}">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                            FİŞİ YAZDIR
+                        </a>
+                        <a href="{% url 'isletme_randevular' %}" class="w-full py-3 rounded-xl font-bold transition-all text-center text-sm
+                            {% if isletme.is_premium %}bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+                            Randevulara Dön
+                        </a>
+                    </div>
+                {% else %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="close_adisyon">
+                        <div class="mb-4">
+                            <select name="payment_method" required class="w-full p-3.5 rounded-xl font-bold outline-none transition-all border cursor-pointer appearance-none
+                                {% if isletme.is_premium %}bg-slate-950 border-slate-700 text-white focus:border-amber-400
+                                {% else %}bg-slate-50 border-slate-200 text-slate-800 focus:border-indigo-500{% endif %}">
+                                {% if adisyon.remaining_balance == 0 %}
+                                <option value="online">✓ Sadece Online Ödendi (Ekstra Yok)</option>
+                                {% else %}
+                                <option value="cash">💵 Nakit Tahsil Edildi</option>
+                                <option value="cc">💳 Kredi Kartı / Fiziksel POS</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full py-4 rounded-xl font-extrabold uppercase tracking-widest transition-all duration-300 hover:-translate-y-1 flex justify-center items-center gap-2
+                            {% if isletme.is_premium %}bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 shadow-[0_10px_20px_rgba(251,191,36,0.3)]
+                            {% else %}bg-emerald-500 text-white shadow-[0_10px_20px_rgba(16,185,129,0.3)] hover:bg-emerald-600{% endif %}">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            TUTARI TAHSİL ET
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    input[type="number"].hide-arrows::-webkit-outer-spin-button,
+    input[type="number"].hide-arrows::-webkit-inner-spin-button {
+        -webkit-appearance: none; margin: 0;
+    }
+    input[type="number"].hide-arrows { -moz-appearance: textfield; }
+</style>
+
+<script>
+    // Dinamik Miktar Artırma (Maksimum Stok Kontrolü İle)
+    function changeQty(idStr, delta) {
+        let input = document.getElementById('qty_' + idStr);
+        let val = parseInt(input.value) + delta;
+        let max = input.getAttribute('max');
+
+        if (val < 1) val = 1;
+        if (max && val > parseInt(max)) val = parseInt(max);
+
+        input.value = val;
+    }
+
+    async function updateCartAJAX(formData) {
+        const container = document.getElementById('receipt-container');
+        container.style.opacity = '0.4';
+
+        await fetch(window.location.href, { method: 'POST', body: formData });
+        const response = await fetch(window.location.href);
+        const html = await response.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        document.getElementById('receipt-items').innerHTML = doc.getElementById('receipt-items').innerHTML;
+        document.getElementById('receipt-totals').innerHTML = doc.getElementById('receipt-totals').innerHTML;
+
+        container.style.opacity = '1';
+    }
+
+    // ÜRÜN EKLE (📦)
+    function addCartProduct(productId) {
+        const qty = document.getElementById('qty_prd_' + productId).value;
+        const formData = new FormData();
+        formData.append('action', 'add_item');
+        formData.append('product_id', productId);
+        formData.append('quantity', qty);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        updateCartAJAX(formData);
+    }
+
+    // HİZMET EKLE (✂️)
+    function addCartService(serviceId) {
+        const qty = document.getElementById('qty_srv_' + serviceId).value;
+        const formData = new FormData();
+        formData.append('action', 'add_service');
+        formData.append('service_id', serviceId);
+        formData.append('quantity', qty);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        updateCartAJAX(formData);
+    }
+
+    // SEPETTEN ÇIKAR (🗑️)
+    function removeCartItem(itemId) {
+        const formData = new FormData();
+        formData.append('action', 'remove_item');
+        formData.append('item_id', itemId);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        updateCartAJAX(formData);
+    }
+
+    // 🚀 CANLI ARAMA MOTORU (Live Search)
+    function filterPOS() {
+        const query = document.getElementById('posSearch').value.toLowerCase('tr-TR');
+        const cards = document.querySelectorAll('.pos-card');
+
+        cards.forEach(card => {
+            const title = card.querySelector('.item-title').innerText.toLowerCase('tr-TR');
+            if (title.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

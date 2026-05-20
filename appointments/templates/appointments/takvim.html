@@ -1,0 +1,845 @@
+{% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
+
+{% block page_title %}Randevu Takvimi{% endblock %}
+
+{% block content %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.15/index.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales/tr.global.min.js'></script>
+
+<style>
+    /* 🔥 MODERN SAAS TASARIMI (ORTAK) 🔥 */
+    .fc { font-family: 'Inter', system-ui, sans-serif; font-size: 0.9rem; }
+    .fc-license-message { display: none !important; }
+
+    .fc-button-group { display: flex; gap: 8px; }
+    .fc-button-group > .fc-button { margin: 0 !important; border-radius: 100px !important; }
+
+    /* margin değerini sildik ki FullCalendar genişlikleri kusursuz hesaplasın */
+    .fc-event { border-radius: 8px !important; cursor: pointer; transition: all 0.2s ease; padding: 4px 6px; }
+    .fc-event-main { font-weight: 600; letter-spacing: -0.01em; color: white !important; }
+
+    .fc-scroller::-webkit-scrollbar { width: 6px; height: 6px; }
+    .fc-scroller::-webkit-scrollbar-track { background: transparent; }
+    .fc-scroller::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
+
+    {% if isletme.is_premium %}
+    /* ======================================================= */
+    /* 👑 VIP (PREMIUM) DARK-AMBER TEMA 👑 */
+    /* ======================================================= */
+    .fc {
+        --fc-border-color: rgba(255, 255, 255, 0.04);
+        --fc-page-bg-color: transparent;
+        --fc-neutral-bg-color: transparent;
+        --fc-neutral-text-color: rgba(255, 255, 255, 0.8);
+        --fc-today-bg-color: rgba(245, 158, 11, 0.03);
+        --fc-now-indicator-color: #fbbf24;
+        color: #ffffff;
+    }
+
+    /* VIP Neon Glowing Glassmorphic Event Design */
+    .fc-event {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(217, 119, 6, 0.05)) !important;
+        border: 1px solid rgba(251, 191, 36, 0.15) !important;
+        border-left: 4px solid #f59e0b !important;
+        border-radius: 12px !important;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        padding: 5px 8px !important;
+    }
+    .fc-event:hover {
+        transform: scale(1.03) translateY(-1px);
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.28), rgba(217, 119, 6, 0.1)) !important;
+        border-color: rgba(251, 191, 36, 0.35) !important;
+        box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35) !important;
+        z-index: 50 !important;
+    }
+    .fc-event-main {
+        color: #ffffff !important;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .fc-toolbar-title { font-size: 1.5rem !important; font-weight: 700; color: #ffffff; }
+    
+    /* Premium Glassmorphic headers */
+    .fc-col-header-cell {
+        background: rgba(255, 255, 255, 0.02) !important;
+        backdrop-filter: blur(10px);
+        padding: 14px 0;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(245, 158, 11, 0.15) !important;
+        color: #ffffff !important;
+    }
+    .fc-col-header-cell a { color: #ffffff !important; }
+    .fc-timegrid-axis-cushion { color: rgba(255,255,255,0.7); font-weight: 500; }
+
+    /* Pulsing Live Time Indicator */
+    .fc-now-indicator-line {
+        border-color: #fbbf24 !important;
+        box-shadow: 0 0 10px #fbbf24, 0 0 20px rgba(251, 191, 36, 0.4) !important;
+    }
+    .fc-now-indicator-arrow {
+        border-color: transparent transparent transparent #fbbf24 !important;
+    }
+
+    .fc-button { font-weight: 600 !important; padding: 8px 16px !important; border: none !important; transition: all 0.2s !important; }
+    .fc-button-primary { background-color: rgba(255, 255, 255, 0.05) !important; color: rgba(255, 255, 255, 0.7) !important; backdrop-filter: blur(12px); }
+    .fc-button-primary:not(:disabled):hover { background-color: rgba(255, 255, 255, 0.1) !important; color: #ffffff !important; transform: translateY(-1px); }
+    .fc-button-active { background-color: #f59e0b !important; color: #ffffff !important; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4) !important; transform: translateY(-1px); }
+
+    {% else %}
+    /* ======================================================= */
+    /* 🆓 FREE YENİ NESİL LIGHT TEMA (İNDİGO RENKLER) 🆓 */
+    /* ======================================================= */
+    .fc {
+        --fc-border-color: rgba(226, 232, 240, 0.8);
+        --fc-page-bg-color: transparent;
+        --fc-neutral-bg-color: transparent;
+        --fc-today-bg-color: rgba(79, 70, 229, 0.03);
+        --fc-now-indicator-color: #4f46e5;
+        color: #334155;
+    }
+
+    /* Free Elegant Left-Border Event Design */
+    .fc-event {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(124, 58, 237, 0.03)) !important;
+        border: 1px solid rgba(79, 70, 229, 0.12) !important;
+        border-left: 4px solid #4f46e5 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.04);
+        padding: 5px 8px !important;
+    }
+    .fc-event:hover {
+        transform: scale(1.02) translateY(-1px);
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(124, 58, 237, 0.08)) !important;
+        border-color: rgba(79, 70, 229, 0.25) !important;
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.15);
+        z-index: 50 !important;
+    }
+    .fc-event-main {
+        color: #312e81 !important;
+        font-weight: 700;
+    }
+
+    .fc-toolbar-title { font-size: 1.5rem !important; font-weight: 800; color: #0f172a; }
+    
+    .fc-col-header-cell {
+        background: #f8fafc !important;
+        padding: 14px 0;
+        font-weight: 700;
+        border-bottom: 2px solid #e2e8f0;
+        color: #1e293b !important;
+    }
+    .fc-col-header-cell a { color: #1e293b !important; }
+
+    .fc-button { font-weight: 600 !important; padding: 8px 16px !important; border: 1px solid #e2e8f0 !important; transition: all 0.2s !important; }
+    .fc-button-primary { background-color: #f8fafc !important; color: #475569 !important; }
+    .fc-button-primary:not(:disabled):hover { background-color: #f1f5f9 !important; color: #0f172a !important; }
+    .fc-button-active { background-color: #4f46e5 !important; border-color: #4f46e5 !important; color: #ffffff !important; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3) !important; }
+    {% endif %}
+
+    .fc-view-harness { height: 65vh !important; min-height: 500px; max-height: 750px; }
+</style>
+
+{% if not isletme.is_premium %}
+<div onclick="openPremiumModal()" class="mb-6 bg-gradient-to-r from-amber-50 to-white border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm cursor-pointer hover:shadow-md transition-all group">
+    <div class="flex items-center gap-3">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+        </span>
+        <div>
+            <h4 class="text-amber-900 font-extrabold text-sm flex items-center gap-2">
+                Premium'a Geçin <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[10px] uppercase">Kilitli Özellik</span>
+            </h4>
+            <p class="text-amber-700 text-xs font-medium mt-0.5">Takvimi sütunlara bölün, her personelin ajandasını yan yana yönetin.</p>
+        </div>
+    </div>
+    <button type="button" onclick="event.stopPropagation(); openPremiumModal();" class="bg-amber-500 group-hover:bg-amber-600 text-white text-sm font-bold px-5 py-2 rounded-xl transition-colors shadow-md whitespace-nowrap">
+        Detayları İncele
+    </button>
+</div>
+{% endif %}
+
+{% if isletme.is_premium %}
+<!-- PREMIUM MULTI-COLUMN DASHBOARD LAYOUT -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-6">
+    
+    <!-- LEFT SIDEBAR: STATISTICS & STAFF DIRECTORY (3 COLUMNS) -->
+    <div class="lg:col-span-3 flex flex-col gap-6 select-none">
+        
+        <!-- SIDEBAR CONTAINER CARD -->
+        <div class="rounded-[2rem] p-6 bg-gradient-to-br from-amber-950/70 via-neutral-900/90 to-black border border-white/5 backdrop-blur-xl shadow-2xl shadow-amber-500/5">
+            
+            <!-- HEADER -->
+            <div class="pb-4 border-b border-white/[0.06] mb-5">
+                <h4 class="text-xs font-black uppercase tracking-widest text-amber-500">Bugünün Özet Raporu</h4>
+                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Süreç ve Personel Durumları</p>
+            </div>
+
+            <!-- RAPOR KARTLARI -->
+            <div class="space-y-3.5 mb-6">
+                <!-- Toplam Randevu -->
+                <div class="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        </div>
+                        <div>
+                            <h5 class="text-[11px] font-black text-slate-300">Sistem Toplamı</h5>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Randevu</p>
+                        </div>
+                    </div>
+                    <span class="text-base font-black text-white">{{ isletme.appointments.all|length }}</span>
+                </div>
+
+                <!-- Aktif Personeller -->
+                <div class="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <div>
+                            <h5 class="text-[11px] font-black text-slate-300">Ekip Üyeleri</h5>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Uzman</p>
+                        </div>
+                    </div>
+                    <span class="text-base font-black text-white">{{ isletme.staff_members.all|length }}</span>
+                </div>
+
+                <!-- Kayıtlı Müşteriler -->
+                <div class="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                        </div>
+                        <div>
+                            <h5 class="text-[11px] font-black text-slate-300">Salon Rehberi</h5>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Müşteri</p>
+                        </div>
+                    </div>
+                    <span class="text-base font-black text-white">{{ isletme.customers.all|length }}</span>
+                </div>
+            </div>
+
+            <!-- MANUEL RANDEVU BTN -->
+            <button type="button" onclick="triggerManuelRandevuFromSidebar()" class="w-full py-4 rounded-xl font-extrabold text-xs bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 transition-all hover:-translate-y-0.5 shadow-lg shadow-amber-500/15 uppercase tracking-wider flex items-center justify-center gap-2 mb-6">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Hızlı Randevu Yaz
+            </button>
+
+            <!-- PERSONEL ROSTER DIRECTORY -->
+            <div class="pt-4 border-t border-white/[0.06]">
+                <h4 class="text-xs font-black uppercase tracking-widest text-slate-300 mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    Aktif Kadro
+                </h4>
+                <div class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-1">
+                    {% for staff in isletme.staff_members.all %}
+                    <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.01] border border-white/[0.03] hover:bg-white/[0.03] transition-all">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-slate-900 font-black text-xs flex items-center justify-center uppercase select-none shrink-0 shadow-inner">
+                            {{ staff.name|slice:":2" }}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h5 class="text-xs font-bold text-slate-200 truncate leading-tight">{{ staff.name }}</h5>
+                            <p class="text-[9px] text-amber-500/80 font-bold uppercase tracking-wider mt-0.5">Uzman</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-slate-500 text-xs font-medium">Kayıtlı uzman personel bulunmuyor.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- RIGHT GRID: THE GRAND SCHEDULER CALENDAR (9 COLUMNS) -->
+    <div class="lg:col-span-9 rounded-[2rem] p-4 md:p-6 bg-gradient-to-br from-amber-950/40 via-neutral-900/50 to-black border border-white/5 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+        <div id="calendar"></div>
+    </div>
+
+</div>
+{% else %}
+<!-- FREE LAYOUT (TRADITIONAL FULL-WIDTH DESIGN) -->
+<div class="mb-6 rounded-[2rem] p-4 md:p-8 bg-white border border-slate-200 shadow-xl">
+    <div id="calendar"></div>
+</div>
+{% endif %}
+
+<div id="calendarEventModal" class="fixed inset-0 z-[999999] hidden flex items-center justify-center p-4 backdrop-blur-sm bg-slate-900/60 opacity-0 transition-opacity duration-300" onclick="closeEventModal()">
+    <div id="calendarModalContent" class="w-full max-w-md rounded-[2rem] p-8 border transition-all duration-300 transform scale-95 shadow-2xl relative
+        {% if isletme.is_premium %}
+            bg-gradient-to-br from-amber-950/95 to-neutral-900/95 border-white/10 shadow-amber-500/20
+        {% else %}
+            bg-white border-slate-100 shadow-slate-200/50
+        {% endif %}"
+        onclick="event.stopPropagation()">
+
+        <div class="flex items-start justify-between mb-8">
+            <div>
+                <h3 id="cModalCustomer" class="text-2xl font-black mb-2 {% if isletme.is_premium %} text-white {% else %} text-slate-800 {% endif %}">Müşteri Adı</h3>
+                <div id="cModalStatus" class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-500">DURUM</div>
+            </div>
+            <button onclick="closeEventModal()" class="p-2 rounded-xl transition-all duration-200 hover:scale-110 {% if isletme.is_premium %} bg-white/10 hover:bg-white/20 text-white {% else %} bg-slate-100 hover:bg-slate-200 text-slate-700 {% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <div class="space-y-5">
+            <div class="flex items-center gap-4 pb-4 border-b {% if isletme.is_premium %}border-white/10{% else %}border-slate-100{% endif %}">
+                <div class="p-2.5 rounded-xl {% if isletme.is_premium %} bg-white/10 text-amber-400 {% else %} bg-indigo-50 text-indigo-600 {% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </div>
+                <div>
+                    <div class="text-xs font-semibold uppercase tracking-wider {% if isletme.is_premium %} text-white/50 {% else %} text-slate-400 {% endif %}">Hizmet</div>
+                    <div id="cModalService" class="font-bold text-lg {% if isletme.is_premium %} text-white {% else %} text-slate-800 {% endif %}">Hizmet Adı</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 pb-4 border-b {% if isletme.is_premium %}border-white/10{% else %}border-slate-100{% endif %}">
+                <div class="p-2.5 rounded-xl {% if isletme.is_premium %} bg-white/10 text-amber-400 {% else %} bg-indigo-50 text-indigo-600 {% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <div>
+                    <div class="text-xs font-semibold uppercase tracking-wider {% if isletme.is_premium %} text-white/50 {% else %} text-slate-400 {% endif %}">Zaman</div>
+                    <div id="cModalTime" class="font-bold text-lg {% if isletme.is_premium %} text-white {% else %} text-slate-800 {% endif %}">10:00 - 11:00</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="p-2.5 rounded-xl {% if isletme.is_premium %} bg-white/10 text-amber-400 {% else %} bg-indigo-50 text-indigo-600 {% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <div>
+                    <div class="text-xs font-semibold uppercase tracking-wider {% if isletme.is_premium %} text-white/50 {% else %} text-slate-400 {% endif %}">Personel</div>
+                    <div id="cModalStaff" class="font-bold text-lg {% if isletme.is_premium %} text-white {% else %} text-slate-800 {% endif %}">Personel Adı</div>
+                </div>
+            </div>
+
+            <a id="cModalPhone" href="#" class="mt-4 flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold transition-all shadow-md {% if isletme.is_premium %} bg-amber-500 hover:bg-amber-600 text-slate-900 {% else %} bg-indigo-600 hover:bg-indigo-700 text-white {% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                <span id="cModalPhoneText">Müşteriyi Ara</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div id="premiumUpsellModal" class="fixed inset-0 z-[999999] hidden flex items-center justify-center p-4 backdrop-blur-md bg-slate-900/70 opacity-0 transition-opacity duration-300" onclick="closePremiumModal()">
+    <div id="premiumModalContent" class="w-full max-w-lg rounded-[2rem] bg-white border border-slate-100 overflow-hidden transition-all duration-300 transform scale-95 shadow-2xl relative" onclick="event.stopPropagation()">
+
+        <div class="bg-gradient-to-br from-amber-400 to-amber-600 p-8 text-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10 blur-2xl"></div>
+            <div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-white opacity-10 blur-xl"></div>
+
+            <div class="w-20 h-20 mx-auto bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 mb-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 text-amber-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <h3 class="text-2xl font-black text-white drop-shadow-md">Premium'un Gücünü Açın</h3>
+            <p class="text-amber-50 mt-2 text-sm font-medium">İşletmenizi bir sonraki seviyeye taşıyın.</p>
+        </div>
+
+        <div class="p-8 space-y-6">
+            <div class="flex items-start gap-4">
+                <div class="mt-1 p-1.5 rounded-full bg-emerald-100 text-emerald-600">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div>
+                    <h4 class="text-slate-900 font-bold">Gelişmiş Personel Takvimi</h4>
+                    <p class="text-slate-500 text-sm mt-1">Ekranda kaybolmayın. Her personelinizi ayrı bir sütunda yan yana görerek boşlukları anında yakalayın.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div class="mt-1 p-1.5 rounded-full bg-emerald-100 text-emerald-600">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div>
+                    <h4 class="text-slate-900 font-bold">VIP Dark Mode Ekranı</h4>
+                    <p class="text-slate-500 text-sm mt-1">Göz yormayan, müşterilerinizin yanında prestijinizi artıran ultra lüks antrasit arayüze geçiş yapın.</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div class="mt-1 p-1.5 rounded-full bg-emerald-100 text-emerald-600">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div>
+                    <h4 class="text-slate-900 font-bold">Sınırsız İşlem Kapasitesi</h4>
+                    <p class="text-slate-500 text-sm mt-1">Randevu kotalarına takılmadan, dilediğiniz kadar personel ekleyin, işletmenizi öne çıkarın ve işletmenize özel analizlerle büyümenin yollarını keşfedin.</p>
+                </div>
+            </div>
+
+            <div class="pt-4 flex gap-3">
+                <button type="button" onclick="closePremiumModal()" class="flex-1 py-3.5 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">Daha Sonra</button>
+                <a href="{% url 'isletme_abonelik' %}" class="flex-[2] flex justify-center items-center gap-2 py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/30 transition-all hover:-translate-y-0.5">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                    Hemen Yükselt
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="manuelRandevuModal" class="fixed inset-0 z-[999999] hidden flex items-center justify-center p-4 backdrop-blur-md bg-slate-900/70 opacity-0 transition-opacity duration-300" onclick="closeManuelModal()">
+    <div id="manuelModalContent" class="w-full max-w-lg rounded-[2rem] p-8 border transition-all duration-300 transform scale-95 shadow-2xl relative
+        {% if isletme.is_premium %}bg-[#14141f] border-white/10 shadow-amber-500/20{% else %}bg-white border-slate-200{% endif %}"
+        onclick="event.stopPropagation()">
+
+        <div class="flex items-start justify-between mb-6 border-b {% if isletme.is_premium %}border-white/10{% else %}border-slate-100{% endif %} pb-4">
+            <div>
+                <h3 class="text-xl font-black mb-1 {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}">Hızlı Randevu Ekle</h3>
+                <p class="text-sm font-bold {% if isletme.is_premium %}text-amber-400{% else %}text-indigo-600{% endif %}">
+                    <span id="m_date_display">Tarih</span> - <span id="m_time_display">Saat</span>
+                </p>
+            </div>
+            <button type="button" onclick="closeManuelModal()" class="p-2 rounded-xl transition-all duration-200 hover:scale-110 {% if isletme.is_premium %} bg-white/10 hover:bg-white/20 text-white {% else %} bg-slate-100 hover:bg-slate-200 text-slate-700 {% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <form method="POST" action="{% url 'manuel_randevu_olustur' %}" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="date" id="m_date">
+            <input type="hidden" name="time" id="m_time">
+
+            <div class="grid grid-cols-2 gap-3">
+                <input type="text" name="first_name" placeholder="Müşteri Adı *" required class="w-full p-3 rounded-xl border text-sm focus:outline-none focus:ring-2 {% if isletme.is_premium %}bg-[#1a1a2e] border-white/10 text-white focus:ring-amber-500/50{% else %}bg-slate-50 border-slate-200 text-slate-800 focus:ring-indigo-500/50{% endif %}">
+                <input type="text" name="last_name" placeholder="Soyadı" class="w-full p-3 rounded-xl border text-sm focus:outline-none focus:ring-2 {% if isletme.is_premium %}bg-[#1a1a2e] border-white/10 text-white focus:ring-amber-500/50{% else %}bg-slate-50 border-slate-200 text-slate-800 focus:ring-indigo-500/50{% endif %}">
+            </div>
+
+            <input type="tel" name="phone" placeholder="Telefon (05XX XXX XX XX) *" required class="w-full p-3 rounded-xl border text-sm focus:outline-none focus:ring-2 {% if isletme.is_premium %}bg-[#1a1a2e] border-white/10 text-white focus:ring-amber-500/50{% else %}bg-slate-50 border-slate-200 text-slate-800 focus:ring-indigo-500/50{% endif %}">
+            <input type="email" name="email" placeholder="E-posta Adresi (İsteğe Bağlı - Fiş/Bildirim İçin)" class="w-full p-3 rounded-xl border text-sm focus:outline-none focus:ring-2 {% if isletme.is_premium %}bg-[#1a1a2e] border-white/10 text-white focus:ring-amber-500/50{% else %}bg-slate-50 border-slate-200 text-slate-800 focus:ring-indigo-500/50{% endif %}">
+
+            <div class="grid grid-cols-2 gap-3">
+                <select name="service_id" required class="w-full p-3 rounded-xl border text-sm focus:outline-none focus:ring-2 appearance-none {% if isletme.is_premium %}bg-[#1a1a2e] border-white/10 text-white focus:ring-amber-500/50{% else %}bg-slate-50 border-slate-200 text-slate-800 focus:ring-indigo-500/50{% endif %}">
+                    <option value="" disabled selected>Hizmet Seç *</option>
+                    {% for h in isletme.services.all %}
+                        <option value="{{ h.id }}">{{ h.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="staff_id" id="m_staff" class="w-full p-3 rounded-xl border text-sm focus:outline-none focus:ring-2 appearance-none {% if isletme.is_premium %}bg-[#1a1a2e] border-white/10 text-white focus:ring-amber-500/50{% else %}bg-slate-50 border-slate-200 text-slate-800 focus:ring-indigo-500/50{% endif %}">
+                    <option value="">Uzman (Fark Etmez)</option>
+                    {% for p in isletme.staff_members.all %}
+                        {% if p.is_active %}<option value="{{ p.id }}">{{ p.name }}</option>{% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mt-4 p-4 rounded-xl border {% if isletme.is_premium %}bg-amber-500/10 border-amber-500/20{% else %}bg-indigo-50 border-indigo-100{% endif %}">
+                <p class="text-xs font-bold mb-2 uppercase tracking-wider {% if isletme.is_premium %}text-amber-500{% else %}text-indigo-600{% endif %}">Ödeme & Komisyon Durumu</p>
+
+                <label class="flex items-center gap-3 cursor-pointer mb-2">
+                    <input type="radio" name="payment_type" value="link" checked class="w-4 h-4 {% if isletme.is_premium %}text-amber-500{% else %}text-indigo-600{% endif %}">
+                    <span class="text-sm font-semibold {% if isletme.is_premium %}text-slate-200{% else %}text-slate-700{% endif %}">Müşteriye Ödeme Linki Gönder (Önerilen)</span>
+                </label>
+
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="radio" name="payment_type" value="cash" class="w-4 h-4 {% if isletme.is_premium %}text-amber-500{% else %}text-indigo-600{% endif %}">
+                    <span class="text-sm font-semibold {% if isletme.is_premium %}text-slate-200{% else %}text-slate-700{% endif %}">Elden Ödeme Alındı (İnternetsiz İşlem)</span>
+                </label>
+            </div>
+
+            <button type="submit" class="w-full mt-4 py-3.5 rounded-xl font-extrabold shadow-lg transition-all hover:-translate-y-0.5
+                {% if isletme.is_premium %}bg-amber-500 hover:bg-amber-600 text-slate-900 shadow-amber-500/30{% else %}bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/30{% endif %}">
+                Randevuyu Takvime Ekle
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="errorModal" class="fixed inset-0 z-[999999] hidden flex items-center justify-center p-4 backdrop-blur-md bg-slate-900/70 opacity-0 transition-opacity duration-300" onclick="closeErrorModal()">
+    <div id="errorModalContent" class="w-full max-w-sm rounded-[2rem] p-8 text-center transition-all duration-300 transform scale-95 shadow-2xl relative
+        {% if isletme.is_premium %}bg-[#14141f] border border-white/10 shadow-rose-500/20{% else %}bg-white border border-slate-200{% endif %}"
+        onclick="event.stopPropagation()">
+
+        <div class="mx-auto flex items-center justify-center w-16 h-16 rounded-full mb-6 {% if isletme.is_premium %}bg-rose-500/10 text-rose-500{% else %}bg-rose-50 text-rose-500{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+
+        <h3 class="text-xl font-black mb-2 {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}">İşlem Başarısız</h3>
+        <p id="errorModalText" class="text-sm font-medium mb-6 {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">Hata mesajı buraya gelecek.</p>
+
+        <button type="button" onclick="closeErrorModal()" class="w-full py-3.5 rounded-xl font-extrabold transition-all hover:-translate-y-0.5 {% if isletme.is_premium %}bg-slate-800 hover:bg-slate-700 text-white{% else %}bg-slate-100 hover:bg-slate-200 text-slate-700{% endif %}">
+            Tamam, Anladım
+        </button>
+    </div>
+</div>
+
+<div id="successModal" class="fixed inset-0 z-[999999] hidden flex items-center justify-center p-4 backdrop-blur-md bg-slate-900/70 opacity-0 transition-opacity duration-300" onclick="closeSuccessModal()">
+    <div id="successModalContent" class="w-full max-w-sm rounded-[2rem] p-8 text-center transition-all duration-300 transform scale-95 shadow-2xl relative
+        {% if isletme.is_premium %}bg-[#14141f] border border-white/10 shadow-emerald-500/20{% else %}bg-white border border-slate-200{% endif %}"
+        onclick="event.stopPropagation()">
+
+        <div class="mx-auto flex items-center justify-center w-16 h-16 rounded-full mb-6 {% if isletme.is_premium %}bg-emerald-500/10 text-emerald-400{% else %}bg-emerald-50 text-emerald-500{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+        </div>
+
+        <h3 class="text-xl font-black mb-2 {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}">Harika!</h3>
+        <p id="successModalText" class="text-sm font-medium mb-6 {% if isletme.is_premium %}text-slate-400{% else %}text-slate-500{% endif %}">Başarı mesajı buraya gelecek.</p>
+
+        <button type="button" onclick="closeSuccessModal()" class="w-full py-3.5 rounded-xl font-extrabold transition-all hover:-translate-y-0.5 {% if isletme.is_premium %}bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400{% else %}bg-emerald-50 hover:bg-emerald-100 text-emerald-600{% endif %}">
+            Kapat
+        </button>
+    </div>
+</div>
+
+<script>
+// =========================================
+// 🔥 ZEKİ MODAL (IŞINLANMA) FONKSİYONLARI 🔥
+// =========================================
+const eventModal = document.getElementById('calendarEventModal');
+const eventModalContent = document.getElementById('calendarModalContent');
+const premiumModal = document.getElementById('premiumUpsellModal');
+const premiumModalContent = document.getElementById('premiumModalContent');
+const mModal = document.getElementById('manuelRandevuModal');
+const mContent = document.getElementById('manuelModalContent');
+
+function openEventModal() {
+    if (eventModal) {
+        document.body.appendChild(eventModal);
+        eventModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        setTimeout(() => {
+            eventModal.classList.remove('opacity-0');
+            eventModalContent.classList.remove('scale-95');
+            eventModalContent.classList.add('scale-100');
+        }, 10);
+    }
+}
+
+function closeEventModal() {
+    if (eventModal) {
+        eventModal.classList.add('opacity-0');
+        eventModalContent.classList.remove('scale-100');
+        eventModalContent.classList.add('scale-95');
+        setTimeout(() => {
+            eventModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+}
+
+function openPremiumModal() {
+    if (premiumModal) {
+        document.body.appendChild(premiumModal);
+        premiumModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        setTimeout(() => {
+            premiumModal.classList.remove('opacity-0');
+            premiumModalContent.classList.remove('scale-95');
+            premiumModalContent.classList.add('scale-100');
+        }, 10);
+    }
+}
+
+function closePremiumModal() {
+    if (premiumModal) {
+        premiumModal.classList.add('opacity-0');
+        premiumModalContent.classList.remove('scale-100');
+        premiumModalContent.classList.add('scale-95');
+        setTimeout(() => {
+            premiumModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+}
+
+function openManuelModal() {
+    if (mModal) {
+        document.body.appendChild(mModal);
+        mModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        setTimeout(() => {
+            mModal.classList.remove('opacity-0');
+            mContent.classList.remove('scale-95');
+            mContent.classList.add('scale-100');
+        }, 10);
+    }
+}
+
+function closeManuelModal() {
+    if (mModal) {
+        mModal.classList.add('opacity-0');
+        mContent.classList.remove('scale-100');
+        mContent.classList.add('scale-95');
+        setTimeout(() => {
+            mModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+}
+
+let calendar; // Global takvim değişkeni
+
+function triggerManuelRandevuFromSidebar() {
+    const now = new Date();
+    const openTimeStr = "{{ isletme.opening_time|time:'H:i' }}";
+    const closeTimeStr = "{{ isletme.closing_time|time:'H:i' }}";
+    
+    let [openH, openM] = openTimeStr.split(':').map(Number);
+    let [closeH, closeM] = closeTimeStr.split(':').map(Number);
+    
+    let targetDate = new Date(now);
+    let targetH, targetM;
+
+    let currentMinutes = now.getHours() * 60 + now.getMinutes();
+    let openMinutes = openH * 60 + openM;
+    let closeMinutes = closeH * 60 + closeM;
+
+    if (currentMinutes < openMinutes) {
+        // Mesai öncesi -> Bugünün Açılış saati
+        targetH = openH;
+        targetM = openM;
+    } else if (currentMinutes >= closeMinutes - 30) {
+        // Mesai bitti (veya bitmesine 30dk kaldı) -> Yarının Açılış saati
+        targetDate.setDate(targetDate.getDate() + 1);
+        targetH = openH;
+        targetM = openM;
+    } else {
+        // Mesai içinde -> Bir sonraki tam saat (13:27 -> 14:00)
+        targetH = now.getHours() + 1;
+        targetM = 0;
+    }
+
+    // TAKVİMDEKİ DOLULUK KONTROLÜ
+    const allEvents = calendar ? calendar.getEvents() : [];
+    
+    function isSlotFull(h, m) {
+        let slotStart = new Date(targetDate);
+        slotStart.setHours(h, m, 0, 0);
+        let slotEnd = new Date(slotStart);
+        slotEnd.setMinutes(slotEnd.getMinutes() + 20); // Ortalama 20dk'lık bir blok kontrolü
+        
+        return allEvents.some(event => {
+            // İptal edilmemiş randevularla çakışma var mı?
+            if (event.extendedProps && (event.extendedProps.status === 'cancelled' || event.extendedProps.status === 'customer_cancelled')) return false;
+            return (slotStart < event.end && slotEnd > event.start);
+        });
+    }
+
+    // Boşluk bulana kadar 10'ar dakikalık adımlarla tara
+    let searchH = targetH;
+    let searchM = targetM;
+    let found = false;
+
+    // Maksimum 100 adım (sonsuz döngü koruması)
+    for (let i = 0; i < 100; i++) {
+        if (!isSlotFull(searchH, searchM)) {
+            found = true;
+            break;
+        }
+        searchM += 10;
+        if (searchM >= 60) {
+            searchM = 0;
+            searchH++;
+        }
+        // Mesai biterse aramayı durdur
+        if (searchH * 60 + searchM >= closeMinutes) break;
+    }
+
+    // Eğer hiç boşluk bulunamadıysa orijinal öneriye dön
+    if (!found) {
+        searchH = targetH;
+        searchM = targetM;
+    }
+
+    const finalDateStr = targetDate.toLocaleDateString('en-CA');
+    const finalTimeStr = String(searchH).padStart(2, '0') + ":" + String(searchM).padStart(2, '0');
+
+    document.getElementById('m_date').value = finalDateStr;
+    document.getElementById('m_time').value = finalTimeStr;
+    document.getElementById('m_staff').value = ""; 
+
+    document.getElementById('m_date_display').textContent = targetDate.toLocaleDateString('tr-TR');
+    document.getElementById('m_time_display').textContent = finalTimeStr;
+
+    openManuelModal();
+}
+
+// --- YENİ EKLENEN HATA VE BAŞARI MODAL FONKSİYONLARI ---
+const errModal = document.getElementById('errorModal');
+const errContent = document.getElementById('errorModalContent');
+const succModal = document.getElementById('successModal');
+const succContent = document.getElementById('successModalContent');
+
+function showErrorModal(message) {
+    if (errModal) {
+        document.getElementById('errorModalText').textContent = message;
+        document.body.appendChild(errModal);
+        errModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        setTimeout(() => {
+            errModal.classList.remove('opacity-0');
+            errContent.classList.remove('scale-95');
+            errContent.classList.add('scale-100');
+        }, 10);
+    }
+}
+
+function closeErrorModal() {
+    if (errModal) {
+        errModal.classList.add('opacity-0');
+        errContent.classList.remove('scale-100');
+        errContent.classList.add('scale-95');
+        setTimeout(() => {
+            errModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+}
+
+function showSuccessModal(message) {
+    if (succModal) {
+        document.getElementById('successModalText').textContent = message;
+        document.body.appendChild(succModal);
+        succModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        setTimeout(() => {
+            succModal.classList.remove('opacity-0');
+            succContent.classList.remove('scale-95');
+            succContent.classList.add('scale-100');
+        }, 10);
+    }
+}
+
+function closeSuccessModal() {
+    if (succModal) {
+        succModal.classList.add('opacity-0');
+        succContent.classList.remove('scale-100');
+        succContent.classList.add('scale-95');
+        setTimeout(() => {
+            succModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 🔥 DJANGO'DAN GELEN MESAJLARI ŞIK MODALLA GÖSTER 🔥
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                setTimeout(() => { showSuccessModal("{{ message }}"); }, 300);
+            {% elif message.tags == 'error' %}
+                setTimeout(() => { showErrorModal("{{ message }}"); }, 300);
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    var calendarEl = document.getElementById('calendar');
+    var isPremium = {{ isletme.is_premium|yesno:"true,false" }};
+
+    var calendarConfig = {
+        schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+        locale: 'tr',
+        height: '100%',
+        expandRows: true,
+        slotMinTime: '08:00:00',
+        slotMaxTime: '22:00:00',
+        allDaySlot: false,
+        nowIndicator: true,
+        stickyHeaderDates: true,
+        initialView: isPremium ? 'resourceTimeGridDay' : 'timeGridDay',
+        slotEventOverlap: false,
+
+        buttonText: {
+            today: 'Bugün'
+        },
+
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: isPremium ? 'resourceTimeGridDay,timeGridWeek,dayGridMonth' : 'timeGridDay,timeGridWeek,dayGridMonth'
+        },
+
+        views: {
+            resourceTimeGridDay: { buttonText: 'Personel' },
+            timeGridDay: { buttonText: 'Günlük' },
+            timeGridWeek: { buttonText: 'Haftalık' },
+            dayGridMonth: { buttonText: 'Aylık' }
+        },
+
+        // 🔥 YENİ: BOŞ SAATE TIKLAYINCA RANDEVU EKLEME 🔥
+        selectable: true,
+        selectMirror: true,
+        select: function(info) {
+            const startDate = info.start;
+
+            const selectedTime = startDate.getHours() * 100 + startDate.getMinutes();
+
+            // İşletme saatlerini al (Örn: 09:00 -> 900, 22:00 -> 2200)
+            const openTime = parseInt("{{ isletme.opening_time|time:'Hi' }}");
+            const closeTime = parseInt("{{ isletme.closing_time|time:'Hi' }}");
+
+            // 🔥 BEKÇİ: Mesai saatleri dışındaysa şık hata modalını aç ve işlemi iptal et
+            if (selectedTime < openTime || selectedTime >= closeTime) {
+                showErrorModal("Seçilen saat (" + startDate.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}) + ") işletmenin mesai saatleri (" + "{{ isletme.opening_time|time:'H:i' }} - {{ isletme.closing_time|time:'H:i' }}" + ") dışındadır!");
+                calendar.unselect();
+                return;
+            }
+
+            const dateStr = startDate.toLocaleDateString('en-CA');
+            const timeStr = startDate.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
+
+            let resourceId = "";
+            if (info.resource && info.resource.id !== "farketmez") {
+                resourceId = info.resource.id;
+            }
+
+            document.getElementById('m_date').value = dateStr;
+            document.getElementById('m_time').value = timeStr;
+            document.getElementById('m_staff').value = resourceId;
+
+            document.getElementById('m_date_display').textContent = startDate.toLocaleDateString('tr-TR');
+            document.getElementById('m_time_display').textContent = timeStr;
+
+            openManuelModal();
+            calendar.unselect();
+        },
+
+        events: '{% url "api_calendar_events" %}',
+
+        eventClick: function(info) {
+            document.getElementById('cModalCustomer').textContent = info.event.extendedProps.customer_name;
+            document.getElementById('cModalService').textContent = info.event.title;
+
+            const startStr = info.event.start.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
+            const endStr = info.event.end ? info.event.end.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}) : '';
+            document.getElementById('cModalTime').textContent = startStr + (endStr ? ' - ' + endStr : '');
+
+            document.getElementById('cModalPhone').href = "tel:" + info.event.extendedProps.phone;
+            document.getElementById('cModalPhoneText').textContent = info.event.extendedProps.phone + " (Ara)";
+
+            document.getElementById('cModalStaff').textContent = info.event.extendedProps.staff_name || "Atanmamış";
+
+            const statusEl = document.getElementById('cModalStatus');
+            let statusText = info.event.extendedProps.status;
+
+            if(statusText === 'pending') {
+                statusEl.textContent = 'BEKLİYOR';
+                statusEl.className = 'inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-500';
+            } else if(statusText === 'confirmed') {
+                statusEl.textContent = 'ONAYLANDI';
+                statusEl.className = 'inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-500';
+            } else if(statusText === 'completed') {
+                statusEl.textContent = 'TAMAMLANDI';
+                statusEl.className = 'inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500';
+            } else {
+                statusEl.textContent = statusText.toUpperCase();
+            }
+
+            openEventModal();
+        }
+    };
+
+    if (isPremium) {
+        calendarConfig.resources = '{% url "api_calendar_resources" %}';
+    }
+
+    calendar = new FullCalendar.Calendar(calendarEl, calendarConfig);
+    calendar.render();
+});
+</script>
+{% endblock %}

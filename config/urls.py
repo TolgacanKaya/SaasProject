@@ -14,21 +14,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# config/urls.py
+
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings # Yeni eklendi
-from django.conf.urls.static import static # Yeni eklendi
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('patron-gizli-giris-404/', admin.site.urls),
     path('hesap/', include('accounts.urls')),
-    path('businesses/', include('businesses.urls')),
+
+
+    path('pos/', include('pos.urls')),
+
+    # DİKKAT: path('businesses/', include('businesses.urls')) satırını sildik! Çiftleme yapıyordu.
+
     path('randevu-yonetimi/', include('appointments.urls')),
-    path('', include('core.urls')),
-    path('', include('businesses.urls')),
     path('odeme/', include('payments.urls')),
+
+    # Kök dizinler en altta olmalı
+    path('', include('core.urls')),
+    path('', include('businesses.urls')),  # Dashboard ve Slug rotaları buradan çalışacak
 ]
 
-# Geliştirme aşamasında medya dosyalarını göstermek için bu satırı ekliyoruz:
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,19 +6,52 @@
   <component name="ChangeListManager">
     <list default="true" id="b8d7e1a1-0524-493f-a306-4793c7ea7bd6" name="Changes" comment="Proje iskeleti ve core app oluşturuldu">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/giris.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/giris.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/kayit.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/kayit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla_email.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla_email.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla_gonderildi.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla_gonderildi.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla_onay.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla_onay.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla_tamam.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/sifre_sifirla_tamam.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appointments/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appointments/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appointments/templates/appointments/isletme_randevular.html" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/templates/appointments/isletme_randevular.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appointments/templates/appointments/musteri_iptal_onay.html" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/templates/appointments/musteri_iptal_onay.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appointments/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appointments/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appointments/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/middleware.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/tasks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/degerlendirme_yap.html" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/templates/appointments/degerlendirme_yap.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/email_degerlendirme.html" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/templates/appointments/email_degerlendirme.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/hizmet_duzenle.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/hizmet_duzenle.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/islem_tamam.html" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/templates/appointments/islem_tamam.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_abonelik.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_abonelik.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_analiz.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_analiz.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_ayarlar.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_ayarlar.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_detay.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_detay.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_hizmetler.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_hizmetler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_kuponlar.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_kuponlar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_musteriler.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_musteriler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_personeller.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_personeller.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/premium_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/premium_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/randevu_iptal_email.html" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/templates/appointments/randevu_iptal_email.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/randevu_odeme.html" beforeDir="false" afterPath="$PROJECT_DIR$/payments/templates/payments/randevu_odeme.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/randevu_onay_email.html" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/templates/appointments/randevu_onay_email.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templatetags/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/templatetags/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/templatetags/custom_filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/templatetags/custom_filters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/tests.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/templates/core/404.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/404.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/templates/core/ana_sayfa.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/ana_sayfa.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/templates/core/gizlilik.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/gizlilik.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/templates/core/hakkimizda.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/hakkimizda.html" afterDir="false" />
@@ -27,8 +60,14 @@
       <change beforePath="$PROJECT_DIR$/core/templates/core/kosullar.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/kosullar.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/templates/core/rehber.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/rehber.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/templates/core/rozetler.html" beforeDir="false" afterPath="$PROJECT_DIR$/core/templates/core/rozetler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/payments/templates/payments/odeme.html" beforeDir="false" afterPath="$PROJECT_DIR$/payments/templates/payments/odeme.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/payments/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/payments/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/payments/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/payments/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard_base.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,8 +77,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
+        <option value="CSS File" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -90,6 +130,7 @@
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Tolgacan Kaya/OneDrive/Masaüstü/SaasProject&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -102,16 +143,16 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\core\templates\core" />
-      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\businesses\templates\businesses" />
+      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\pos\templates\pos" />
+      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\core" />
+      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\appointments" />
       <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\appointments\templates\appointments" />
-      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\accounts\templates\accounts" />
+      <recent name="C:\Users\Tolgacan Kaya\OneDrive\Masaüstü\SaasProject\appointments\templates" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.31033.139" />
         <option value="bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139" />
       </set>
     </attachedChunks>
@@ -164,7 +205,18 @@
       <workItem from="1774742640663" duration="2530000" />
       <workItem from="1774817937905" duration="10275000" />
       <workItem from="1774862476386" duration="3955000" />
-      <workItem from="1774929131832" duration="844000" />
+      <workItem from="1774929131832" duration="37235000" />
+      <workItem from="1775028393610" duration="22116000" />
+      <workItem from="1775062051569" duration="5614000" />
+      <workItem from="1775125468230" duration="19635000" />
+      <workItem from="1775178009424" duration="1749000" />
+      <workItem from="1775200648098" duration="5253000" />
+      <workItem from="1775231278350" duration="5281000" />
+      <workItem from="1775251903075" duration="2467000" />
+      <workItem from="1775311510794" duration="1204000" />
+      <workItem from="1775380680044" duration="4464000" />
+      <workItem from="1775395120725" duration="2519000" />
+      <workItem from="1775405296524" duration="565000" />
     </task>
     <task id="LOCAL-00001" summary="Proje iskeleti ve core app oluşturuldu">
       <option name="closed" value="true" />

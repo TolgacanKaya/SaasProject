@@ -12,5 +12,8 @@ urlpatterns = [
     path('kullanim-rehberi/', views.rehber, name='rehber'),
     path('gizlilik-politikasi/', views.gizlilik, name='gizlilik'),
     path('kullanim-kosullari/', views.kosullar, name='kosullar'),
+    path('on-bilgilendirme/', views.on_bilgilendirme, name='on_bilgilendirme'),
+    path('mesafeli-satis-sozlesmesi/', views.mesafeli_satis, name='mesafeli_satis'),
     path('test-404/', TemplateView.as_view(template_name='core/404.html')),
+    path('test-500/', TemplateView.as_view(template_name='core/500.html')),
 ]

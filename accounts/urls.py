@@ -25,4 +25,8 @@ urlpatterns = [
     path('sifre-yenile/basarili/',
          auth_views.PasswordResetCompleteView.as_view(template_name='accounts/sifre_sifirla_tamam.html'),
          name='password_reset_complete'),
+
+    # 👑 DEVELOPER MAIL TEMPLATE PREVIEW PANEL ENDPOINTS 👑
+    path('mail-onizleme/', views.email_preview_dashboard, name='email_preview_dashboard'),
+    path('mail-onizleme/<str:template_name>/', views.email_preview_render, name='email_preview_render'),
 ]

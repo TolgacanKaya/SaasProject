@@ -1,0 +1,103 @@
+{% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
+
+{% block page_title %}Ürünler & Ekstralar{% endblock %}
+
+{% block content %}
+    <div class="flex items-center gap-3 mb-6">
+        <h3 class="text-2xl font-extrabold {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %} m-0">📦 Ürün ve Ekstra Hizmetler</h3>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1">
+            <div class="{% if isletme.is_premium %}bg-slate-900 border border-slate-800{% else %}bg-white border border-slate-200{% endif %} rounded-2xl p-6 shadow-sm">
+                <h5 class="font-bold border-b pb-4 mb-5 {% if isletme.is_premium %}text-white border-slate-800{% else %}text-slate-800 border-slate-100{% endif %}">Yeni Ürün Ekle</h5>
+
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add">
+                    
+                    <div>
+                        <label class="block text-sm font-bold mb-2 {% if isletme.is_premium %}text-slate-400{% else %}text-slate-700{% endif %}">Ürün / Ekstra Adı</label>
+                        <input type="text" name="name" required placeholder="Örn: Keratin Şampuanı" class="w-full px-4 py-3 rounded-xl outline-none transition-all font-medium {% if isletme.is_premium %}bg-slate-950 border border-slate-800 text-white focus:border-amber-400{% else %}bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-indigo-500{% endif %}">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold mb-2 {% if isletme.is_premium %}text-slate-400{% else %}text-slate-700{% endif %}">Satış Fiyatı (₺)</label>
+                        <input type="number" step="0.01" name="price" required placeholder="Örn: 250" class="w-full px-4 py-3 rounded-xl outline-none transition-all font-medium {% if isletme.is_premium %}bg-slate-950 border border-slate-800 text-white focus:border-amber-400{% else %}bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-indigo-500{% endif %}">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold mb-2 {% if isletme.is_premium %}text-slate-400{% else %}text-slate-700{% endif %}">Stok Miktarı (İsteğe Bağlı)</label>
+                        <input type="number" name="stock" placeholder="Örn: 50" class="w-full px-4 py-3 rounded-xl outline-none transition-all font-medium {% if isletme.is_premium %}bg-slate-950 border border-slate-800 text-white focus:border-amber-400{% else %}bg-slate-50 border border-slate-200 text-slate-800 focus:ring-2 focus:ring-indigo-500{% endif %}">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 font-bold rounded-xl transition-all duration-300 hover:-translate-y-0.5 mt-2 {% if isletme.is_premium %}bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 shadow-lg shadow-amber-500/20{% else %}bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/30{% endif %}">
+                        Stoğa Ekle
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2">
+            <div class="{% if isletme.is_premium %}bg-slate-900 border border-slate-800{% else %}bg-white border border-slate-200{% endif %} rounded-2xl shadow-sm overflow-hidden h-full flex flex-col">
+                <div class="{% if isletme.is_premium %}bg-slate-900/50 border-slate-800{% else %}bg-slate-50 border-slate-200{% endif %} border-b px-6 py-4">
+                    <h5 class="font-bold m-0 flex items-center gap-2 {% if isletme.is_premium %}text-white{% else %}text-slate-700{% endif %}">
+                        Mevcut Ürünleriniz
+                    </h5>
+                </div>
+
+                <div class="overflow-x-auto flex-1">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="{% if isletme.is_premium %}bg-slate-800/50 text-slate-400 border-slate-700{% else %}bg-white text-slate-500 border-slate-200{% endif %} text-sm border-b">
+                            <tr>
+                                <th class="px-6 py-3 font-semibold">Ürün Adı</th>
+                                <th class="px-6 py-3 font-semibold">Stok</th>
+                                <th class="px-6 py-3 font-semibold">Fiyat</th>
+                                <th class="px-6 py-3 font-semibold text-right">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y {% if isletme.is_premium %}divide-slate-800/50{% else %}divide-slate-100{% endif %}">
+                            {% for urun in urunler %}
+                            <tr class="transition-colors {% if isletme.is_premium %}hover:bg-slate-800/30{% else %}hover:bg-slate-50{% endif %}">
+                                <td class="px-6 py-4 font-bold {% if isletme.is_premium %}text-slate-200{% else %}text-slate-900{% endif %}">
+                                    {{ urun.name }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {% if urun.stock > 0 %}
+                                        <span class="inline-flex px-2.5 py-1 rounded-md text-xs font-bold {% if isletme.is_premium %}bg-slate-800 text-slate-300 border border-slate-700{% else %}bg-slate-100 text-slate-600 border border-slate-200{% endif %}">
+                                            {{ urun.stock }} Adet
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex px-2.5 py-1 rounded-md text-xs font-bold {% if isletme.is_premium %}bg-rose-500/10 text-rose-400 border border-rose-500/20{% else %}bg-rose-100 text-rose-600 border border-rose-200{% endif %}">
+                                            Sınırsız / Stoksuz
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 font-extrabold {% if isletme.is_premium %}text-emerald-400{% else %}text-emerald-600{% endif %}">
+                                    {{ urun.price|floatformat:2 }} ₺
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <form method="POST" class="inline" onsubmit="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="product_id" value="{{ urun.id }}">
+                                        <button type="submit" class="inline-flex items-center px-3 py-1.5 border text-sm font-bold rounded-lg transition-colors {% if isletme.is_premium %}bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white{% else %}border-rose-200 text-rose-600 hover:bg-rose-50{% endif %}">
+                                            🗑️ Sil
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-12 {% if isletme.is_premium %}text-slate-500{% else %}text-slate-500{% endif %} font-medium">
+                                    Henüz hiç ürün eklemediniz. Sol taraftaki formu kullanarak ekleyebilirsiniz.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çalışma Alanı Seç | T-Randevu</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b; /* Koyu siyah arka plan */
+        }
+        .glass-panel {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Modal Çıkış Animasyonu */
+        @keyframes zoomOutFade {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0; visibility: hidden; }
+        }
+        .modal-exit {
+            animation: zoomOutFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Gizli Scrollbar */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+
+<body class="text-white min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+
+    <div id="workspaceWelcomeModal" class="fixed inset-0 z-[99999] flex items-center justify-center bg-[#09090b] transition-opacity duration-500">
+        <div class="text-center relative">
+            <div class="absolute inset-0 bg-indigo-500/30 rounded-full blur-[80px] animate-pulse"></div>
+
+            <div class="relative z-10">
+                <div class="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(99,102,241,0.5)] transform hover:scale-105 transition-transform">
+                    <span class="text-5xl font-black text-white">T</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-2 tracking-tight">
+                    Workspace
+                </h2>
+                <div class="flex items-center justify-center gap-3 mt-4">
+                    <div class="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style="animation-delay: 0s;"></div>
+                    <div class="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style="animation-delay: 0.1s;"></div>
+                    <div class="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style="animation-delay: 0.2s;"></div>
+                </div>
+                <p class="text-indigo-400/80 font-bold tracking-[0.2em] uppercase text-xs mt-4">Çalışma Alanı Yükleniyor...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="absolute top-0 w-full p-6 md:p-10 flex justify-between items-center z-20 opacity-0" id="mainHeader">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">
+                T
+            </div>
+            <div class="text-xl font-black tracking-tight text-white hidden sm:block">
+                T-Randevu <span class="text-[10px] font-bold text-indigo-400 tracking-[0.2em] ml-1 uppercase">Workspace</span>
+            </div>
+        </div>
+
+        <a href="{% url 'cikis' %}" class="text-sm font-bold text-slate-400 hover:text-white transition-colors flex items-center gap-2 bg-slate-800/50 hover:bg-slate-800 px-4 py-2 rounded-full border border-slate-700/50">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            Çıkış Yap
+        </a>
+    </div>
+
+    <div class="z-10 w-full max-w-6xl px-4 text-center opacity-0 transition-opacity duration-1000 mt-10" id="mainContent">
+
+        <h1 class="text-3xl md:text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 flex items-center justify-center gap-3">
+            <span id="greetingText">Hoş Geldin,</span>
+            {{ request.user.first_name|default:request.user.username|title }}! 👋
+        </h1>
+        <p class="text-slate-400 text-sm md:text-base font-medium mb-12">Yönetmek istediğin işletmeyi seç veya yeni bir marka yarat.</p>
+
+        <form method="POST" class="flex flex-wrap justify-center gap-6 md:gap-8 max-w-4xl mx-auto">
+            {% csrf_token %}
+
+            {% for isletme in isletmeler %}
+
+                {% if not has_premium and isletme.id != ilk_isletme.id %}
+                    <button type="button" onclick="openPremiumModal()" class="group relative w-44 h-60 md:w-52 md:h-64 glass-panel rounded-[2rem] p-6 flex flex-col items-center justify-center gap-5 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] hover:border-rose-500/30">
+
+                        <div class="absolute inset-0 z-20 bg-[#09090b]/60 backdrop-blur-[3px] flex flex-col items-center justify-center transition-all duration-300 group-hover:bg-[#09090b]/40">
+                            <div class="w-12 h-12 bg-slate-800/80 rounded-full flex items-center justify-center text-slate-400 mb-2 shadow-lg border border-slate-700/50 group-hover:scale-110 group-hover:border-rose-500/50 group-hover:text-rose-500 transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+                            </div>
+                            <span class="text-[10px] font-bold text-slate-300 px-3 py-1 bg-slate-800/90 rounded-md border border-slate-700/50 uppercase tracking-widest group-hover:text-rose-400 group-hover:border-rose-500/50 transition-colors">Kilidi Aç</span>
+                        </div>
+
+                        <div class="w-full h-full flex flex-col items-center justify-center gap-5 opacity-30 grayscale pointer-events-none text-center">
+                            <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-slate-700/50 shadow-inner flex items-center justify-center bg-slate-900 relative z-10 mx-auto">
+                                {% if isletme.logo %}
+                                    <img src="{{ isletme.logo.url }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <span class="text-4xl font-black text-slate-500">{{ isletme.name|make_list|first|upper }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="w-full relative z-10">
+                                <h3 class="font-extrabold text-white text-base md:text-lg truncate w-full px-1 drop-shadow-sm">{{ isletme.name }}</h3>
+                                <p class="text-xs font-semibold text-slate-500 mt-1 truncate px-2">
+                                    {{ isletme.city|default:"Konum Yok" }}
+                                </p>
+                            </div>
+                        </div>
+                    </button>
+
+                {% else %}
+                    <button type="submit" name="isletme_id" value="{{ isletme.id }}" class="group relative w-44 h-60 md:w-52 md:h-64 glass-panel rounded-[2rem] p-6 flex flex-col items-center justify-center gap-5 hover:bg-slate-800/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(79,70,229,0.15)] hover:border-indigo-500/40">
+
+                        {% if isletme.is_premium %}
+                        <div class="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-amber-300 to-amber-500 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/30 border-2 border-slate-900 z-10" title="Premium İşletme">
+                            <svg class="w-4 h-4 text-slate-900" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+                        {% endif %}
+
+                        <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-slate-700/50 group-hover:border-indigo-500 transition-colors shadow-inner flex items-center justify-center bg-slate-900 relative z-10">
+                            {% if isletme.logo %}
+                                <img src="{{ isletme.logo.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <span class="text-4xl font-black text-slate-500 group-hover:text-indigo-400 transition-colors">{{ isletme.name|make_list|first|upper }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="w-full relative z-10">
+                            <h3 class="font-extrabold text-white text-base md:text-lg truncate w-full px-1 drop-shadow-sm">{{ isletme.name }}</h3>
+                            <p class="text-xs font-semibold text-slate-500 mt-1 truncate px-2 group-hover:text-indigo-300/70 transition-colors">
+                                {{ isletme.city|default:"Konum Belirtilmemiş" }}
+                            </p>
+                        </div>
+
+                        <div class="absolute inset-0 rounded-[2rem] border-2 border-transparent group-hover:border-indigo-500/20 transition-all pointer-events-none"></div>
+                    </button>
+                {% endif %}
+            {% endfor %}
+
+            {% if isletmeler.count >= 3 %}
+                <div class="group relative w-44 h-60 md:w-52 md:h-64 border-2 border-dashed border-rose-900/50 bg-rose-950/10 rounded-[2rem] p-6 flex flex-col items-center justify-center gap-5 opacity-80 cursor-not-allowed">
+                    <div class="w-16 h-16 rounded-full bg-rose-900/30 flex items-center justify-center text-rose-500 shadow-inner">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    </div>
+                    <div class="text-center">
+                        <span class="font-extrabold text-rose-500 text-sm">Limit Doldu</span>
+                        <span class="block text-[10px] font-medium text-slate-500 mt-1">Maksimum 3 şube açabilirsiniz.</span>
+                    </div>
+                </div>
+            {% elif not has_premium %}
+                <button type="button" onclick="openPremiumModal()" class="group relative w-44 h-60 md:w-52 md:h-64 border-2 border-dashed border-slate-700/70 rounded-[2rem] p-6 flex flex-col items-center justify-center gap-5 hover:bg-amber-500/5 hover:border-amber-500/50 transition-all duration-300 hover:-translate-y-2">
+                    <div class="w-16 h-16 rounded-full bg-slate-800/50 group-hover:bg-amber-500 flex items-center justify-center text-slate-500 group-hover:text-slate-900 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-amber-500/30">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    </div>
+                    <div class="text-center">
+                        <span class="font-extrabold text-slate-400 group-hover:text-amber-400 transition-colors text-sm">Yeni Şube</span>
+                        <span class="block text-[10px] font-bold text-slate-500 mt-2 bg-slate-800/80 py-1 px-2 rounded-md border border-slate-700/50 group-hover:border-amber-500/30 transition-colors">Premium Gerekli</span>
+                    </div>
+                </button>
+            {% else %}
+                <a href="{% url 'yeni_sube_ekle' %}" class="group relative w-44 h-60 md:w-52 md:h-64 border-2 border-dashed border-slate-700/70 rounded-[2rem] p-6 flex flex-col items-center justify-center gap-5 hover:bg-indigo-500/5 hover:border-indigo-500/50 transition-all duration-300 hover:-translate-y-2">
+                    <div class="w-16 h-16 rounded-full bg-slate-800/50 group-hover:bg-indigo-500 flex items-center justify-center text-slate-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/30">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    </div>
+                    <div class="text-center">
+                        <span class="font-extrabold text-slate-400 group-hover:text-indigo-300 transition-colors text-sm">Yeni Şube</span>
+                        <span class="block text-[10px] font-bold text-slate-500 mt-2 bg-slate-800/80 py-1 px-2 rounded-md border border-slate-700/50">Kapasite: {{ isletmeler.count }} / 3</span>
+                    </div>
+                </a>
+            {% endif %}
+
+        </form>
+    </div>
+
+    <div id="premiumUpsellModal" class="fixed inset-0 z-[99999] flex items-center justify-center bg-[#09090b]/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-8 pt-12 shadow-2xl transform scale-95 transition-transform duration-300 relative" id="premiumUpsellContent">
+
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-gradient-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.5)] border-4 border-[#09090b]">
+                <svg class="w-10 h-10 text-slate-900" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </div>
+
+            <div class="text-center">
+                <h3 class="text-2xl font-black text-white mb-3">Premium Özellik</h3>
+                <p class="text-slate-400 text-sm font-medium mb-8 leading-relaxed">
+                    Aynı hesap üzerinden birden fazla şube eklemek ve tüm lokasyonları tek bir panelden yönetmek <strong class="text-amber-400">Pro Plan</strong> kullanıcılarına özeldir.
+                </p>
+
+                <div class="flex flex-col gap-3">
+                    <a href="{% url 'isletme_abonelik' %}" class="w-full py-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-900 font-extrabold rounded-xl shadow-lg shadow-amber-500/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        Aboneliği Yükselt
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                    </a>
+                    <button type="button" onclick="closePremiumModal()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-colors">
+                        Daha Sonra
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. ZEKİ SELAMLAMA (SAATE GÖRE)
+            const hour = new Date().getHours();
+            const greetingElement = document.getElementById('greetingText');
+
+            if (hour >= 5 && hour < 12) {
+                greetingElement.innerText = "Günaydın,";
+            } else if (hour >= 12 && hour < 18) {
+                greetingElement.innerText = "İyi Günler,";
+            } else if (hour >= 18 && hour < 22) {
+                greetingElement.innerText = "İyi Akşamlar,";
+            } else {
+                greetingElement.innerText = "İyi Geceler,";
+            }
+
+            // 2. SİNEMATİK AÇILIŞ (Oturum başına 1 kez)
+            const modal = document.getElementById('workspaceWelcomeModal');
+            const content = document.getElementById('mainContent');
+            const header = document.getElementById('mainHeader');
+            const seenKey = 'workspaceWelcomeSeen_{{ request.user.username }}';
+
+            if (!sessionStorage.getItem(seenKey)) {
+                // Sesi Çal
+                const welcomeSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+                welcomeSound.volume = 0.4;
+                welcomeSound.play().catch(e => console.log('Otomatik ses engellendi.'));
+
+                // 2.2 Saniye sonra modalı havalı şekilde gizle
+                setTimeout(() => {
+                    modal.classList.add('modal-exit'); // Yukarı doğru büyüyerek kaybolur
+
+                    // Ana içeriği göster
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        header.classList.remove('opacity-0');
+                        header.classList.add('animate-fade-in');
+                        content.classList.remove('opacity-0');
+                        content.classList.add('animate-fade-in');
+
+                        sessionStorage.setItem(seenKey, 'true');
+                    }, 500); // Animasyon bitimine yakın ana ekranı getir
+                }, 2200);
+            } else {
+                // Zaten görmüşse modalı anında yok et, sayfayı direkt göster
+                modal.style.display = 'none';
+                header.classList.remove('opacity-0');
+                content.classList.remove('opacity-0');
+                content.classList.add('animate-fade-in');
+            }
+        });
+
+        // 🔥 MODAL AÇMA / KAPAMA FONKSİYONLARI 🔥
+        function openPremiumModal() {
+            const modal = document.getElementById('premiumUpsellModal');
+            const content = document.getElementById('premiumUpsellContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closePremiumModal() {
+            const modal = document.getElementById('premiumUpsellModal');
+            const content = document.getElementById('premiumUpsellContent');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    </script>
+</body>
+</html>

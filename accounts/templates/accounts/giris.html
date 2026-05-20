@@ -2,8 +2,19 @@
 
 {% block title %}İşletme Girişi | T-Randevu{% endblock %}
 
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
 {% block content %}
-<div class="relative min-h-screen flex items-center justify-center pt-32 pb-12 px-4 bg-slate-50 overflow-hidden">
+<div class="relative min-h-screen flex items-center justify-center pt-24 pb-12 px-4 bg-slate-50 overflow-hidden">
+
+    <!-- Minimalist Geri Butonu -->
+    <div class="absolute top-6 left-6 sm:left-10 z-50">
+        <a href="{% url 'ana_sayfa' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-md border border-slate-200 text-slate-700 hover:text-indigo-600 hover:bg-white text-xs font-black tracking-wider uppercase shadow-sm transition-all hover:scale-105">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+            Ana Sayfaya Dön
+        </a>
+    </div>
 
     <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-400/20 rounded-full blur-[100px] animate-blob pointer-events-none"></div>
     <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-300/20 rounded-full blur-[100px] animate-blob animation-delay-2000 pointer-events-none"></div>
