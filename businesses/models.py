@@ -59,8 +59,8 @@ class Business(models.Model):
     # ==========================================
     # 🎵 SPOTIFY ENTEGRASYONU
     # ==========================================
-    spotify_access_token = models.CharField(max_length=500, blank=True, null=True)
-    spotify_refresh_token = models.CharField(max_length=500, blank=True, null=True)
+    spotify_access_token = models.TextField(blank=True, null=True, verbose_name="Spotify Erişim Anahtarı")
+    spotify_refresh_token = models.TextField(blank=True, null=True, verbose_name="Spotify Yenileme Anahtarı")
     spotify_token_expiry = models.DateTimeField(blank=True, null=True)
 
     # ==========================================
