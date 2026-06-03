@@ -36,6 +36,37 @@
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 🔥 PRO PLAN BUTON PARLAMA VE GEÇİŞ ANİMASYONLARI 🔥 */
+        @keyframes proGlow {
+            0%, 100% {
+                box-shadow: 0 0 12px rgba(245, 158, 11, 0.4), 0 0 25px rgba(245, 158, 11, 0.2);
+                border-color: rgba(251, 191, 36, 0.8);
+            }
+            50% {
+                box-shadow: 0 0 22px rgba(239, 68, 68, 0.55), 0 0 40px rgba(245, 158, 11, 0.3);
+                border-color: rgba(239, 68, 68, 0.9);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .pro-upgrade-btn {
+            background: linear-gradient(-45deg, #f59e0b, #eab308, #ef4444, #ec4899);
+            background-size: 300% 300%;
+            animation: gradientShift 4s ease infinite, proGlow 2.5s infinite ease-in-out;
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pro-upgrade-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            filter: brightness(1.1);
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -64,9 +95,15 @@
                 </button>
             </div>
 
-            <div class="mb-8 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider border border-slate-200">
+            {% if isletme.is_premium %}
+            <div class="mb-8 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-700 text-xs font-black uppercase tracking-wider border border-amber-500/20 shadow-sm">
+                👑 Pro Plan
+            </div>
+            {% else %}
+            <div class="mb-8 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider border border-slate-200 animate-pulse">
                 🚀 Ücretsiz Plan
             </div>
+            {% endif %}
 
             <nav class="space-y-2">
                 <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium group {% if request.resolver_match.url_name == 'dashboard' %}bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-100{% else %}text-slate-600 hover:text-indigo-600 hover:bg-slate-50{% endif %}">
@@ -166,9 +203,21 @@
                     <span>Kullanım Rehberi</span>
                 </a>
 
-                <a href="{% url 'isletme_abonelik' %}" class="flex items-center gap-3 px-4 py-3 mt-4 rounded-xl transition-all duration-300 font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 shadow-md shadow-amber-500/10 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5 group">
-                    <span class="text-base group-hover:scale-110 transition-transform">👑</span> Pro Plan'a Geç
+                {% if not isletme.is_premium %}
+                <a href="{% url 'isletme_abonelik' %}" class="pro-upgrade-btn flex items-center justify-center gap-2 px-4 py-3.5 mt-4 rounded-xl font-black text-white text-sm shadow-xl relative overflow-hidden group">
+                    <!-- Parıltı animasyonu şeridi -->
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                    <span class="text-lg animate-bounce shrink-0">👑</span>
+                    <span class="tracking-wide uppercase">Pro Plan'a Geç</span>
                 </a>
+                {% else %}
+                <a href="{% url 'isletme_abonelik' %}" class="flex items-center gap-3 px-4 py-3 mt-4 rounded-xl transition-all duration-200 font-medium group bg-slate-50 border border-slate-200 text-slate-600 hover:text-indigo-600 hover:bg-slate-100/70 hover:border-indigo-300">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span>Abonelik Yönetimi</span>
+                </a>
+                {% endif %}
             </nav>
         </div>
 
@@ -311,7 +360,9 @@
                                 {{ isletme.name|truncatechars:15 }}
                                 <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                             </div>
-                            <div class="text-xs text-slate-500 font-medium">Ücretsiz Plan</div>
+                            <div class="text-xs text-slate-500 font-medium">
+                                {% if isletme.is_premium %}Pro Plan{% else %}Ücretsiz Plan{% endif %}
+                            </div>
                         </div>
                         {% if isletme.logo %}
                             <img src="{{ isletme.logo.url }}" class="w-10 h-10 rounded-full object-cover border-2 border-slate-100 shadow-sm group-hover:border-indigo-200 transition-colors">
