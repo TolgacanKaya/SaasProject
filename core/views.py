@@ -22,7 +22,7 @@ def ana_sayfa(request):
 
 def kesfet(request):
     kategoriler = Category.objects.all()
-    isletmeler = Business.objects.filter(is_active=True)
+    isletmeler = Business.objects.filter(is_active=True).prefetch_related('services')
 
     # Formdan gelen verileri alıyoruz
     arama_kelimesi = request.GET.get('arama')
