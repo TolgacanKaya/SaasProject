@@ -1,4 +1,4 @@
-{% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
+{% extends isletme.is_premium|yesno:"premium_base.html,dashboard_base.html" %}
 
 {% block title %}Güvenli Ödeme{% endblock %}
 {% block page_title %}{{ sayfa_basligi|default:"Premium Plana Geçiş" }}{% endblock %}
