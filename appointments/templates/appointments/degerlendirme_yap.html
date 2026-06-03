@@ -46,24 +46,76 @@
         <form method="POST" class="space-y-8 relative z-10">
             {% csrf_token %}
 
-            <!-- Yıldız Puanlama Alanı -->
-            <div class="bg-slate-50/70 border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-inner">
-                <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Puan Veriniz</label>
-                <div class="flex justify-center items-center gap-3 flex-row-reverse rating-group" id="star-rating">
-                    <input type="radio" id="star5" name="rating" value="5" class="hidden peer" required />
-                    <label for="star5" class="star-item text-4xl sm:text-5xl text-slate-200 cursor-pointer transition-all duration-200 hover:scale-125">★</label>
+            <!-- 4 Kriterli Yıldız Puanlama Alanı -->
+            <div class="bg-slate-50/70 border border-slate-100 rounded-[2rem] p-6 sm:p-8 shadow-inner space-y-6">
+                <label class="block text-[11px] font-black text-slate-450 uppercase tracking-widest mb-4 border-b border-slate-200/50 pb-2">Değerlendirme Kriterleri</label>
+                
+                <!-- 1. Hizmet Kalitesi -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2 border-b border-slate-100 pb-4">
+                    <span class="text-sm font-bold text-slate-800 text-left">Hizmet Kalitesi</span>
+                    <div class="flex justify-start sm:justify-end items-center gap-2 flex-row-reverse rating-group">
+                        <input type="radio" id="quality5" name="rating_quality" value="5" class="hidden peer" required />
+                        <label for="quality5" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="quality4" name="rating_quality" value="4" class="hidden peer" />
+                        <label for="quality4" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="quality3" name="rating_quality" value="3" class="hidden peer" />
+                        <label for="quality3" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="quality2" name="rating_quality" value="2" class="hidden peer" />
+                        <label for="quality2" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="quality1" name="rating_quality" value="1" class="hidden peer" />
+                        <label for="quality1" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                    </div>
+                </div>
 
-                    <input type="radio" id="star4" name="rating" value="4" class="hidden peer" />
-                    <label for="star4" class="star-item text-4xl sm:text-5xl text-slate-200 cursor-pointer transition-all duration-200 hover:scale-125">★</label>
+                <!-- 2. Müşteri Karşılama -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2 border-b border-slate-100 pb-4">
+                    <span class="text-sm font-bold text-slate-800 text-left">Müşteri Karşılama</span>
+                    <div class="flex justify-start sm:justify-end items-center gap-2 flex-row-reverse rating-group">
+                        <input type="radio" id="hospitality5" name="rating_hospitality" value="5" class="hidden peer" required />
+                        <label for="hospitality5" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="hospitality4" name="rating_hospitality" value="4" class="hidden peer" />
+                        <label for="hospitality4" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="hospitality3" name="rating_hospitality" value="3" class="hidden peer" />
+                        <label for="hospitality3" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="hospitality2" name="rating_hospitality" value="2" class="hidden peer" />
+                        <label for="hospitality2" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="hospitality1" name="rating_hospitality" value="1" class="hidden peer" />
+                        <label for="hospitality1" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                    </div>
+                </div>
 
-                    <input type="radio" id="star3" name="rating" value="3" class="hidden peer" />
-                    <label for="star3" class="star-item text-4xl sm:text-5xl text-slate-200 cursor-pointer transition-all duration-200 hover:scale-125">★</label>
+                <!-- 3. Temizlik & Hijyen -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2 border-b border-slate-100 pb-4">
+                    <span class="text-sm font-bold text-slate-800 text-left">Temizlik & Hijyen</span>
+                    <div class="flex justify-start sm:justify-end items-center gap-2 flex-row-reverse rating-group">
+                        <input type="radio" id="cleanliness5" name="rating_cleanliness" value="5" class="hidden peer" required />
+                        <label for="cleanliness5" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="cleanliness4" name="rating_cleanliness" value="4" class="hidden peer" />
+                        <label for="cleanliness4" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="cleanliness3" name="rating_cleanliness" value="3" class="hidden peer" />
+                        <label for="cleanliness3" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="cleanliness2" name="rating_cleanliness" value="2" class="hidden peer" />
+                        <label for="cleanliness2" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="cleanliness1" name="rating_cleanliness" value="1" class="hidden peer" />
+                        <label for="cleanliness1" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                    </div>
+                </div>
 
-                    <input type="radio" id="star2" name="rating" value="2" class="hidden peer" />
-                    <label for="star2" class="star-item text-4xl sm:text-5xl text-slate-200 cursor-pointer transition-all duration-200 hover:scale-125">★</label>
-
-                    <input type="radio" id="star1" name="rating" value="1" class="hidden peer" />
-                    <label for="star1" class="star-item text-4xl sm:text-5xl text-slate-200 cursor-pointer transition-all duration-200 hover:scale-125">★</label>
+                <!-- 4. Fiyat / Performans -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
+                    <span class="text-sm font-bold text-slate-800 text-left">Fiyat / Performans</span>
+                    <div class="flex justify-start sm:justify-end items-center gap-2 flex-row-reverse rating-group">
+                        <input type="radio" id="value5" name="rating_value" value="5" class="hidden peer" required />
+                        <label for="value5" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="value4" name="rating_value" value="4" class="hidden peer" />
+                        <label for="value4" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="value3" name="rating_value" value="3" class="hidden peer" />
+                        <label for="value3" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="value2" name="rating_value" value="2" class="hidden peer" />
+                        <label for="value2" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                        <input type="radio" id="value1" name="rating_value" value="1" class="hidden peer" />
+                        <label for="value1" class="star-item text-3xl cursor-pointer text-slate-200 transition-all duration-200 hover:scale-125">★</label>
+                    </div>
                 </div>
             </div>
 

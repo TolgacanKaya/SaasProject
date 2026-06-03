@@ -170,7 +170,7 @@ def send_welcome_email_task(user_id):
         plain_message = strip_tags(html_message)
 
         send_mail(
-            subject=f"🥂 T-Randevu Ailesine Hoş Geldiniz, Patron!",
+            subject=f"🥂 KobiRandevu Ailesine Hoş Geldiniz, Patron!",
             message=plain_message,
             html_message=html_message,
             from_email=settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER,

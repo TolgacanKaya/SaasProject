@@ -1,8 +1,24 @@
 {% extends isletme.is_premium|yesno:"businesses/premium_base.html,dashboard_base.html" %}
 
-{% block page_title %}Gider & Finans Yönetimi{% endblock %}
+{% block page_title %}Gider ve Finans Yönetimi{% endblock %}
 
 {% block content %}
+<style>
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+</style>
 <div class="relative min-h-[600px]">
     {% if is_premium_teaser %}
     <!-- Premium Teaser Glassmorphism Lock Card -->
@@ -11,11 +27,13 @@
             <div class="absolute -right-20 -top-20 w-48 h-48 bg-rose-500/10 rounded-full blur-3xl"></div>
             <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
             
-            <div class="w-16 h-16 bg-gradient-to-tr from-rose-500 to-rose-600 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg shadow-rose-500/20 border-2 border-rose-300 animate-pulse">
-                📉
+            <div class="w-16 h-16 bg-gradient-to-tr from-rose-500 to-rose-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-500/20 border-2 border-rose-300 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
             </div>
             
-            <h3 class="text-2xl font-black text-white mb-2 tracking-tight">📉 T-Randevu Gider & Finans Yönetimi</h3>
+            <h3 class="text-2xl font-black text-white mb-2 tracking-tight">KobiRandevu Gider ve Finans Yönetimi</h3>
             <p class="text-sm text-slate-400 max-w-lg mx-auto mb-8 font-semibold leading-relaxed">
                 Harcamalarınızı kontrol altına alın, işletme bütçenizi kolayca planlayın.
             </p>
@@ -23,23 +41,23 @@
             <!-- Features list instead of slider -->
             <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-6 mb-8 text-left max-w-md mx-auto shadow-inner relative z-10">
                 <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-                    ⚡ Premium Modülle Neler Kazanacaksınız?
+                    Premium Modülle Neler Kazanacaksınız?
                 </h4>
                 <ul class="space-y-3.5 text-xs text-slate-300 font-bold">
                     <li class="flex items-start gap-2.5">
-                        <span class="text-emerald-400 text-sm leading-none">✔</span>
+                        <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                         <span>Kira, Fatura, Malzeme ve Kozmetik Alımlarını Kategorize Etme</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                        <span class="text-emerald-400 text-sm leading-none">✔</span>
-                        <span>Aylık Otomatik Gider Dağılım Grafikleri & Bakiye Raporları</span>
+                        <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        <span>Aylık Otomatik Gider Dağılım Grafikleri ve Bakiye Raporları</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                        <span class="text-emerald-400 text-sm leading-none">✔</span>
+                        <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                         <span>Personel Prim Hak Edişlerini ve Maaş Bütçelerini Hesaplama</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                        <span class="text-emerald-400 text-sm leading-none">✔</span>
+                        <svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                         <span>Gider Ekstrelerini ve Raporlarınızı Kolayca Dışa Aktarma</span>
                     </li>
                 </ul>
@@ -47,7 +65,7 @@
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <a href="{% url 'isletme_abonelik' %}" class="px-8 py-3.5 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-black text-sm rounded-xl shadow-lg shadow-rose-500/20 hover:-translate-y-0.5 transition-all w-full sm:w-auto">
-                    ⭐ Premium Plana Yükselt ve Başla
+                    Premium Plana Yükselt ve Başla
                 </a>
                 <a href="{% url 'dashboard' %}" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl transition-colors w-full sm:w-auto">
                     Geri Dön
@@ -59,219 +77,378 @@
 
     <div class="{% if is_premium_teaser %}filter blur-sm select-none pointer-events-none{% endif %}">
         <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-    <div>
-        <h2 class="text-3xl font-black text-white flex items-center gap-3 mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-rose-500">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
-            </svg>
-            Gider & Finans
-        </h2>
-        <p class="text-slate-400 font-medium">İşletmenizin tüm harcamalarını tek ekrandan kontrol edin.</p>
-    </div>
-
-    <a href="{% url 'gider_raporu_indir' %}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold tracking-wide uppercase rounded-xl shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all duration-300 hover:-translate-y-1">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-        RAPORU İNDİR (CSV)
-    </a>
-</div>
-
-<div id="expenseSummaries" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 transition-opacity duration-300">
-    <div class="bg-slate-900 border border-rose-500/30 shadow-[0_0_20px_rgba(244,63,94,0.1)] rounded-2xl p-6 relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-            <svg class="w-24 h-24 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        </div>
-        <p class="text-sm font-bold text-rose-400 uppercase tracking-widest mb-1 relative z-10">Bugünkü Gider</p>
-        <h3 class="text-4xl font-black text-white relative z-10">{{ gunluk_gider|floatformat:2 }} <span class="text-xl text-rose-500">₺</span></h3>
-    </div>
-
-    <div class="bg-slate-900 border border-slate-800 shadow-xl rounded-2xl p-6 relative overflow-hidden group hover:border-rose-500/30 transition-colors">
-        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-            <svg class="w-24 h-24 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-        </div>
-        <p class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1 relative z-10">Bu Haftaki Gider</p>
-        <h3 class="text-4xl font-black text-white relative z-10">{{ haftalik_gider|floatformat:2 }} <span class="text-xl text-slate-600">₺</span></h3>
-    </div>
-
-    <div class="bg-slate-900 border border-slate-800 shadow-xl rounded-2xl p-6 relative overflow-hidden group hover:border-rose-500/30 transition-colors">
-        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-            <svg class="w-24 h-24 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-        </div>
-        <p class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1 relative z-10">Bu Ayki Gider</p>
-        <h3 class="text-4xl font-black text-white relative z-10">{{ aylik_gider|floatformat:2 }} <span class="text-xl text-slate-600">₺</span></h3>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-    <div class="lg:col-span-1">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl sticky top-6">
-            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
-                <svg class="w-6 h-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                Yeni Gider İşle
-            </h2>
-
-            <form id="addExpenseForm" method="POST" class="space-y-5" onsubmit="submitExpenseAJAX(event, this)">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add">
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Gider Başlığı / Açıklama</label>
-                    <input type="text" name="title" required placeholder="Örn: Karşı Manavdan Su Alındı" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all font-semibold">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori</label>
-                    <select name="category" required class="premium-select">
-                        {% for kod, isim in kategoriler %}
-                            <option value="{{ kod }}">{% if isletme.is_premium %}{{ isim|slice:"2:" }}{% else %}{{ isim }}{% endif %}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tutar (₺)</label>
-                        <input type="number" step="0.01" name="amount" required placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all font-black text-lg">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tarih</label>
-                        <input type="date" name="date" value="{{ bugun_tarih }}" required class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all font-semibold cursor-pointer">
-                    </div>
-                </div>
-
-                <button type="submit" id="submitExpenseBtn" class="w-full py-4 mt-2 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-black uppercase tracking-widest rounded-xl hover:-translate-y-1 shadow-[0_10px_20px_rgba(244,63,94,0.2)] transition-all duration-300 flex justify-center items-center gap-2">
-                    KASADAN ÇIKIŞ YAP
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <div class="lg:col-span-2">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden h-full flex flex-col">
-            <div class="p-6 border-b border-slate-800 bg-slate-900/50">
-                <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                    <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-                    Geçmiş Gider Kayıtları
+            <div>
+                <h2 class="text-3xl font-black text-white flex items-center gap-3 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-rose-500">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                    </svg>
+                    Gider ve Finans Yönetimi
                 </h2>
+                <p class="text-slate-400 font-medium">İşletmenizin tüm harcamalarını tek ekrandan kontrol edin.</p>
             </div>
 
-            <div id="expenseListContainer" class="p-6">
-                {% for yil, aylar in grouped_expenses.items %}
-                    <div class="mb-6 last:mb-0 border border-white/[0.05] rounded-[2rem] bg-white/[0.01] overflow-hidden">
-                        <!-- YIL BAŞLIĞI (Toggle) -->
-                        <button onclick="toggleSection('year-{{ yil }}')" class="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors group">
-                            <div class="flex items-center gap-4">
-                                <h2 class="text-3xl font-black text-white tracking-tighter opacity-40 group-hover:opacity-100 transition-opacity">{{ yil }}</h2>
-                                <div class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black text-slate-400">
-                                    {{ aylar|length }} AY KAYDI
-                                </div>
-                            </div>
-                            <svg id="icon-year-{{ yil }}" class="w-6 h-6 text-slate-600 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
+            <a href="{% url 'gider_raporu_indir' %}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold tracking-wide uppercase rounded-xl shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all duration-300 hover:-translate-y-1">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                RAPORU İNDİR (CSV)
+            </a>
+        </div>
+ 
+        <div id="expenseSummaries" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 transition-opacity duration-300">
+            <!-- Bugün Kasa Durumu -->
+            <div class="bg-slate-900 border border-slate-800 shadow-[0_0_20px_rgba(255,255,255,0.02)] rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+                <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-16 h-16 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 relative z-10">Bugünkü Net Kasa</p>
+                <h3 class="text-3xl font-black {% if gunluk_net >= 0 %}text-emerald-400{% else %}text-rose-500{% endif %} mb-4 relative z-10">
+                    {% if gunluk_net > 0 %}+{% endif %}{{ gunluk_net|floatformat:2 }} <span class="text-lg">₺</span>
+                </h3>
+                <div class="flex items-center justify-between border-t border-slate-800/80 pt-3 text-xs font-semibold relative z-10">
+                    <span class="text-emerald-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                        Gelir: +{{ gunluk_gelir|floatformat:2 }} ₺
+                    </span>
+                    <span class="text-rose-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span>
+                        Gider: -{{ gunluk_gider|floatformat:2 }} ₺
+                    </span>
+                </div>
+            </div>
+
+            <!-- Bu Haftaki Kasa Durumu -->
+            <div class="bg-slate-900 border border-slate-800 shadow-[0_0_20px_rgba(255,255,255,0.02)] rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+                <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-16 h-16 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                </div>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 relative z-10">Bu Haftaki Net Kasa</p>
+                <h3 class="text-3xl font-black {% if haftalik_net >= 0 %}text-emerald-400{% else %}text-rose-500{% endif %} mb-4 relative z-10">
+                    {% if haftalik_net > 0 %}+{% endif %}{{ haftalik_net|floatformat:2 }} <span class="text-lg">₺</span>
+                </h3>
+                <div class="flex items-center justify-between border-t border-slate-800/80 pt-3 text-xs font-semibold relative z-10">
+                    <span class="text-emerald-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                        Gelir: +{{ haftalik_gelir|floatformat:2 }} ₺
+                    </span>
+                    <span class="text-rose-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span>
+                        Gider: -{{ haftalik_gider|floatformat:2 }} ₺
+                    </span>
+                </div>
+            </div>
+
+            <!-- Bu Ayki Kasa Durumu -->
+            <div class="bg-slate-900 border border-slate-800 shadow-[0_0_20px_rgba(255,255,255,0.02)] rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+                <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-16 h-16 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                </div>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 relative z-10">Bu Ayki Net Kasa</p>
+                <h3 class="text-3xl font-black {% if aylik_net >= 0 %}text-emerald-400{% else %}text-rose-500{% endif %} mb-4 relative z-10">
+                    {% if aylik_net > 0 %}+{% endif %}{{ aylik_net|floatformat:2 }} <span class="text-lg">₺</span>
+                </h3>
+                <div class="flex items-center justify-between border-t border-slate-800/80 pt-3 text-xs font-semibold relative z-10">
+                    <span class="text-emerald-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                        Gelir: +{{ aylik_gelir|floatformat:2 }} ₺
+                    </span>
+                    <span class="text-rose-400 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span>
+                        Gider: -{{ aylik_gider|floatformat:2 }} ₺
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 space-y-6">
+                <!-- MANUEL HARCAMA VE HASILAT EKLEME -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <!-- Dynamic Tab Switcher -->
+                    <div class="flex border-b border-slate-800 mb-6">
+                        <button type="button" onclick="switchFinanceTab('expense')" id="tab-expense" class="flex-1 pb-4 text-center border-b-2 border-rose-500 text-sm font-bold text-white transition-all">
+                            Gider Ekle
                         </button>
+                        <button type="button" onclick="switchFinanceTab('income')" id="tab-income" class="flex-1 pb-4 text-center border-b-2 border-transparent text-sm font-bold text-slate-400 hover:text-white transition-all">
+                            Gelir Ekle
+                        </button>
+                    </div>
 
-                        <div id="year-{{ yil }}" class="{% if not forloop.first %}hidden{% endif %} space-y-4 p-6 pt-0">
-                            {% for ay, giderler in aylar.items %}
-                                <div class="border border-white/[0.03] rounded-3xl bg-white/[0.01]">
-                                    <!-- AY BAŞLIĞI (Toggle) -->
-                                    <button onclick="toggleSection('month-{{ yil }}-{{ ay }}')" class="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors group">
-                                        <h3 class="text-xs font-black text-amber-500/60 uppercase tracking-[0.2em] flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                            {{ ay }}
-                                        </h3>
-                                        <div class="flex items-center gap-3">
-                                            <span class="text-[10px] font-bold text-slate-600 uppercase">{{ giderler|length }} İşlem</span>
-                                            <svg id="icon-month-{{ yil }}-{{ ay }}" class="w-4 h-4 text-slate-700 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                            </svg>
+                    <form id="addExpenseForm" method="POST" class="space-y-5" onsubmit="submitExpenseAJAX(event, this)">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add">
+
+                        <div>
+                            <label id="title-label" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">GİDER BAŞLIĞI / AÇIKLAMA</label>
+                            <input type="text" name="title" required placeholder="Örn: Karşı Manavdan Su Alındı" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all font-semibold text-xs">
+                        </div>
+
+                        <!-- Gider Kategorisi -->
+                        <div id="category-expense-div">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori</label>
+                            <select name="category" id="select-expense" required class="premium-select text-xs">
+                                {% for kod, isim in kategoriler %}
+                                    <option value="{{ kod }}">{{ isim }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Gelir Kategorisi (Gizli) -->
+                        <div id="category-income-div" class="hidden">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Gelir Kategorisi</label>
+                            <select name="income_category" id="select-income" class="premium-select text-xs" disabled>
+                                <option value="elden">Elden / Doğrudan Müşteri Hasılatı</option>
+                                <option value="urun">Ekstra Ürün Satışı Hasılatı</option>
+                                <option value="diger">Diğer Gelirler / Çeşitli Hasılat</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tutar (₺)</label>
+                                <input type="number" step="0.01" name="amount" required placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all font-black text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tarih</label>
+                                <input type="date" name="date" value="{{ bugun_tarih }}" required class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all font-semibold cursor-pointer text-xs">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitExpenseBtn" class="w-full py-4 mt-2 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-black uppercase tracking-widest rounded-xl hover:-translate-y-1 shadow-[0_10px_20px_rgba(244,63,94,0.2)] transition-all duration-300 flex justify-center items-center gap-2 text-xs">
+                            KASADAN ÇIKIŞ YAP
+                        </button>
+                    </form>
+                </div>
+
+                <!-- SABİT GİDER TALİMATLARI -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
+                        <svg class="w-6 h-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.656 48.656 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l-3 3m3-3l3 3" />
+                        </svg>
+                        Sabit Gider Kuralları
+                    </h2>
+
+                    <div class="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scroll">
+                        {% for rule in sabit_giderler %}
+                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between group">
+                            <div>
+                                <h4 class="font-bold text-white text-sm">{{ rule.title }}</h4>
+                                <p class="text-xs text-slate-400 mt-1">
+                                    {{ rule.get_expense_type_display }}
+                                    {% if rule.is_per_staff %}
+                                    <span class="text-[9px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded font-black ml-1.5">ÇALIŞAN BAŞINA</span>
+                                    {% endif %}
+                                </p>
+                                <p class="text-xs text-indigo-400 font-bold mt-1.5">{{ rule.amount|floatformat:2 }} ₺</p>
+                            </div>
+                            
+                            <form method="POST" class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_recurring">
+                                <input type="hidden" name="rule_id" value="{{ rule.id }}">
+                                <button type="submit" class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </form>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-6 border border-dashed border-slate-800 rounded-xl">
+                            <p class="text-xs text-slate-500">Kayıtlı otomatik gider kuralı bulunmuyor.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Yeni Sabit Gider Talimatı Ekleme -->
+                    <form method="POST" class="space-y-4 pt-4 border-t border-slate-800">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_recurring">
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Talimat Başlığı</label>
+                            <input type="text" name="title" required placeholder="Örn: Kira, Maaş, Yemek Ödemesi" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all text-xs font-semibold">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Gider Türü</label>
+                                <select name="expense_type" required class="premium-select text-xs">
+                                    <option value="rent">Kira ve Aidat</option>
+                                    <option value="salary">Personel Maaşı</option>
+                                    <option value="meal">Yemek Ücreti</option>
+                                    <option value="other">Diğer Giderler</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tutar (₺)</label>
+                                <input type="number" step="0.01" name="amount" required placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-4 py-3 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all text-xs font-black">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 py-2">
+                            <input type="checkbox" id="is_per_staff" name="is_per_staff" value="true" class="rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-rose-500 h-4 w-4">
+                            <label for="is_per_staff" class="text-xs text-slate-400 font-bold select-none cursor-pointer">Çalışan Başına Hesapla</label>
+                        </div>
+                        
+                        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_5px_15px_rgba(79,70,229,0.2)]">
+                            TALİMATI EKLE
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden h-full flex flex-col">
+                    <div class="p-6 border-b border-slate-800 bg-slate-900/50">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                            Geçmiş Finansal Hareketler (Kasa Defteri)
+                        </h2>
+                    </div>
+
+                    <div id="expenseListContainer" class="p-6 max-h-[720px] overflow-y-auto pr-2 custom-scroll">
+                        {% for yil, aylar in grouped_expenses.items %}
+                            <div class="mb-6 last:mb-0 border border-white/[0.05] rounded-[2rem] bg-white/[0.01] overflow-hidden">
+                                <!-- YIL BAŞLIĞI (Toggle) -->
+                                <button onclick="toggleSection('year-{{ yil }}')" class="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors group">
+                                    <div class="flex items-center gap-4">
+                                        <h2 class="text-3xl font-black text-white tracking-tighter opacity-40 group-hover:opacity-100 transition-opacity">{{ yil }}</h2>
+                                        <div class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black text-slate-400">
+                                            {{ aylar|length }} AY KAYDI
                                         </div>
-                                    </button>
+                                    </div>
+                                    <svg id="icon-year-{{ yil }}" class="w-6 h-6 text-slate-600 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
 
-                                    <div id="month-{{ yil }}-{{ ay }}" class="{% if not forloop.parentloop.first or not forloop.first %}hidden{% endif %} space-y-2 p-4 pt-0">
-                                        {% for gider in giderler %}
-                                            <div class="expense-row flex items-center justify-between p-4 rounded-2xl border border-white/[0.03] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all group relative overflow-hidden">
-                                                <div class="flex items-center gap-4 relative z-10">
-                                                    <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform">
-                                                        {% if isletme.is_premium %}
-                                                            {% if gider.category == 'ikram' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zM9 11h6M4 17h16a2 2 0 002-2V5a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                                            {% elif gider.category == 'temizlik' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                                                            {% elif gider.category == 'yemek' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" /></svg>
-                                                            {% elif gider.category == 'ulasim' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                                                            {% elif gider.category == 'tamir' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                            {% elif gider.category == 'malzeme' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                                                            {% elif gider.category == 'kira' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1v1H9V7zm5 0h1v1h-1V7zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1z" /></svg>
-                                                            {% elif gider.category == 'fatura' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                                            {% elif gider.category == 'maas' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                                            {% elif gider.category == 'pazarlama' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.167a1.125 1.125 0 01.442-1.243l4.316-2.822a1.125 1.125 0 00.806-1.144zm5 0V19.24a1.76 1.76 0 003.417.592l2.147-6.167a1.125 1.125 0 00-.442-1.243l-4.316-2.822a1.125 1.125 0 01-.806-1.144z" /></svg>
-                                                            {% elif gider.category == 'vergi' %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                <div id="year-{{ yil }}" class="{% if not forloop.first %}hidden{% endif %} space-y-4 p-6 pt-0">
+                                    {% for ay, giderler in aylar.items %}
+                                        <div class="border border-white/[0.03] rounded-3xl bg-white/[0.01]">
+                                            <!-- AY BAŞLIĞI (Toggle) -->
+                                            <button onclick="toggleSection('month-{{ yil }}-{{ ay }}')" class="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors group">
+                                                <h3 class="text-xs font-black text-amber-500/60 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                    {{ ay }}
+                                                </h3>
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-[10px] font-bold text-slate-600 uppercase">{{ giderler|length }} İşlem</span>
+                                                    <svg id="icon-month-{{ yil }}-{{ ay }}" class="w-4 h-4 text-slate-700 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </div>
+                                            </button>
+
+                                            <div id="month-{{ yil }}-{{ ay }}" class="{% if not forloop.parentloop.first or not forloop.first %}hidden{% endif %} space-y-2 p-4 pt-0">
+                                                {% for gider in giderler %}
+                                                    <div class="expense-row flex items-center justify-between p-4 rounded-2xl border border-white/[0.03] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all group relative overflow-hidden">
+                                                        <div class="flex items-center gap-4 relative z-10">
+                                                            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform">
+                                                                {% if isletme.is_premium %}
+                                                                    {% if not is_premium_teaser and not gider.is_expense %}
+                                                                        {% if gider.category == 'elden' %}
+                                                                            <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zM9 11h6M4 17h16a2 2 0 002-2V5a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                                                        {% elif gider.category == 'urun' %}
+                                                                            <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                                                                        {% else %}
+                                                                            <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        {% if gider.category == 'ikram' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zM9 11h6M4 17h16a2 2 0 002-2V5a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                                                        {% elif gider.category == 'temizlik' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                                                        {% elif gider.category == 'yemek' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" /></svg>
+                                                                        {% elif gider.category == 'ulasim' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                                                                        {% elif gider.category == 'tamir' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                                        {% elif gider.category == 'malzeme' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                                                                        {% elif gider.category == 'kira' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1v1H9V7zm5 0h1v1h-1V7zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1z" /></svg>
+                                                                        {% elif gider.category == 'fatura' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                                                        {% elif gider.category == 'maas' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                                                        {% elif gider.category == 'pazarlama' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.167a1.125 1.125 0 01.442-1.243l4.316-2.822a1.125 1.125 0 00.806-1.144zm5 0V19.24a1.76 1.76 0 003.417.592l2.147-6.167a1.125 1.125 0 00-.442-1.243l-4.316-2.822a1.125 1.125 0 01-.806-1.144z" /></svg>
+                                                                        {% elif gider.category == 'vergi' %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                                        {% else %}
+                                                                            <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <svg class="w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                                                                {% endif %}
+                                                            </div>
+                                                            <div>
+                                                                <h4 class="font-bold text-white text-sm {% if not is_premium_teaser and not gider.is_expense %}group-hover:text-emerald-400{% else %}group-hover:text-amber-400{% endif %} transition-colors">{{ gider.title }}</h4>
+                                                                <div class="flex items-center gap-3 mt-1">
+                                                                    <span class="text-white/40 text-[9px] font-black uppercase tracking-widest flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded">
+                                                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                                        {{ gider.date|date:"d M Y" }}
+                                                                    </span>
+                                                                    {% if not is_premium_teaser and not gider.is_expense %}
+                                                                        <span class="text-emerald-500/60 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20 px-2 py-0.5 rounded">
+                                                                            {{ gider.get_category_display }}
+                                                                        </span>
+                                                                    {% else %}
+                                                                        <span class="text-amber-500/60 text-[9px] font-black uppercase tracking-widest border border-amber-500/20 px-2 py-0.5 rounded">
+                                                                            {{ gider.get_category_display }}
+                                                                        </span>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="flex items-center gap-4 relative z-10">
+                                                            {% if not is_premium_teaser and not gider.is_expense %}
+                                                                <div class="text-emerald-500 font-black text-sm md:text-base">+ {{ gider.amount|floatformat:2 }} ₺</div>
+                                                                <form method="POST" onsubmit="deleteExpenseAJAX(event, this)" class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="action" value="delete_income">
+                                                                    <input type="hidden" name="income_id" value="{{ gider.id }}">
+                                                                    <button type="submit" class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all">
+                                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                                    </button>
+                                                                </form>
                                                             {% else %}
-                                                                <svg class="w-5 h-5 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1.01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                                <div class="text-rose-500 font-black text-sm md:text-base">- {{ gider.amount|floatformat:2 }} ₺</div>
+                                                                <form method="POST" onsubmit="deleteExpenseAJAX(event, this)" class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="action" value="delete">
+                                                                    <input type="hidden" name="expense_id" value="{{ gider.id }}">
+                                                                    <button type="submit" class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all">
+                                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                                    </button>
+                                                                </form>
                                                             {% endif %}
-                                                        {% else %}
-                                                            <svg class="w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-                                                        {% endif %}
-                                                    </div>
-                                                    <div>
-                                                        <h4 class="font-bold text-white text-sm group-hover:text-amber-400 transition-colors">{{ gider.title }}</h4>
-                                                        <div class="flex items-center gap-3 mt-1">
-                                                            <span class="text-white/40 text-[9px] font-black uppercase tracking-widest flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded">
-                                                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                                                {{ gider.date|date:"d M Y" }}
-                                                            </span>
-                                                            <span class="text-amber-500/60 text-[9px] font-black uppercase tracking-widest border border-amber-500/20 px-2 py-0.5 rounded">
-                                                                {% if isletme.is_premium %}{{ gider.get_category_display|slice:"2:" }}{% else %}{{ gider.get_category_display }}{% endif %}
-                                                            </span>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <div class="flex items-center gap-4 relative z-10">
-                                                    <div class="text-rose-500 font-black text-sm md:text-base">- {{ gider.amount|floatformat:2 }} ₺</div>
-                                                    <form method="POST" onsubmit="deleteExpenseAJAX(event, this)" class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="action" value="delete">
-                                                        <input type="hidden" name="expense_id" value="{{ gider.id }}">
-                                                        <button type="submit" class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all">
-                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                        </button>
-                                                    </form>
-                                                </div>
+                                                {% endfor %}
                                             </div>
-                                        {% endfor %}
-                                    </div>
+                                        </div>
+                                    {% endfor %}
                                 </div>
-                            {% endfor %}
-                        </div>
+                            </div>
+                        {% empty %}
+                            <div class="text-center py-20 bg-white/5 border border-dashed border-white/10 rounded-[2rem]">
+                                <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                                   <svg class="w-10 h-10 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                </div>
+                                <p class="text-white/40 font-bold">Henüz kaydedilmiş bir gider bulunmuyor.</p>
+                                <p class="text-xs text-white/20 mt-2">Sol taraftaki formu kullanarak ilk harcamanızı kaydedebilirsiniz.</p>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% empty %}
-                    <div class="text-center py-20 bg-white/5 border border-dashed border-white/10 rounded-[2rem]">
-                        <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                           <svg class="w-10 h-10 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        </div>
-                        <p class="text-white/40 font-bold">Henüz kaydedilmiş bir gider bulunmuyor.</p>
-                        <p class="text-xs text-white/20 mt-2">Sol taraftaki formu kullanarak ilk harcamanızı kaydedebilirsiniz.</p>
-                    </div>
-                {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 </div>
-</div>
-</div>
 
-<!-- 🗑️ GİDER SİLME ONAY MODALI (PREMIUM) -->
+<!-- GİDER SİLME ONAY MODALI (PREMIUM) -->
 <div id="deleteExpenseModal" class="hidden fixed inset-0 !z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0" style="width: 100vw; height: 100vh; top: 0; left: 0;">
     <div class="w-full max-w-sm rounded-[2rem] border p-8 transform transition-all scale-95 opacity-0 bg-slate-900 border-slate-700 text-white shadow-2xl relative overflow-hidden" id="deleteExpenseModalContent">
         <!-- Arkaplan Süslemesi -->
@@ -302,13 +479,62 @@
 
 {% block extra_js %}
 <script>
-    // 🔥 GİDER EKLEME AJAX MOTORU 🔥
+    // FİNANS GELİR/GİDER SEKME DEĞİŞTİRİCİ
+    function switchFinanceTab(type) {
+        const form = document.getElementById('addExpenseForm');
+        const actionInput = form.querySelector('input[name="action"]');
+        const titleLabel = form.querySelector('#title-label');
+        const titleInput = form.querySelector('input[name="title"]');
+        const expenseDiv = document.getElementById('category-expense-div');
+        const incomeDiv = document.getElementById('category-income-div');
+        const selectExpense = document.getElementById('select-expense');
+        const selectIncome = document.getElementById('select-income');
+        const submitBtn = document.getElementById('submitExpenseBtn');
+        const tabExpense = document.getElementById('tab-expense');
+        const tabIncome = document.getElementById('tab-income');
+
+        if (type === 'expense') {
+            actionInput.value = 'add';
+            titleLabel.innerText = 'GİDER BAŞLIĞI / AÇIKLAMA';
+            titleInput.placeholder = 'Örn: Karşı Manavdan Su Alındı';
+            expenseDiv.classList.remove('hidden');
+            incomeDiv.classList.add('hidden');
+            selectExpense.required = true;
+            selectExpense.disabled = false;
+            selectIncome.required = false;
+            selectIncome.disabled = true;
+            
+            submitBtn.innerText = 'KASADAN ÇIKIŞ YAP';
+            submitBtn.className = 'w-full py-4 mt-2 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-black uppercase tracking-widest rounded-xl hover:-translate-y-1 shadow-[0_10px_20px_rgba(244,63,94,0.2)] transition-all duration-300 flex justify-center items-center gap-2 text-xs';
+            
+            tabExpense.className = 'flex-1 pb-4 text-center border-b-2 border-rose-500 text-sm font-bold text-white transition-all';
+            tabIncome.className = 'flex-1 pb-4 text-center border-b-2 border-transparent text-sm font-bold text-slate-400 hover:text-white transition-all';
+        } else {
+            actionInput.value = 'add_income';
+            titleLabel.innerText = 'GELİR BAŞLIĞI / AÇIKLAMA';
+            titleInput.placeholder = 'Örn: Elden Alınan Hasılat, Ürün Satışı';
+            expenseDiv.classList.add('hidden');
+            incomeDiv.classList.remove('hidden');
+            selectExpense.required = false;
+            selectExpense.disabled = true;
+            selectIncome.required = true;
+            selectIncome.disabled = false;
+
+            submitBtn.innerText = 'KASAYA GİRİŞ YAP';
+            submitBtn.className = 'w-full py-4 mt-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black uppercase tracking-widest rounded-xl hover:-translate-y-1 shadow-[0_10px_20px_rgba(16,185,129,0.2)] transition-all duration-300 flex justify-center items-center gap-2 text-xs';
+            
+            tabExpense.className = 'flex-1 pb-4 text-center border-b-2 border-transparent text-sm font-bold text-slate-400 hover:text-white transition-all';
+            tabIncome.className = 'flex-1 pb-4 text-center border-b-2 border-emerald-500 text-sm font-bold text-white transition-all';
+        }
+    }
+
+    // GİDER EKLEME AJAX MOTORU
     async function submitExpenseAJAX(event, form) {
-        event.preventDefault(); // Sayfanın yenilenmesini durdur!
+        event.preventDefault();
 
         const btn = document.getElementById('submitExpenseBtn');
         const originalText = btn.innerHTML;
-        btn.innerHTML = '⏳ İŞLENİYOR...';
+        btn.innerHTML = `<span class="flex items-center justify-center gap-2"><svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>İŞLENİYOR...</span>`;
         btn.disabled = true;
 
         const summaries = document.getElementById('expenseSummaries');
@@ -319,18 +545,15 @@
         const formData = new FormData(form);
 
         try {
-            // Arka plana sessizce veriyi gönder ve dönen güncel HTML'i al
             const response = await fetch(window.location.href, { method: 'POST', body: formData });
             const html = await response.text();
 
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
-            // Yeni 3'lü panel özetlerini ve Listeyi ekrana yapıştır
             summaries.innerHTML = doc.getElementById('expenseSummaries').innerHTML;
             list.innerHTML = doc.getElementById('expenseListContainer').innerHTML;
 
-            // Formu temizle (Tarih ve kategori hariç)
             form.querySelector('input[name="title"]').value = '';
             form.querySelector('input[name="amount"]').value = '';
 
@@ -345,10 +568,9 @@
         }
     }
 
-    // 🔥 GİDER SİLME AJAX MOTORU 🔥
+    // GİDER SİLME AJAX MOTORU
     async function deleteExpenseAJAX(event, form) {
-        event.preventDefault(); // Sayfa yenilenmesini durdur!
-
+        event.preventDefault();
         openDeleteModal(form);
     }
 
@@ -357,7 +579,6 @@
         const content = document.getElementById('deleteExpenseModalContent');
         const confirmBtn = document.getElementById('confirmDeleteExpenseBtn');
 
-        // Modalı body'ye taşı (Scrolling/Z-index fix)
         document.body.appendChild(modal);
 
         modal.classList.remove('hidden');
@@ -370,7 +591,7 @@
         confirmBtn.onclick = async () => {
             closeDeleteModal();
             const row = form.closest('.expense-row');
-            if(row) row.style.opacity = '0.3'; // Silinme efekti
+            if(row) row.style.opacity = '0.3';
             
             const summaries = document.getElementById('expenseSummaries');
             const list = document.getElementById('expenseListContainer');
@@ -420,24 +641,5 @@
             if (icon) icon.classList.remove('rotate-180');
         }
     }
-
-    // --- PREMIUM SAVINGS SIMULATOR ---
-    {% if is_premium_teaser %}
-    document.addEventListener("DOMContentLoaded", function() {
-        const slider = document.getElementById('expenseSlider');
-        const amountVal = document.getElementById('expenseAmountVal');
-        const savingsVal = document.getElementById('savingsVal');
-        
-        if(slider) {
-            slider.addEventListener('input', function() {
-                const val = parseInt(this.value);
-                amountVal.innerText = val.toLocaleString('tr-TR') + " ₺";
-                // Net savings is typically around 15% with optimized spending, automated tracking, and less leakage
-                const savedAmount = Math.round(val * 0.15);
-                savingsVal.innerText = savedAmount.toLocaleString('tr-TR') + " ₺ / Ay";
-            });
-        }
-    });
-    {% endif %}
 </script>
 {% endblock %}

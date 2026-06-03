@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='appointment',
             name='platform_fee_paid',
-            field=models.DecimalField(decimal_places=2, default=5.0, max_digits=6, verbose_name='T-Randevu İşlem Bedeli'),
+            field=models.DecimalField(decimal_places=2, default=5.0, max_digits=6, verbose_name='KobiRandevu İşlem Bedeli'),
         ),
         migrations.AddField(
             model_name='appointment',

@@ -450,7 +450,7 @@ body {
                 <!-- STEP 3: PROFESSIONAL -->
                 <div id="step3" class="step-content">
                     <div class="space-y-4">
-                        <div class="wizard-card flex items-center gap-4 interactive-card" onclick="selectStaff('', 'Fark Etmez')">
+                        <div id="staff-card-fark-etmez" class="wizard-card staff-card-item flex items-center gap-4 interactive-card" onclick="selectStaff('', 'Fark Etmez')">
                             <div class="w-12 h-12 rounded-full bg-[var(--border-dim)] flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
                             </div>
@@ -461,7 +461,7 @@ body {
                         </div>
 
                         {% for personel in aktif_personeller %}
-                        <div class="wizard-card flex items-center gap-4 interactive-card" onclick="selectStaff({{ personel.id }}, '{{ personel.name }}')">
+                        <div id="staff-card-{{ personel.id }}" class="wizard-card staff-card staff-card-item flex items-center gap-4 interactive-card" data-services="{% for s in personel.services.all %}{{ s.id }}{% if not forloop.last %},{% endif %}{% endfor %}" onclick="selectStaff({{ personel.id }}, '{{ personel.name }}')">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[var(--border-dim)]">
                                 {% if personel.photo %}
                                     <img src="{{ personel.photo.url }}" class="w-full h-full object-cover">
@@ -786,6 +786,20 @@ body {
 
     }
 
+    function filterStaffCards() {
+        if (!bookingData.serviceId) return;
+        const serviceIdStr = String(bookingData.serviceId);
+        document.querySelectorAll('.staff-card').forEach(card => {
+            const servicesAttr = card.getAttribute('data-services') || '';
+            const serviceIds = servicesAttr.split(',').map(s => s.trim());
+            if (serviceIds.includes(serviceIdStr)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
     function selectService(id, name, price, duration, isInStore, isAtHome, isOnline) {
         bookingData.serviceId = id;
         bookingData.serviceName = name;
@@ -805,6 +819,12 @@ body {
         document.getElementById('textarea_customer_address').value = '';
         document.getElementById('select_online_app').value = 'Zoom';
         document.getElementById('input_online_link').value = '';
+
+        // Reset staff selection on service change
+        bookingData.staffId = '';
+        bookingData.staffName = '';
+        document.getElementById('input_staff_id').value = '';
+        document.querySelectorAll('.staff-card-item').forEach(el => el.classList.remove('selected'));
 
         // Hide details box
         document.getElementById('locationDetailsBox').classList.add('hidden');
@@ -851,6 +871,16 @@ body {
         // If only 1 option is allowed, pre-select it
         if (allowedLocationsCount === 1) {
             selectLocation(lastAllowedLocation);
+        }
+
+        // Dynamically filter staff list based on ManyToMany service relation
+        filterStaffCards();
+
+        // Highlight selected service card
+        document.querySelectorAll('[id^="wizard-service-card-"]').forEach(el => el.classList.remove('selected'));
+        const activeServiceCard = document.getElementById(`wizard-service-card-${id}`);
+        if (activeServiceCard) {
+            activeServiceCard.classList.add('selected');
         }
 
         updateCart();
@@ -901,6 +931,19 @@ body {
         bookingData.staffId = id;
         bookingData.staffName = name;
         document.getElementById('input_staff_id').value = id;
+
+        // Highlight selected staff card
+        document.querySelectorAll('.staff-card-item').forEach(el => el.classList.remove('selected'));
+        let selectedCard;
+        if (id === '') {
+            selectedCard = document.getElementById('staff-card-fark-etmez');
+        } else {
+            selectedCard = document.getElementById(`staff-card-${id}`);
+        }
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+
         updateCart();
         nextStep();
     }
@@ -1060,6 +1103,10 @@ body {
         document.getElementById('stepTitle').innerText = steps[currentStep-1];
         document.getElementById('btnBack').style.display = 'flex';
 
+        if (currentStep === 3) {
+            filterStaffCards();
+        }
+
         if (currentStep === 4) {
             generateDates();
         }
@@ -1076,6 +1123,10 @@ body {
             document.getElementById('stepTitle').innerText = steps[currentStep-1];
             if (currentStep === 1) document.getElementById('btnBack').style.display = 'none';
             
+            if (currentStep === 3) {
+                filterStaffCards();
+            }
+
             updateCart();
         }
     }

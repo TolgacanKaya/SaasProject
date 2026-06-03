@@ -41,7 +41,7 @@ def create_iyzico_sub_merchant(business):
     }
     # Her denemede benzersiz olması için rastgele değerler
     random_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
-    test_email = f"test_{random_id.lower()}_{business.id}@t-randevu.com"
+    test_email = f"test_{random_id.lower()}_{business.id}@kobirandevu.com"
 
     # Iyzico Sub-Merchant isteği
     request = {

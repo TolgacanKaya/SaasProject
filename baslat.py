@@ -80,7 +80,7 @@ def brave_ile_ac():
 
 
 if __name__ == '__main__':
-    print("\n🚀 T-Randevu Sunucusu Hazırlanıyor...")
+    print("\n🚀 KobiRandevu Sunucusu Hazırlanıyor...")
     
     # Veritabanı ve Redis'i kontrol et/başlat
     veritabani_kontrol_ve_baslat()
@@ -97,4 +97,4 @@ if __name__ == '__main__':
         # Django sunucusunu çalıştır
         os.system(f'"{sys.executable}" manage.py runserver')
     except KeyboardInterrupt:
-        print("\n👋 Sunucu başarıyla kapatıldı.")
+        print("\n👋 Sunucu başarıyla kapatıldı.")

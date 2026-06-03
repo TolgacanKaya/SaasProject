@@ -396,6 +396,12 @@ class Staff(models.Model):
     photo = models.ImageField(upload_to='personel_fotolari/', blank=True, null=True, verbose_name="Personel Fotoğrafı")
     is_active = models.BooleanField(default=True, verbose_name="Aktif mi?")
     is_approved = models.BooleanField(default=False, verbose_name="Sistem Onayı (Mavi Tık)")
+    secure_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.secure_token:
+            self.secure_token = uuid.uuid4()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} - {self.business.name}"
@@ -482,6 +488,13 @@ class Review(models.Model):
     appointment = models.OneToOneField('appointments.Appointment', on_delete=models.CASCADE, related_name='review')
     rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], verbose_name="Puan (1-5)")
     comment = models.TextField(blank=True, null=True, verbose_name="Müşteri Yorumu")
+    
+    # 🌟 YENİ GERÇEK HİZMET KRİTERLERİ ALANLARI
+    rating_quality = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], default=5, verbose_name="Hizmet Kalitesi")
+    rating_hospitality = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], default=5, verbose_name="Müşteri Karşılama")
+    rating_cleanliness = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], default=5, verbose_name="Temizlik & Hijyen")
+    rating_value = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], default=5, verbose_name="Fiyat/Performans")
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     # 🔥 EKLENECEK YENİ ALANLAR (PATRON YANITI)
@@ -503,24 +516,42 @@ class BusinessImage(models.Model):
         return f"{self.business.name} - Galeri Görseli"
 
 
+class RecurringExpense(models.Model):
+    EXPENSE_TYPES = (
+        ('rent', 'Kira ve Dükkan Aidatı'),
+        ('salary', 'Personel Maaşları'),
+        ('meal', 'Personel Yemek Ücreti'),
+        ('other', 'Diğer Düzenli Giderler'),
+    )
+    business = models.ForeignKey('Business', on_delete=models.CASCADE, related_name='recurring_expenses')
+    title = models.CharField(max_length=200, verbose_name="Gider Başlığı")
+    expense_type = models.CharField(max_length=20, choices=EXPENSE_TYPES, verbose_name="Gider Türü")
+    is_per_staff = models.BooleanField(default=False, verbose_name="Çalışan Başına mı Hesaplasın?")
+    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Tutar (₺)")
+    is_active = models.BooleanField(default=True, verbose_name="Aktif mi?")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.business.name} - {self.title} ({self.amount} ₺)"
+
 class Expense(models.Model):
     """Premium İşletmeler İçin Gider/Masraf Tablosu"""
     CATEGORY_CHOICES = (
-        # 🔥 GÜNLÜK VE HAFTALIK HIZLI GİDERLER
-        ('ikram', '☕ Mutfak & İkram (Çay, Kahve, Su vb.)'),
-        ('temizlik', '🧹 Temizlik ve Hijyen Malzemeleri'),
-        ('yemek', '🍔 Personel Yemek ve Günlük Harcırah'),
-        ('ulasim', '🚕 Ulaşım, Kurye ve Kargo Giderleri'),
-        ('tamir', '🔧 Acil Bakım ve Onarım (Tamirat)'),
+        # GÜNLÜK VE HAFTALIK HIZLI GİDERLER
+        ('ikram', 'Mutfak & İkram (Çay, Kahve, Su vb.)'),
+        ('temizlik', 'Temizlik ve Hijyen Malzemeleri'),
+        ('yemek', 'Personel Yemek ve Günlük Harcırah'),
+        ('ulasim', 'Ulaşım, Kurye ve Kargo Giderleri'),
+        ('tamir', 'Acil Bakım ve Onarım (Tamirat)'),
 
-        # 🏢 AYLIK VE DÜZENLİ GİDERLER
-        ('malzeme', '📦 Ana Ürün ve Toptan Malzeme Alımı'),
-        ('kira', '🏢 Kira ve Dükkan Aidatı'),
-        ('fatura', '⚡ Faturalar (Elektrik, Su, İnternet)'),
-        ('maas', '💰 Personel Maaş, Avans ve Primleri'),
-        ('pazarlama', '📱 Reklam ve Pazarlama (Sosyal Medya)'),
-        ('vergi', '📜 Vergi, Muhasebe ve Yasal Giderler'),
-        ('diger', '📝 Diğer / Çeşitli Giderler'),
+        # AYLIK VE DÜZENLİ GİDERLER
+        ('malzeme', 'Ana Ürün ve Toptan Malzeme Alımı'),
+        ('kira', 'Kira ve Dükkan Aidatı'),
+        ('fatura', 'Faturalar (Elektrik, Su, İnternet)'),
+        ('maas', 'Personel Maaş, Avans ve Primleri'),
+        ('pazarlama', 'Reklam ve Pazarlama (Sosyal Medya)'),
+        ('vergi', 'Vergi, Muhasebe ve Yasal Giderler'),
+        ('diger', 'Diğer / Çeşitli Giderler'),
     )
 
     business = models.ForeignKey('Business', on_delete=models.CASCADE, related_name='expenses')
@@ -528,6 +559,27 @@ class Expense(models.Model):
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, verbose_name="Kategori")
     amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Tutar (₺)")
     date = models.DateField(default=timezone.now, verbose_name="Gider Tarihi")
+    
+    auto_generated_from = models.ForeignKey('RecurringExpense', on_delete=models.SET_NULL, null=True, blank=True, related_name='generated_expenses')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.business.name} - {self.get_category_display()} - {self.amount} ₺"
+
+class Income(models.Model):
+    """Premium İşletmeler İçin Gelir/Hasılat Tablosu"""
+    CATEGORY_CHOICES = (
+        ('elden', 'Elden / Doğrudan Müşteri Hasılatı'),
+        ('urun', 'Ekstra Ürün Satışı Hasılatı'),
+        ('diger', 'Diğer Gelirler / Çeşitli Hasılat'),
+    )
+
+    business = models.ForeignKey('Business', on_delete=models.CASCADE, related_name='incomes')
+    title = models.CharField(max_length=200, verbose_name="Gelir Başlığı / Açıklaması")
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, verbose_name="Kategori")
+    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Tutar (₺)")
+    date = models.DateField(default=timezone.now, verbose_name="Gelir Tarihi")
 
     created_at = models.DateTimeField(auto_now_add=True)
 

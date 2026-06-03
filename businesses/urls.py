@@ -70,6 +70,13 @@ urlpatterns = [
 
     path('ayarlar/galeri-sil/<int:id>/', views.galeri_resim_sil, name='galeri_resim_sil'),
 
+    # ==========================================
+    # YENİ: PERSONEL SİHİRLİ LİNK ÇALIŞMA PANELİ
+    # ==========================================
+    path('personel-paneli/<uuid:token>/', views.staff_magic_panel, name='staff_magic_panel'),
+    path('personel-paneli/aksiyon/<int:appointment_id>/<str:status_action>/', views.staff_appointment_action, name='staff_appointment_action'),
+    path('personel-paneli/sifirla/<int:staff_id>/', views.staff_reset_token, name='staff_reset_token'),
+
     # DİKKAT: Slug her zaman en altta olmalıdır!
     path('<slug:slug>/rezervasyon/', views.booking_wizard, name='booking_wizard'),
     path('<slug:slug>/yorumlar/', views.isletme_yorumlar, name='isletme_yorumlar'),

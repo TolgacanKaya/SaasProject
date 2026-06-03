@@ -178,7 +178,7 @@ def iletisim(request):
         email = request.POST.get("email")
         mesaj = request.POST.get("message")
 
-        konu = f"T-Randevu İletişim: {ad_soyad}"
+        konu = f"KobiRandevu İletişim: {ad_soyad}"
 
         html_icerik = render_to_string("core/iletisim_mail.html", {
             "ad_soyad": ad_soyad,

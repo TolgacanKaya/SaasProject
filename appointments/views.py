@@ -51,7 +51,7 @@ def bildirim_gonder(musteri, mesaj, html_mesaj=None):
         try:
             from appointments.tasks import send_email_task
             send_email_task.delay(
-                'Randevu Bilgilendirmesi | T-Randevu',
+                'Randevu Bilgilendirmesi | KobiRandevu',
                 mesaj,
                 [musteri.email],
                 settings.DEFAULT_FROM_EMAIL,
@@ -103,7 +103,7 @@ def randevuyu_takvime_ekle(randevu):
 
         # 4. Takvime eklenecek fiyakalı etiketi (Paketi) hazırla
         event = {
-            'summary': f'💇‍♀️ T-Randevu: {randevu.service.name}',
+            'summary': f'💇‍♀️ KobiRandevu: {randevu.service.name}',
             'location': isletme.address or 'Belirtilmedi',
             'description': f'👤 Müşteri: {randevu.customer.first_name} {randevu.customer.last_name}\n📞 Telefon: {randevu.customer.phone}\n📝 Not: {randevu.customer_note or "Yok"}\n💸 Tutar: {randevu.final_service_price} TL',
             'start': {
@@ -374,14 +374,31 @@ def degerlendirme_yap(request, token):
         return render(request, 'appointments/islem_tamam.html', {'randevu': randevu})
 
     if request.method == 'POST':
-        puan = request.POST.get('rating')
+        puan_quality = request.POST.get('rating_quality')
+        puan_hospitality = request.POST.get('rating_hospitality')
+        puan_cleanliness = request.POST.get('rating_cleanliness')
+        puan_value = request.POST.get('rating_value')
         yorum = request.POST.get('comment')
 
-        if puan:
+        if puan_quality and puan_hospitality and puan_cleanliness and puan_value:
+            rq = int(puan_quality)
+            rh = int(puan_hospitality)
+            rc = int(puan_cleanliness)
+            rv = int(puan_value)
+            
+            # Ortalama puanı yuvarlayarak tam sayı yap (1-5 arası olmalı)
+            overall_rating = int(round((rq + rh + rc + rv) / 4.0))
+            if overall_rating < 1: overall_rating = 1
+            if overall_rating > 5: overall_rating = 5
+
             Review.objects.create(
                 business=randevu.business,
                 appointment=randevu,
-                rating=int(puan),
+                rating=overall_rating,
+                rating_quality=rq,
+                rating_hospitality=rh,
+                rating_cleanliness=rc,
+                rating_value=rv,
                 comment=yorum
             )
             randevu.is_reviewed = True
@@ -389,6 +406,26 @@ def degerlendirme_yap(request, token):
 
             messages.success(request, 'Değerlendirmeniz için teşekkür ederiz!')
             return redirect('isletme_detay', slug=randevu.business.slug)
+        else:
+            # Fallback (Eski şablon veya eksik puanlama olması durumuna karşı)
+            puan = request.POST.get('rating')
+            if puan:
+                p_val = int(puan)
+                Review.objects.create(
+                    business=randevu.business,
+                    appointment=randevu,
+                    rating=p_val,
+                    rating_quality=p_val,
+                    rating_hospitality=p_val,
+                    rating_cleanliness=p_val,
+                    rating_value=p_val,
+                    comment=yorum
+                )
+                randevu.is_reviewed = True
+                randevu.save()
+
+                messages.success(request, 'Değerlendirmeniz için teşekkür ederiz!')
+                return redirect('isletme_detay', slug=randevu.business.slug)
 
     return render(request, 'appointments/degerlendirme_yap.html', {'randevu': randevu})
 
@@ -537,7 +574,7 @@ def google_takvim_bagla(request):
     client_config = {
         "web": {
             "client_id": settings.GOOGLE_CLIENT_ID,
-            "project_id": "t-randevu",
+            "project_id": "kobirandevu",
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
             "client_secret": settings.GOOGLE_CLIENT_SECRET,
@@ -575,7 +612,7 @@ def google_takvim_callback(request):
     client_config = {
         "web": {
             "client_id": settings.GOOGLE_CLIENT_ID,
-            "project_id": "t-randevu",
+            "project_id": "kobirandevu",
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
             "client_secret": settings.GOOGLE_CLIENT_SECRET,

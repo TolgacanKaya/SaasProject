@@ -28,7 +28,7 @@ import qrcode
 from io import BytesIO
 from businesses.models import Category
 from appointments.models import Appointment
-from .models import Business, Customer, Service, Staff, Coupon, BusinessImage, Expense, Review, GlobalBlacklist, AuditLog
+from .models import Business, Customer, Service, Staff, Coupon, BusinessImage, Expense, Review, GlobalBlacklist, AuditLog, RecurringExpense, Income
 from pos.models import Adisyon, AdisyonItem  # 🔥 YENİ EKLENDİ
 
 
@@ -397,12 +397,36 @@ def isletme_yorumlar(request, slug):
     yorumlar = isletme.reviews.all().order_by('-created_at')
     ortalama_puan = yorumlar.aggregate(Avg('rating'))['rating__avg'] or 0
 
+    # Real criteria averages from DB
+    kriter_ortalamalari = yorumlar.aggregate(
+        avg_quality=Avg('rating_quality'),
+        avg_hospitality=Avg('rating_hospitality'),
+        avg_cleanliness=Avg('rating_cleanliness'),
+        avg_value=Avg('rating_value'),
+    )
+
+    avg_quality = round(kriter_ortalamalari['avg_quality'] or 0.0, 1)
+    avg_hospitality = round(kriter_ortalamalari['avg_hospitality'] or 0.0, 1)
+    avg_cleanliness = round(kriter_ortalamalari['avg_cleanliness'] or 0.0, 1)
+    avg_value = round(kriter_ortalamalari['avg_value'] or 0.0, 1)
+
+    # If there are no reviews, default to 5.0
+    if yorumlar.count() == 0:
+        avg_quality = 5.0
+        avg_hospitality = 5.0
+        avg_cleanliness = 5.0
+        avg_value = 5.0
+
     return render(
         request, "businesses/yorumlar.html",
         {
             "isletme": isletme,
             "yorumlar": yorumlar,
-            "ortalama_puan": round(ortalama_puan, 1),
+            "ortalama_puan": round(ortalama_puan, 1) if ortalama_puan > 0 else 5.0,
+            "avg_quality": avg_quality,
+            "avg_hospitality": avg_hospitality,
+            "avg_cleanliness": avg_cleanliness,
+            "avg_value": avg_value,
         },
     )
 
@@ -463,7 +487,14 @@ def dashboard(request):
         adisyon__closed_at__month=now.month
     ).aggregate(genel_toplam=Sum('total_price_cache'))['genel_toplam'] or Decimal('0.00')
 
-    aylik_kazanc = aylik_online_kazanc + aylik_ekstra_kazanc
+    aylik_manuel_gelir = Decimal('0.00')
+    if isletme.is_premium:
+        aylik_manuel_gelir = isletme.incomes.filter(
+            date__year=now.year,
+            date__month=now.month
+        ).aggregate(toplam=Sum('amount'))['toplam'] or Decimal('0.00')
+
+    aylik_kazanc = aylik_online_kazanc + aylik_ekstra_kazanc + aylik_manuel_gelir
 
     toplam_randevu_sayisi = isletme.appointments.count()
     aktif_personel_sayisi = isletme.staff_members.filter(is_active=True, is_approved=True).count()
@@ -517,7 +548,7 @@ def geocode_address(address_text, city_name="", district_name=""):
         url = "https://nominatim.openstreetmap.org/search?q=" + urllib.parse.quote(query) + "&format=json&limit=1"
         req = urllib.request.Request(
             url, 
-            headers={'User-Agent': 'T-Randevu-SaaS-App-Agent'}
+            headers={'User-Agent': 'KobiRandevu-SaaS-App-Agent'}
         )
         with urllib.request.urlopen(req, timeout=3) as response:
             data = json.loads(response.read().decode())
@@ -533,7 +564,7 @@ def geocode_address(address_text, city_name="", district_name=""):
             url = "https://nominatim.openstreetmap.org/search?q=" + urllib.parse.quote(city_query) + "&format=json&limit=1"
             req = urllib.request.Request(
                 url, 
-                headers={'User-Agent': 'T-Randevu-SaaS-App-Agent'}
+                headers={'User-Agent': 'KobiRandevu-SaaS-App-Agent'}
             )
             with urllib.request.urlopen(req, timeout=3) as response:
                 data = json.loads(response.read().decode())
@@ -1119,6 +1150,46 @@ def isletme_analiz(request):
         basari_orani = 96
         iptal_orani = 4
         
+        # Teaser P&L Comparison Data (Ocak - Haziran 2026)
+        karsilastirma_labels = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"]
+        karsilastirma_gelir = [42000.0, 48000.0, 52000.0, 49000.0, 55000.0, 62000.0]
+        karsilastirma_gider = [32000.0, 34000.0, 31000.0, 33500.0, 38650.0, 41000.0]
+        karsilastirma_kar = [10000.0, 14000.0, 21000.0, 15500.0, 16350.0, 21000.0]
+        
+        dummy_details = []
+        dummy_months = [
+            (2026, 1, "Ocak", 42000.0, 32000.0),
+            (2026, 2, "Şubat", 48000.0, 34000.0),
+            (2026, 3, "Mart", 52000.0, 31000.0),
+            (2026, 4, "Nisan", 49000.0, 33500.0),
+            (2026, 5, "Mayıs", 55000.0, 38650.0),
+            (2026, 6, "Haziran", 62000.0, 41000.0),
+        ]
+        for yr, mn, name, gel, gid in dummy_months:
+            cat_breakdown = {
+                'kira': {'name': 'Kira ve Dükkan Aidatı', 'amount': 15000.0 if gid > 15000 else 10000.0},
+                'maas': {'name': 'Personel Maaş, Avans ve Primleri', 'amount': 12000.0 if gid > 12000 else 8000.0},
+                'yemek': {'name': 'Personel Yemek ve Günlük Harcırah', 'amount': 3000.0 if gid > 3000 else 1500.0},
+                'temizlik': {'name': 'Temizlik ve Hijyen Malzemeleri', 'amount': 1000.0},
+                'ikram': {'name': 'Mutfak & İkram (Çay, Kahve, Su vb.)', 'amount': 800.0},
+                'fatura': {'name': 'Faturalar (Elektrik, Su, İnternet)', 'amount': 2500.0},
+                'diger': {'name': 'Diğer / Çeşitli Giderler', 'amount': gid - (2500.0 + 800.0 + 1000.0 + (15000.0 if gid > 15000 else 10000.0) + (12000.0 if gid > 12000 else 8000.0) + (3000.0 if gid > 3000 else 1500.0))}
+            }
+            # Fill missing CATEGORY_CHOICES
+            for cat_code, cat_name in Expense.CATEGORY_CHOICES:
+                if cat_code not in cat_breakdown:
+                    cat_breakdown[cat_code] = {'name': cat_name, 'amount': 0.0}
+                    
+            dummy_details.append({
+                'label': f"{name} {yr}",
+                'month': mn,
+                'year': yr,
+                'gelir': gel,
+                'gider': gid,
+                'kar': gel - gid,
+                'breakdown': cat_breakdown
+            })
+
         context = {
             'isletme': isletme,
             'is_premium_teaser': is_premium_teaser,
@@ -1131,6 +1202,11 @@ def isletme_analiz(request):
             'ciro_tutarlari_json': json.dumps(ciro_tutarlari),
             'urun_isimleri_json': json.dumps(urun_isimleri),
             'urun_tutarlari_json': json.dumps(urun_tutarlari),
+            'karsilastirma_labels_json': json.dumps(karsilastirma_labels),
+            'karsilastirma_gelir_json': json.dumps(karsilastirma_gelir),
+            'karsilastirma_gider_json': json.dumps(karsilastirma_gider),
+            'karsilastirma_kar_json': json.dumps(karsilastirma_kar),
+            'monthly_details_json': json.dumps(dummy_details),
         }
         return render(request, "businesses/isletme_analiz.html", context)
 
@@ -1204,6 +1280,97 @@ def isletme_analiz(request):
     urun_isimleri = [item['product__name'] for item in urun_dagilimi]
     urun_tutarlari = [float(item['toplam_ciro'] or 0) for item in urun_dagilimi]
 
+    # --- HAREKETLİ P&L AY KARŞILAŞTIRMA (Mayıs ve Haziranı yan yana getirecek 6 aylık pencere) ---
+    bugun = timezone.now().date()
+    if bugun.month == 12:
+        next_month_date = bugun.replace(year=bugun.year + 1, month=1, day=1)
+    else:
+        next_month_date = bugun.replace(month=bugun.month + 1, day=1)
+
+    target_months = []
+    current_year = next_month_date.year
+    current_month = next_month_date.month
+    for i in range(6):
+        target_months.append((current_year, current_month))
+        current_month -= 1
+        if current_month == 0:
+            current_month = 12
+            current_year -= 1
+    target_months.reverse()
+
+    karsilastirma_labels = []
+    karsilastirma_gelir = []
+    karsilastirma_gider = []
+    karsilastirma_kar = []
+    monthly_details = []
+
+    ay_isimleri = {
+        1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan',
+        5: 'Mayıs', 6: 'Haziran', 7: 'Temmuz', 8: 'Ağustos',
+        9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık'
+    }
+
+    for yr, mn in target_months:
+        m_name = ay_isimleri.get(mn, f"{mn}. Ay")
+        karsilastirma_labels.append(m_name)
+        
+        # O ay için sabit giderleri eşitle
+        sync_recurring_expenses(isletme, yr, mn)
+        
+        # Gelir hesaplama: Randevular + Ekstra Adisyonlar
+        app_inc = isletme.appointments.filter(
+            status__in=['approved', 'confirmed', 'completed'],
+            date_time__year=yr,
+            date_time__month=mn
+        ).aggregate(top=Sum('final_service_price'))['top'] or Decimal('0.00')
+        
+        ads_inc = AdisyonItem.objects.filter(
+            adisyon__business=isletme,
+            adisyon__status='closed',
+            adisyon__closed_at__year=yr,
+            adisyon__closed_at__month=mn
+        ).aggregate(top=Sum('total_price_cache'))['top'] or Decimal('0.00')
+
+        manual_inc = isletme.incomes.filter(
+            date__year=yr,
+            date__month=mn
+        ).aggregate(top=Sum('amount'))['top'] or Decimal('0.00')
+        
+        gelir_val = float(app_inc + ads_inc + manual_inc)
+        karsilastirma_gelir.append(gelir_val)
+        
+        # Gider hesaplama: O aya kayıtlı tüm giderler
+        month_expenses = isletme.expenses.filter(
+            date__year=yr,
+            date__month=mn
+        )
+        
+        exp_val = float(month_expenses.aggregate(top=Sum('amount'))['top'] or Decimal('0.00'))
+        karsilastirma_gider.append(exp_val)
+        
+        # Net Kar
+        net_kar = gelir_val - exp_val
+        karsilastirma_kar.append(net_kar)
+
+        # Kategori bazlı harcama kırılımı hesapla
+        cat_breakdown = {}
+        for cat_code, cat_name in Expense.CATEGORY_CHOICES:
+            cat_amt = float(month_expenses.filter(category=cat_code).aggregate(top=Sum('amount'))['top'] or Decimal('0.00'))
+            cat_breakdown[cat_code] = {
+                'name': cat_name,
+                'amount': cat_amt
+            }
+
+        monthly_details.append({
+            'label': f"{m_name} {yr}",
+            'month': mn,
+            'year': yr,
+            'gelir': gelir_val,
+            'gider': exp_val,
+            'kar': net_kar,
+            'breakdown': cat_breakdown
+        })
+
     context = {
         'isletme': isletme,
         'basari_orani': basari_orani,
@@ -1215,6 +1382,11 @@ def isletme_analiz(request):
         'ciro_tutarlari_json': json.dumps(ciro_tutarlari),
         'urun_isimleri_json': json.dumps(urun_isimleri),
         'urun_tutarlari_json': json.dumps(urun_tutarlari),
+        'karsilastirma_labels_json': json.dumps(karsilastirma_labels),
+        'karsilastirma_gelir_json': json.dumps(karsilastirma_gelir),
+        'karsilastirma_gider_json': json.dumps(karsilastirma_gider),
+        'karsilastirma_kar_json': json.dumps(karsilastirma_kar),
+        'monthly_details_json': json.dumps(monthly_details),
     }
 
     return render(request, "businesses/isletme_analiz.html", context)
@@ -1862,25 +2034,74 @@ def analiz_raporu_indir(request):
         toplam_kazanc = p['getiri'] + ekstra
         writer.writerow([p['staff__name'], p['islem_sayisi'], f"{toplam_kazanc} TL"])
 
-    return response
-
+def sync_recurring_expenses(business, year, month):
+    """
+    Syncs/generates expenses for a given year and month from active recurring expense templates.
+    Checks if active staff count has changed since it was generated, and automatically updates the expense.
+    """
+    import datetime
+    from django.utils import timezone
+    from decimal import Decimal
+    
+    first_day = datetime.date(year, month, 1)
+    active_rules = business.recurring_expenses.filter(is_active=True)
+    active_staff_count = business.staff_members.filter(is_active=True).count()
+    
+    for rule in active_rules:
+        expense = business.expenses.filter(
+            auto_generated_from=rule,
+            date__year=year,
+            date__month=month
+        ).first()
+        
+        if rule.is_per_staff:
+            total_amount = rule.amount * active_staff_count
+            title = f"{rule.title} (Otomatik - {active_staff_count} Çalışan)"
+        else:
+            total_amount = rule.amount
+            title = f"{rule.title} (Otomatik)"
+            
+        category_map = {
+            'rent': 'kira',
+            'salary': 'maas',
+            'meal': 'yemek',
+            'other': 'diger'
+        }
+        category = category_map.get(rule.expense_type, 'diger')
+        
+        if expense:
+            # Otomatik gider zaten var, eğer aktif çalışan sayısı veya tutar değiştiyse otomatik güncelle
+            if expense.amount != total_amount or expense.title != title:
+                expense.amount = total_amount
+                expense.title = title
+                expense.category = category
+                expense.save()
+        else:
+            Expense.objects.create(
+                business=business,
+                title=title,
+                category=category,
+                amount=total_amount,
+                date=first_day,
+                auto_generated_from=rule
+            )
 
 @login_required(login_url="/hesap/giris/")
 def isletme_giderler(request):
     isletme = get_aktif_isletme(request)
     if not isletme: return redirect("kayit")
 
-    bugun = timezone.now().date()
+    bugun = timezone.localdate()
 
     if not isletme.is_premium:
         is_premium_teaser = True
         # Teaser için dummy verileri grupla
         from collections import OrderedDict
         dummy_giderler = [
-            {"title": "Dükkan Aylık Kirası", "category": "kira", "amount": Decimal("15000.00"), "date": bugun, "get_category_display": "🏢 Kira ve Dükkan Aidatı"},
-            {"title": "Elektrik & İnternet Faturası", "category": "fatura", "amount": Decimal("3450.00"), "date": bugun, "get_category_display": "⚡ Faturalar (Elektrik, Su, İnternet)"},
-            {"title": "Malzeme & Kozmetik Alımı", "category": "malzeme", "amount": Decimal("8200.00"), "date": bugun, "get_category_display": "📦 Ana Ürün ve Toptan Malzeme Alımı"},
-            {"title": "Personel Maaş & Primleri", "category": "maas", "amount": Decimal("12000.00"), "date": bugun, "get_category_display": "💰 Personel Maaş, Avans ve Primleri"},
+            {"title": "Dükkan Aylık Kirası", "category": "kira", "amount": Decimal("15000.00"), "date": bugun, "get_category_display": "Kira ve Dükkan Aidatı"},
+            {"title": "Elektrik & İnternet Faturası", "category": "fatura", "amount": Decimal("3450.00"), "date": bugun, "get_category_display": "Faturalar (Elektrik, Su, İnternet)"},
+            {"title": "Malzeme & Kozmetik Alımı", "category": "malzeme", "amount": Decimal("8200.00"), "date": bugun, "get_category_display": "Ana Ürün ve Toptan Malzeme Alımı"},
+            {"title": "Personel Maaş & Primleri", "category": "maas", "amount": Decimal("12000.00"), "date": bugun, "get_category_display": "Personel Maaş, Avans ve Primleri"},
         ]
         
         grouped_expenses = OrderedDict()
@@ -1890,16 +2111,41 @@ def isletme_giderler(request):
         
         kategoriler = Expense.CATEGORY_CHOICES
         
+        dummy_sabit = [
+            {"id": 1, "title": "Dükkan Aylık Kirası", "expense_type": "rent", "get_expense_type_display": "Kira ve Dükkan Aidatı", "amount": Decimal("15000.00"), "is_per_staff": False, "is_active": True},
+            {"id": 2, "title": "Çalışan Maaşları", "expense_type": "salary", "get_expense_type_display": "Personel Maaşları", "amount": Decimal("30000.00"), "is_per_staff": True, "is_active": True},
+            {"id": 3, "title": "Çalışan Yemek Ücreti", "expense_type": "meal", "get_expense_type_display": "Personel Yemek Ücreti", "amount": Decimal("2000.00"), "is_per_staff": True, "is_active": True},
+        ]
+        
         return render(request, "businesses/isletme_giderler.html", {
             "isletme": isletme,
             "is_premium_teaser": is_premium_teaser,
             "grouped_expenses": grouped_expenses,
             "kategoriler": kategoriler,
+            "sabit_giderler": dummy_sabit,
             "gunluk_gider": Decimal("3450.00"),
             "haftalik_gider": Decimal("11650.00"),
             "aylik_gider": Decimal("38650.00"),
+            "gunluk_gelir": Decimal("5000.00"),
+            "haftalik_gelir": Decimal("18000.00"),
+            "aylik_gelir": Decimal("55000.00"),
+            "gunluk_net": Decimal("1550.00"),
+            "haftalik_net": Decimal("6350.00"),
+            "aylik_net": Decimal("16350.00"),
             "bugun_tarih": bugun.strftime("%Y-%m-%d")
         })
+
+    # Sync automated recurring expenses for 18 months (-5 in the past to +12 in the future)
+    for offset in range(-5, 13):
+        target_month = bugun.month + offset
+        target_year = bugun.year
+        while target_month <= 0:
+            target_month += 12
+            target_year -= 1
+        while target_month > 12:
+            target_month -= 12
+            target_year += 1
+        sync_recurring_expenses(isletme, target_year, target_month)
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -1916,15 +2162,72 @@ def isletme_giderler(request):
                     title=title,
                     category=category,
                     amount=amount,
-                    date=date_str if date_str else timezone.now().date()
+                    date=date_str if date_str else timezone.localdate()
                 )
-                messages.success(request, "💸 Gider başarıyla kaydedildi!")
+                messages.success(request, "Gider başarıyla kaydedildi!")
 
         elif action == "delete":
             expense_id = request.POST.get("expense_id")
             gider = get_object_or_404(Expense, id=expense_id, business=isletme)
             gider.delete()
-            messages.error(request, "🗑️ Gider kaydı silindi.")
+            messages.error(request, "Gider kaydı silindi.")
+
+        elif action == "add_income":
+            title = request.POST.get("title")
+            category = request.POST.get("income_category")
+            amount = request.POST.get("amount")
+            date_str = request.POST.get("date")
+
+            if title and amount:
+                Income.objects.create(
+                    business=isletme,
+                    title=title,
+                    category=category,
+                    amount=amount,
+                    date=date_str if date_str else timezone.localdate()
+                )
+                messages.success(request, "Gelir başarıyla kaydedildi!")
+
+        elif action == "delete_income":
+            income_id = request.POST.get("income_id")
+            gelir = get_object_or_404(Income, id=income_id, business=isletme)
+            gelir.delete()
+            messages.error(request, "Gelir kaydı silindi.")
+
+        elif action == "add_recurring":
+            title = request.POST.get("title")
+            expense_type = request.POST.get("expense_type")
+            amount = request.POST.get("amount")
+            is_per_staff = request.POST.get("is_per_staff") in ["on", "true"]
+
+            if title and amount:
+                rule = RecurringExpense.objects.create(
+                    business=isletme,
+                    title=title,
+                    expense_type=expense_type,
+                    amount=amount,
+                    is_per_staff=is_per_staff
+                )
+                # Sync for the 18 months (-5 in the past to +12 in the future)
+                for offset in range(-5, 13):
+                    target_month = bugun.month + offset
+                    target_year = bugun.year
+                    while target_month <= 0:
+                        target_month += 12
+                        target_year -= 1
+                    while target_month > 12:
+                        target_month -= 12
+                        target_year += 1
+                    sync_recurring_expenses(isletme, target_year, target_month)
+                messages.success(request, "Sabit harcama kuralı eklendi ve tüm aylara yansıtıldı!")
+
+        elif action == "delete_recurring":
+            rule_id = request.POST.get("rule_id")
+            rule = get_object_or_404(RecurringExpense, id=rule_id, business=isletme)
+            # Delete corresponding generated expenses across all months
+            isletme.expenses.filter(auto_generated_from=rule).delete()
+            rule.delete()
+            messages.error(request, "Sabit harcama kuralı ve tüm aylardaki otomatik kayıtları silindi.")
 
         return redirect("isletme_giderler")
 
@@ -1940,22 +2243,41 @@ def isletme_giderler(request):
     else:
         bu_ayin_sonu = bugun.replace(month=bugun.month + 1, day=1) - timedelta(days=1)
 
+    # Giderler
     gunluk_gider = isletme.expenses.filter(date=bugun).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
-    
-    # Haftalık: Sadece bu hafta içindekiler (Gelecek aydakiler gelmez)
     haftalik_gider = isletme.expenses.filter(date__range=[bu_haftanin_basi, bu_haftanin_sonu]).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
-    
-    # Aylık: Sadece bu ay içindekiler (Gelecek aydakiler gelmez)
     aylik_gider = isletme.expenses.filter(date__range=[bu_ayin_basi, bu_ayin_sonu]).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
 
-    # --- GEÇMİŞ KAYITLARI GRUPLAMA ---
+    # Gelirler (Manuel Kasa Defteri için)
+    gunluk_gelir = isletme.incomes.filter(date=bugun).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+    haftalik_gelir = isletme.incomes.filter(date__range=[bu_haftanin_basi, bu_haftanin_sonu]).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+    aylik_gelir = isletme.incomes.filter(date__range=[bu_ayin_basi, bu_ayin_sonu]).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+
+    # Net Kasa
+    gunluk_net = gunluk_gelir - gunluk_gider
+    haftalik_net = haftalik_gelir - haftalik_gider
+    aylik_net = aylik_gelir - aylik_gider
+
+    # --- GEÇMİŞ KAYITLARI BİRLEŞTİREREK GRUPLAMA (KASA DEFTERİ) ---
     from collections import OrderedDict
-    all_expenses = isletme.expenses.all().order_by("-date", "-id")
+    all_expenses = list(isletme.expenses.all())
+    all_incomes = list(isletme.incomes.all())
+
+    # Tag entries with is_expense flag
+    for e in all_expenses:
+        e.is_expense = True
+    for i in all_incomes:
+        i.is_expense = False
+
+    # Combine and sort chronologically (date desc, id desc)
+    all_transactions = all_expenses + all_incomes
+    all_transactions.sort(key=lambda x: (x.date, getattr(x, 'id', 0)), reverse=True)
+
     grouped_expenses = OrderedDict()
 
-    for gider in all_expenses:
-        yil = gider.date.year
-        ay = gider.date.strftime("%B")
+    for transaction in all_transactions:
+        yil = transaction.date.year
+        ay = transaction.date.strftime("%B")
         ay_map = {
             'January': 'Ocak', 'February': 'Şubat', 'March': 'Mart', 'April': 'Nisan',
             'May': 'Mayıs', 'June': 'Haziran', 'July': 'Temmuz', 'August': 'Ağustos',
@@ -1970,17 +2292,25 @@ def isletme_giderler(request):
         if ay_tr not in grouped_expenses[yil_key]:
             grouped_expenses[yil_key][ay_tr] = []
             
-        grouped_expenses[yil_key][ay_tr].append(gider)
+        grouped_expenses[yil_key][ay_tr].append(transaction)
 
     kategoriler = Expense.CATEGORY_CHOICES
+    sabit_giderler = isletme.recurring_expenses.all()
 
     return render(request, "businesses/isletme_giderler.html", {
         "isletme": isletme,
         "grouped_expenses": grouped_expenses,
         "kategoriler": kategoriler,
+        "sabit_giderler": sabit_giderler,
         "gunluk_gider": gunluk_gider,
         "haftalik_gider": haftalik_gider,
         "aylik_gider": aylik_gider,
+        "gunluk_gelir": gunluk_gelir,
+        "haftalik_gelir": haftalik_gelir,
+        "aylik_gelir": aylik_gelir,
+        "gunluk_net": gunluk_net,
+        "haftalik_net": haftalik_net,
+        "aylik_net": aylik_net,
         "bugun_tarih": bugun.strftime("%Y-%m-%d")
     })
 
@@ -2101,4 +2431,111 @@ def isletme_degerlendirmeler(request):
     # Tüm değerlendirmeleri tarihe göre en yeniden eskiye sırala
     degerlendirmeler = isletme.reviews.all().order_by("-created_at")
     return render(request, "businesses/isletme_degerlendirmeler.html",
-                  {"isletme": isletme, "degerlendirmeler": degerlendirmeler})
+                  {"isletme": isletme, "degerlendirmeler": degerlendirmeler})
+
+
+# ──────────────────────────────────────────
+# PERSONEL SİHİRLİ LİNK (UUID) VE ÇALIŞMA PANELİ
+# ──────────────────────────────────────────
+
+def staff_magic_panel(request, token):
+    personel = get_object_or_404(Staff, secure_token=token)
+    isletme = personel.business
+    
+    # 🔥 GÜVENLİK DUVARI: İşletme premium değilse ve personel limiti aşılmışsa en eski 2 personel hariç erişimi engelle
+    if not isletme.is_premium:
+        allowed_staff_ids = list(isletme.staff_members.all().order_by('id').values_list('id', flat=True)[:2])
+        if personel.id not in allowed_staff_ids:
+            return render(request, 'businesses/staff_restricted.html', {
+                'personel': personel,
+                'isletme': isletme
+            })
+
+    # Session'a token'ı kaydet (Giriş yetkisi)
+    request.session['staff_token'] = str(token)
+    
+    # Personelin randevularını çek (Ödeme bekleyenleri hariç tut)
+    all_appointments = Appointment.objects.filter(staff=personel).exclude(status='payment_pending').order_by('date_time')
+    
+    today = timezone.localdate()
+    
+    today_appointments = []
+    upcoming_appointments = []
+    past_appointments = []
+    
+    completed_today = 0
+    
+    for app in all_appointments:
+        app_date = timezone.localtime(app.date_time).date()
+        if app_date == today:
+            today_appointments.append(app)
+            if app.status == 'completed':
+                completed_today += 1
+        elif app_date > today:
+            upcoming_appointments.append(app)
+        else:
+            past_appointments.append(app)
+            
+    # Ters sırada geçmiş randevuları gösterelim (En yakın geçmiş en başta olsun)
+    past_appointments.reverse()
+
+    return render(request, 'businesses/staff_dashboard.html', {
+        'personel': personel,
+        'isletme': isletme,
+        'today_appointments': today_appointments,
+        'upcoming_appointments': upcoming_appointments,
+        'past_appointments': past_appointments,
+        'completed_today': completed_today,
+        'total_today': len(today_appointments),
+    })
+
+
+def staff_appointment_action(request, appointment_id, status_action):
+    token = request.session.get('staff_token')
+    if not token:
+        messages.error(request, "🚨 Yetkisiz işlem! Lütfen sihirli bağlantınızı tekrar kullanın.")
+        return redirect("/")  # ya da ana sayfaya yönlendir
+
+    personel = get_object_or_404(Staff, secure_token=token)
+    isletme = personel.business
+    
+    # 🔥 GÜVENLİK DUVARI: İşletme premium değilse ve personel limiti aşılmışsa en eski 2 personel hariç erişimi engelle
+    if not isletme.is_premium:
+        allowed_staff_ids = list(isletme.staff_members.all().order_by('id').values_list('id', flat=True)[:2])
+        if personel.id not in allowed_staff_ids:
+            messages.error(request, "🚨 Yetkisiz işlem! İşletmenizin Premium aboneliği sona ermiştir.")
+            return redirect("/")
+
+    appointment = get_object_or_404(Appointment, id=appointment_id, staff=personel)
+    
+    if status_action == 'complete':
+        appointment.status = 'completed'
+        appointment.is_paid = True
+        appointment.save()
+        messages.success(request, f"✅ {appointment.customer} adlı müşterinin randevusu başarıyla tamamlandı olarak işaretlendi!")
+    elif status_action == 'confirm':
+        appointment.status = 'confirmed'
+        appointment.save()
+        messages.success(request, f"👍 {appointment.customer} adlı müşterinin randevusu onaylandı!")
+    elif status_action == 'cancel':
+        appointment.status = 'cancelled'
+        appointment.save()
+        messages.warning(request, f"❌ {appointment.customer} adlı müşterinin randevusu iptal edildi!")
+    
+    return redirect('staff_magic_panel', token=personel.secure_token)
+
+
+@login_required(login_url="/hesap/giris/")
+def staff_reset_token(request, staff_id):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect("kayit")
+        
+    personel = get_object_or_404(Staff, id=staff_id, business=isletme)
+    import uuid
+    personel.secure_token = uuid.uuid4()
+    personel.save()
+    
+    messages.success(request, f"🔄 {personel.name} adlı personelin sihirli bağlantısı başarıyla sıfırlandı. Eski link artık geçersizdir!")
+    return redirect("isletme_personeller")
+

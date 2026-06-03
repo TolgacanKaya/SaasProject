@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'businesses',    # Dükkan, hizmetler, müşteriler
     'appointments',  # Randevular, takvim, saatler
     'payments',      # Ödeme İşlemleri
-    'pos'            # POS(Adisyon) Sistemi
+    'pos',           # POS(Adisyon) Sistemi
+    'debug_toolbar', # Debug Toolbar
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -124,11 +130,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 JAZZMIN_SETTINGS = {
-    "site_title": "T-Randevu Admin",
-    "site_header": "T-Randevu",
+    "site_title": "KobiRandevu Admin",
+    "site_header": "KobiRandevu",
     "site_brand": "Sistem Yönetimi",
-    "welcome_sign": "T-Randevu Yönetim Merkezine Hoş Geldiniz, Patron!",
-    "copyright": "T-Randevu Inc.",
+    "welcome_sign": "KobiRandevu Yönetim Merkezine Hoş Geldiniz, Patron!",
+    "copyright": "KobiRandevu Inc.",
     "search_model": ["businesses.Business", "auth.User"],
     "show_ui_builder": False,
 

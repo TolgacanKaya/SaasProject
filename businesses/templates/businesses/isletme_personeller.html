@@ -5,8 +5,12 @@
 {% block content %}
 <div id="staffWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl transform scale-95 transition-transform duration-300" id="staffModalContent">
-        <div class="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 border border-amber-200 shadow-inner">
-            🛡️
+        <div class="w-16 h-16 {% if isletme.is_premium %}bg-amber-500/10 text-amber-400 border border-amber-400/20{% else %}bg-amber-100 text-amber-500 border border-amber-200{% endif %} rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-inner">
+            {% if isletme.is_premium %}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
+            {% else %}
+                🛡️
+            {% endif %}
         </div>
         <h3 class="text-2xl font-extrabold text-slate-900 text-center mb-4">Güvenlik Kontrolü</h3>
         <p class="text-slate-600 text-center leading-relaxed font-medium mb-6">
@@ -189,6 +193,57 @@
                         {% endif %}
                         <span class="font-black text-base">{{ personel.appointment_set.count|default:"0" }}</span>
                     </span>
+                </div>
+
+                <!-- ==========================================
+                     YENİ: SİHİRLİ ÇALIŞMA PANELİ BAĞLANTISI
+                     ========================================== -->
+                <div class="rounded-2xl p-3 border transition-all relative z-10 {% if isletme.is_premium %}border-slate-800 bg-slate-950/40{% else %}border-slate-200 bg-slate-50/50{% endif %} flex flex-col gap-2 mt-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider {% if isletme.is_premium %}text-amber-400/80{% else %}text-indigo-600{% endif %} flex items-center gap-1">
+                            {% if isletme.is_premium %}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.973-8.973m0 0L19.5 12l-2.28-2.28m2.28 2.28l-8.973 8.973m0 0L7.5 21l.904-9.813" /></svg>
+                            {% else %}
+                                ✨
+                            {% endif %}
+                            Sihirli Çalışma Paneli
+                        </span>
+                        <button type="button" onclick="confirmResetToken('{% url 'staff_reset_token' personel.id %}', '{{ personel.name }}')"
+                                class="text-[10px] font-bold hover:underline transition-all {% if isletme.is_premium %}text-slate-500 hover:text-rose-400{% else %}text-slate-400 hover:text-rose-600{% endif %}"
+                                title="Sihirli bağlantıyı iptal et ve yenisini oluştur">
+                            Bağlantıyı Yenile
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-1.5 w-full">
+                        <input type="text" readonly value="{{ request.scheme }}://{{ request.get_host }}{% url 'staff_magic_panel' token=personel.secure_token %}" 
+                               id="magic-link-{{ personel.id }}"
+                               class="text-[11px] font-mono px-2 py-1.5 rounded-lg border outline-none flex-1 truncate
+                               {% if isletme.is_premium %}bg-slate-900 border-slate-800 text-slate-300{% else %}bg-white border-slate-200 text-slate-600{% endif %}">
+                               
+                        <button type="button" onclick="copyMagicLink({{ personel.id }})" 
+                                id="copy-btn-{{ personel.id }}"
+                                class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 active:scale-95 flex items-center justify-center shrink-0
+                                {% if isletme.is_premium %}bg-slate-800 text-white hover:bg-amber-400 hover:text-slate-950 border border-slate-700{% else %}bg-slate-200 text-slate-700 hover:bg-indigo-600 hover:text-white border border-slate-300{% endif %}"
+                                title="Kopyala">
+                            {% if isletme.is_premium %}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5A3.375 3.375 0 006.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0015 2.25h-1.5a2.25 2.25 0 00-2.25 2.25h-3a2.25 2.25 0 00-2.25 2.25Y18a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-.225-1.015M16.5 9h-9" /></svg>
+                            {% else %}
+                                📋
+                            {% endif %}
+                        </button>
+                        
+                        <a href="https://api.whatsapp.com/send?text=Merhaba%20{{ personel.name|urlencode }}%2C%20randevu%20takip%20panelinize%20bu%20%C3%B6zel%20ba%C4%9Flant%C4%B1%20ile%20g%C3%BCvenli%20bir%20%C5%9Fekilde%20eri%C5%9Febilirsiniz%3A%20{{ request.scheme }}%3A%2F%2F{{ request.get_host }}{% url 'staff_magic_panel' token=personel.secure_token %}"
+                           target="_blank"
+                           class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 active:scale-95 flex items-center justify-center shrink-0 bg-emerald-600 text-white hover:bg-emerald-500"
+                           title="WhatsApp ile Paylaş">
+                            {% if isletme.is_premium %}
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.863-9.73.001-2.597-1.006-5.04-2.834-6.87C16.673 2.155 14.24 1.19 11.758 1.19c-4.996 0-9.06 4.015-9.064 9.013-.002 1.868.512 3.696 1.488 5.255l-.976 3.565 3.654-.959c1.514.823 3.09 1.248 4.747 1.25zM15.86 12.82c-.3-.15-1.78-.88-2.057-.98-.28-.1-.48-.15-.68.15-.2.3-.77.98-.95 1.18-.18.2-.35.23-.65.08-.3-.15-1.28-.47-2.45-1.51-.9-.8-1.51-1.8-1.68-2.1-.18-.3-.02-.46.13-.61.14-.13.3-.35.45-.53.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.63-.93-2.23-.24-.58-.49-.5-.68-.5-.18-.01-.38-.01-.58-.01-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.45 1.06 2.87 1.2 3.07.15.2 2.1 3.2 5.07 4.5.7.3 1.26.49 1.69.62.7.22 1.34.19 1.85.11.57-.08 1.78-.73 2.03-1.43.25-.7.25-1.3.17-1.43-.08-.13-.28-.2-.58-.35z"/></svg>
+                            {% else %}
+                                💬
+                            {% endif %}
+                        </a>
+                    </div>
                 </div>
 
                 <div class="flex gap-2 pt-2 relative z-10">
@@ -466,6 +521,37 @@
             modal.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }, 300);
+    }
+
+    // ==========================================
+    // YENİ: SİHİRLİ LİNK YARDIMCI FONKSİYONLARI
+    // ==========================================
+    function copyMagicLink(staffId) {
+        const copyText = document.getElementById(`magic-link-${staffId}`);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // Mobil için
+        
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            const btn = document.getElementById(`copy-btn-${staffId}`);
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = "✓";
+            btn.style.backgroundColor = "#059669"; // emerald-600
+            btn.style.color = "#ffffff";
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.backgroundColor = "";
+                btn.style.color = "";
+            }, 1500);
+        }).catch(err => {
+            alert("Bağlantı kopyalanamadı, lütfen manuel kopyalayın.");
+        });
+    }
+
+    function confirmResetToken(resetUrl, name) {
+        if (confirm(`⚠️ Emin misiniz?\n\n"${name}" adlı personelin sihirli bağlantısını sıfırlamak üzeresiniz. Bu işlem gerçekleştiğinde eski sihirli link anında geçersiz kılınacaktır ve personeliniz eski link ile artık giriş yapamayacaktır!`)) {
+            window.location.href = resetUrl;
+        }
     }
 </script>
 {% endblock %}

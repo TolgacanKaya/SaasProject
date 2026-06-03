@@ -55,12 +55,12 @@ def premium_satin_al(request):
     secilen_plan = request.GET.get('plan', 'monthly')
 
     if secilen_plan == 'yearly':
-        fiyat = Decimal("2990.00")
-        paket_adi = "T-Randevu Premium Plan (Yıllık)"
+        fiyat = Decimal("9990.00")
+        paket_adi = "KobiRandevu Premium Plan (Yıllık)"
         sepet_id = "PREM_YIL_001"
     else:
-        fiyat = Decimal("299.00")
-        paket_adi = "T-Randevu Premium Plan (Aylık)"
+        fiyat = Decimal("999.00")
+        paket_adi = "KobiRandevu Premium Plan (Aylık)"
         sepet_id = "PREM_AY_001"
 
     odeme_kaydi = SubscriptionPayment.objects.create(
@@ -72,7 +72,7 @@ def premium_satin_al(request):
 
     callback_url = request.build_absolute_uri(reverse('odeme_sonuc'))
 
-    alici_ad = request.user.first_name.strip() if request.user.first_name else "T-Randevu"
+    alici_ad = request.user.first_name.strip() if request.user.first_name else "KobiRandevu"
     alici_soyad = request.user.last_name.strip() if request.user.last_name else "Isletmesi"
     tam_isim = f"{alici_ad} {alici_soyad}"
 

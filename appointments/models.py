@@ -42,7 +42,7 @@ class Appointment(models.Model):
     coupon_used = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True,
                                     verbose_name="Kullanılan Kupon")
     platform_fee_paid = models.DecimalField(max_digits=6, decimal_places=2, default=5.00,
-                                            verbose_name="T-Randevu İşlem Bedeli")
+                                            verbose_name="KobiRandevu İşlem Bedeli")
     final_service_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,
                                               verbose_name="İşletmeye Ödenecek Net Tutar")
     total_online_charged = models.DecimalField(max_digits=10, decimal_places=2, default=5.00,

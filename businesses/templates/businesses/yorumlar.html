@@ -59,6 +59,13 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Syne', sans-serif !important; }
     transform: translateY(-2px);
     box-shadow: 0 12px 30px rgba(0,0,0,0.4);
 }
+#reviewSort {
+    color-scheme: dark;
+}
+#reviewSort option {
+    background-color: #0d0d1a !important;
+    color: #f4f4f8 !important;
+}
 </style>
 {% else %}
 <style>
@@ -93,6 +100,13 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Syne', sans-serif !important; }
     border-color: #a5b4fc;
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(79, 70, 229, 0.05);
+}
+#reviewSort {
+    color-scheme: light;
+}
+#reviewSort option {
+    background-color: #ffffff !important;
+    color: #334155 !important;
 }
 </style>
 {% endif %}
@@ -178,30 +192,127 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Syne', sans-serif !important; }
                 
                 <!-- Önemli Bilgi Rozeti -->
                 <div class="mt-8 p-4 rounded-2xl flex gap-3 text-xs {% if isletme.is_premium %}bg-white/[0.02] border border-white/[0.04] text-slate-400{% else %}bg-indigo-50/50 border border-indigo-100/40 text-slate-600{% endif %}">
-                    <span class="text-xl">🛡️</span>
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 {% if isletme.is_premium %}bg-emerald-500/10 text-emerald-400{% else %}bg-emerald-50 text-emerald-600{% endif %}">
+                        <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                        </svg>
+                    </span>
                     <p class="leading-relaxed font-medium">Bu sayfadaki tüm yorumlar sadece işletmeden randevu alıp hizmeti tamamlayan **gerçek ve onaylı müşteriler** tarafından yapılmıştır.</p>
+                </div>
+
+                <!-- Detaylı Değerlendirme Kırılımları (Airbnb/Booking tarzı) -->
+                <div class="mt-8 pt-6 border-t {% if isletme.is_premium %}border-white/[0.06]{% else %}border-slate-100{% endif %}">
+                    <h4 class="text-xs uppercase tracking-widest font-black {% if isletme.is_premium %}text-amber-500{% else %}text-indigo-600{% endif %} mb-4">Hizmet Kriterleri</h4>
+                    <div class="space-y-4">
+                        <!-- Hizmet Kalitesi -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="{% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %}">Hizmet Kalitesi</span>
+                                <span class="{% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}" id="metric-quality">0.0</span>
+                            </div>
+                            <div class="h-1.5 rounded-full overflow-hidden {% if isletme.is_premium %}bg-white/[0.04]{% else %}bg-slate-100{% endif %}">
+                                <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" id="metric-quality-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <!-- Müşteri Karşılama -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="{% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %}">Müşteri Karşılama</span>
+                                <span class="{% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}" id="metric-hospitality">0.0</span>
+                            </div>
+                            <div class="h-1.5 rounded-full overflow-hidden {% if isletme.is_premium %}bg-white/[0.04]{% else %}bg-slate-100{% endif %}">
+                                <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" id="metric-hospitality-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <!-- Temizlik & Hijyen -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="{% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %}">Temizlik & Hijyen</span>
+                                <span class="{% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}" id="metric-cleanliness">0.0</span>
+                            </div>
+                            <div class="h-1.5 rounded-full overflow-hidden {% if isletme.is_premium %}bg-white/[0.04]{% else %}bg-slate-100{% endif %}">
+                                <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" id="metric-cleanliness-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <!-- Fiyat / Performans -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="{% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %}">Fiyat / Performans</span>
+                                <span class="{% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %}" id="metric-value">0.0</span>
+                            </div>
+                            <div class="h-1.5 rounded-full overflow-hidden {% if isletme.is_premium %}bg-white/[0.04]{% else %}bg-slate-100{% endif %}">
+                                <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" id="metric-value-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Sağ Panel: Yorum Kartları Listesi -->
         <div class="lg:col-span-8 space-y-5">
+            <div class="glass-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <!-- Canlı Arama -->
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </span>
+                    <input type="text" id="reviewSearch" placeholder="Yorumlar içerisinde ara..." 
+                           class="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm font-semibold transition-all focus:outline-none 
+                                  {% if isletme.is_premium %}bg-white/[0.03] border border-white/10 text-white focus:border-amber-400/50 focus:bg-white/[0.05]{% else %}bg-slate-50 border border-slate-200 text-slate-700 focus:border-indigo-500/50{% endif %}">
+                </div>
+                <!-- Sıralama Dropdown -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-400 shrink-0">Sıralama:</span>
+                    <select id="reviewSort" 
+                            class="rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none transition-all
+                                   {% if isletme.is_premium %}bg-slate-950 border border-white/10 text-white focus:border-amber-400/50{% else %}bg-slate-50 border border-slate-200 text-slate-700 focus:border-indigo-500{% endif %}">
+                        <option value="newest" style="background-color: {% if isletme.is_premium %}#09090b{% else %}#ffffff{% endif %}; color: {% if isletme.is_premium %}#ffffff{% else %}#334155{% endif %};">En Yeni</option>
+                        <option value="highest" style="background-color: {% if isletme.is_premium %}#09090b{% else %}#ffffff{% endif %}; color: {% if isletme.is_premium %}#ffffff{% else %}#334155{% endif %};">En Yüksek Puan</option>
+                        <option value="lowest" style="background-color: {% if isletme.is_premium %}#09090b{% else %}#ffffff{% endif %}; color: {% if isletme.is_premium %}#ffffff{% else %}#334155{% endif %};">En Düşük Puan</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <!-- Filtreleme Butonları (Yıldız Seçenekleri) -->
+            <div class="flex flex-wrap items-center gap-2">
+                <button class="review-filter-btn px-4 py-2 rounded-xl text-xs font-black transition-all active-pill
+                               {% if isletme.is_premium %}bg-amber-400 text-slate-950 shadow-md shadow-amber-400/10{% else %}bg-indigo-600 text-white shadow-md shadow-indigo-600/10{% endif %}" 
+                        data-filter="all">
+                    Tümü
+                </button>
+                {% for star in "54321"|make_list %}
+                <button class="review-filter-btn px-4 py-2 rounded-xl text-xs font-black transition-all
+                               {% if isletme.is_premium %}bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.05]{% else %}bg-white border border-slate-200 text-slate-600 hover:bg-slate-50{% endif %}" 
+                        data-filter="{{ star }}">
+                    {{ star }} Yıldız
+                </button>
+                {% endfor %}
+            </div>
+
+            <div id="reviewListContainer" class="space-y-4">
             {% if yorumlar %}
-                <div class="space-y-4">
-                    {% for yorum in yorumlar %}
+                {% for yorum in yorumlar %}
+                <div class="review-card-wrapper" data-rating="{{ yorum.rating }}" data-date="{{ yorum.created_at|date:'U' }}" data-text="{{ yorum.comment|default:''|lower }} {{ yorum.appointment.service.name|lower }} {{ yorum.appointment.customer.first_name|lower }}">
                     <div class="review-card">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-base shadow-inner
-                                            {% if isletme.is_premium %}bg-amber-400/10 text-amber-400{% else %}bg-indigo-100 text-indigo-600{% endif %}">
+                                             {% if isletme.is_premium %}bg-amber-400/10 text-amber-400{% else %}bg-indigo-100 text-indigo-600{% endif %}">
                                     {{ yorum.appointment.customer.first_name|make_list|first|upper }}
                                 </div>
                                 <div>
                                     <h5 class="font-bold text-base {% if isletme.is_premium %}text-white{% else %}text-slate-800{% endif %} flex items-center gap-1.5">
                                         {{ yorum.appointment.customer.first_name }} {{ yorum.appointment.customer.last_name|make_list|first|upper }}.
-                                        <span class="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full
                                                      {% if isletme.is_premium %}bg-emerald-500/10 text-emerald-400{% else %}bg-emerald-50 text-emerald-600{% endif %}">
-                                            ✓ Onaylı
+                                            <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Onaylı
                                         </span>
                                     </h5>
                                     <p class="text-xs {% if isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %}">
@@ -235,17 +346,20 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Syne', sans-serif !important; }
                         </div>
                         {% endif %}
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             {% else %}
                 <div class="text-center py-20 rounded-3xl border-2 border-dashed {% if isletme.is_premium %}border-white/[0.06] bg-white/[0.01]{% else %}border-slate-200 bg-white{% endif %}">
-                    <div class="w-20 h-20 mx-auto mb-5 rounded-2xl {% if isletme.is_premium %}bg-white/[0.03]{% else %}bg-slate-100{% endif %} flex items-center justify-center text-4xl">
-                        💬
+                    <div class="w-16 h-16 mx-auto mb-5 rounded-2xl {% if isletme.is_premium %}bg-white/[0.03] text-slate-500{% else %}bg-slate-100 text-slate-400{% endif %} flex items-center justify-center">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.12 2.9 2.58 3.16H4v3.33L7.33 16.5h3.92c1.46 0 2.58-1.3 2.58-2.9v-7.1c0-1.6-1.12-2.9-2.58-2.9H4.83c-1.46 0-2.58 1.3-2.58 2.9v7.1z" />
+                        </svg>
                     </div>
                     <h3 class="font-extrabold text-lg {% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %} mb-1">Henüz Yorum Yapılmamış</h3>
                     <p class="{% if isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %} text-sm max-w-sm mx-auto">Bu işletme için değerlendirme yapılınca burada listelenecektir.</p>
                 </div>
             {% endif %}
+            </div>
         </div>
 
     </div>
@@ -281,6 +395,121 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Syne', sans-serif !important; }
                     countLabel.innerText = count;
                 }
             }
+        }
+
+        // --- PUAN KIRILIMLARI (DİNAMİK) ---
+        const ratingAvg = parseFloat('{{ ortalama_puan|default:"5.0" }}'.replace(',', '.')) || 5.0;
+        
+        // Dynamic averages calculated in Django backend
+        const quality = (parseFloat('{{ avg_quality|default:"0.0" }}'.replace(',', '.')) || ratingAvg).toFixed(1);
+        const hospitality = (parseFloat('{{ avg_hospitality|default:"0.0" }}'.replace(',', '.')) || ratingAvg).toFixed(1);
+        const cleanliness = (parseFloat('{{ avg_cleanliness|default:"0.0" }}'.replace(',', '.')) || ratingAvg).toFixed(1);
+        const value = (parseFloat('{{ avg_value|default:"0.0" }}'.replace(',', '.')) || ratingAvg).toFixed(1);
+
+        document.getElementById('metric-quality').innerText = quality;
+        document.getElementById('metric-quality-bar').style.width = `${(quality / 5.0) * 100}%`;
+
+        document.getElementById('metric-hospitality').innerText = hospitality;
+        document.getElementById('metric-hospitality-bar').style.width = `${(hospitality / 5.0) * 100}%`;
+
+        document.getElementById('metric-cleanliness').innerText = cleanliness;
+        document.getElementById('metric-cleanliness-bar').style.width = `${(cleanliness / 5.0) * 100}%`;
+
+        document.getElementById('metric-value').innerText = value;
+        document.getElementById('metric-value-bar').style.width = `${(value / 5.0) * 100}%`;
+
+        // --- CANLI ARAMA, FİLTRELEME VE SIRALAMA ---
+        const searchInput = document.getElementById('reviewSearch');
+        const sortSelect = document.getElementById('reviewSort');
+        const filterBtns = document.querySelectorAll('.review-filter-btn');
+        const reviewContainer = document.getElementById('reviewListContainer');
+        
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        if (reviewContainer) {
+            const originalCards = Array.from(reviewContainer.querySelectorAll('.review-card-wrapper'));
+
+            function filterAndSortReviews() {
+                let filtered = originalCards.filter(card => {
+                    const rating = card.getAttribute('data-rating');
+                    const text = card.getAttribute('data-text');
+                    
+                    const matchesFilter = (currentFilter === 'all' || rating === currentFilter);
+                    const matchesSearch = (text.indexOf(currentSearch) !== -1);
+                    
+                    return matchesFilter && matchesSearch;
+                });
+
+                // Sort
+                const sortBy = sortSelect.value;
+                filtered.sort((a, b) => {
+                    if (sortBy === 'newest') {
+                        return parseInt(b.getAttribute('data-date')) - parseInt(a.getAttribute('data-date'));
+                    } else if (sortBy === 'highest') {
+                        return parseInt(b.getAttribute('data-rating')) - parseInt(a.getAttribute('data-rating'));
+                    } else if (sortBy === 'lowest') {
+                        return parseInt(a.getAttribute('data-rating')) - parseInt(b.getAttribute('data-rating'));
+                    }
+                    return 0;
+                });
+
+                // Clear & Append
+                reviewContainer.innerHTML = '';
+                if (filtered.length > 0) {
+                    filtered.forEach(card => {
+                        reviewContainer.appendChild(card);
+                        card.style.display = 'block';
+                    });
+                } else {
+                    reviewContainer.innerHTML = `
+                        <div class="text-center py-20 rounded-3xl border-2 border-dashed {% if isletme.is_premium %}border-white/[0.06] bg-white/[0.01]{% else %}border-slate-200 bg-white{% endif %}">
+                            <div class="w-16 h-16 mx-auto mb-5 rounded-2xl {% if isletme.is_premium %}bg-white/[0.03] text-slate-500{% else %}bg-slate-100 text-slate-400{% endif %} flex items-center justify-center">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.12 2.9 2.58 3.16H4v3.33L7.33 16.5h3.92c1.46 0 2.58-1.3 2.58-2.9v-7.1c0-1.6-1.12-2.9-2.58-2.9H4.83c-1.46 0-2.58 1.3-2.58 2.9v7.1z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-extrabold text-lg {% if isletme.is_premium %}text-slate-300{% else %}text-slate-700{% endif %} mb-1">Aramanıza Uygun Yorum Bulunmadı</h3>
+                            <p class="{% if isletme.is_premium %}text-slate-500{% else %}text-slate-400{% endif %} text-sm max-w-sm mx-auto">Filtreleri değiştirmeyi veya farklı kelimeler aramayı deneyebilirsiniz.</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Bind inputs
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    currentSearch = e.target.value.toLowerCase().trim();
+                    filterAndSortReviews();
+                });
+            }
+
+            if (sortSelect) {
+                sortSelect.addEventListener('change', filterAndSortReviews);
+            }
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterBtns.forEach(b => {
+                        b.className = "review-filter-btn px-4 py-2 rounded-xl text-xs font-black transition-all " + 
+                            ("{% if isletme.is_premium %}" + 
+                             "bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.05]" + 
+                             "{% else %}" + 
+                             "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" + 
+                             "{% endif %}");
+                    });
+                    
+                    this.className = "review-filter-btn px-4 py-2 rounded-xl text-xs font-black transition-all active-pill " +
+                        ("{% if isletme.is_premium %}" + 
+                         "bg-amber-400 text-slate-950 shadow-md shadow-amber-400/10" + 
+                         "{% else %}" + 
+                         "bg-indigo-600 text-white shadow-md shadow-indigo-600/10" + 
+                         "{% endif %}");
+                    
+                    currentFilter = this.getAttribute('data-filter');
+                    filterAndSortReviews();
+                });
+            });
         }
     });
 </script>

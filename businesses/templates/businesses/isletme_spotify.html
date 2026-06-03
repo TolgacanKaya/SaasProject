@@ -287,6 +287,7 @@ h1, h2, h3, h4, h5 {
 {% endblock %}
 
 {% block extra_js %}
+{% if spotify_connected %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const slug = "{{ isletme.slug }}";
@@ -379,7 +380,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         stopNoteAnimation();
                     } else {
                         trackName.textContent = "Salon Çalma Listesi Çalıyor";
-                        artistName.textContent = "Şu an arka planda salon şarkıları açık.";
+                        artistName.textContent = "Şşu an arka planda salon şarkıları açık.";
                         cover.src = "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=300&auto=format&fit=crop";
                         vinyl.classList.remove('animate-vinyl-spin');
                         stopNoteAnimation();
@@ -666,4 +667,5 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+{% endif %}
 {% endblock %}

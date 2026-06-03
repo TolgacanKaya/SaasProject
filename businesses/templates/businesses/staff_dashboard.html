@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ personel.name }} - Çalışma Paneli | KobiRandevu</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#09090b',
+                            card: '#18181b',
+                            border: '#27272a',
+                            gold: '#fbbf24',
+                            goldHover: '#f59e0b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Premium Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fbbf24;
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(251, 191, 36, 0.08);
+        }
+
+        .active-tab-glow {
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.15);
+        }
+
+        /* Micro-animations */
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+        .pulse-gold-dot {
+            animation: pulse-gold 2s infinite ease-in-out;
+        }
+
+        /* Safe Area Inset Support for Notch Phones */
+        body {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Detail Drawer Transitions */
+        .detail-drawer {
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+        }
+        .detail-drawer.open {
+            max-height: 600px;
+            opacity: 1;
+        }
+        .detail-chevron {
+            transition: transform 0.3s ease;
+        }
+        .detail-chevron.rotated {
+            transform: rotate(180deg);
+        }
+        .detail-compact-notes.hidden-notes {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
+            padding-top: 0;
+            border: none;
+        }
+    </style>
+</head>
+<body class="bg-[#09090b] text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-amber-400 selection:text-zinc-950" {% if isletme.is_premium %}data-premium="true"{% endif %}>
+
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-zinc-800/80 px-4 py-4 md:px-8">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3.5">
+                <div class="relative w-12 h-12 rounded-2xl overflow-hidden p-0.5 bg-gradient-to-tr from-amber-400/40 to-transparent shadow-lg">
+                    {% if personel.photo %}
+                        <img src="{{ personel.photo.url }}" class="w-full h-full object-cover rounded-[14px]">
+                    {% else %}
+                        <div class="w-full h-full rounded-[14px] bg-zinc-900 border border-zinc-800 flex items-center justify-center text-amber-400 font-bold text-lg">
+                            {{ personel.name|make_list|first|upper }}
+                        </div>
+                    {% endif %}
+                    <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[#09090b] flex items-center justify-center" title="Aktif Çalışma Paneli">
+                        <span class="w-1.5 h-1.5 bg-emerald-300 rounded-full pulse-gold-dot"></span>
+                    </span>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-white leading-tight flex items-center gap-1.5">
+                        {{ personel.name }} 
+                        <svg class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor" title="Onaylı Personel"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </h1>
+                    <p class="text-xs font-semibold text-amber-400/90 tracking-wide uppercase">{{ isletme.name }}</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="window.location.reload();" 
+                        class="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-slate-300 hover:text-amber-400 active:scale-95 transition-all"
+                        title="Sayfayı Yenile">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 md:px-8 space-y-6">
+        
+        <!-- DJANGO MESSAGES TOASTS -->
+        {% if messages %}
+            <div class="space-y-3" id="django-messages-container">
+                {% for message in messages %}
+                    <div class="flex items-center justify-between p-4 rounded-2xl border text-sm font-medium animate-fade-in
+                        {% if message.tags == 'success' %}bg-emerald-500/10 border-emerald-500/25 text-emerald-400
+                        {% elif message.tags == 'warning' %}bg-amber-500/10 border-amber-500/25 text-amber-400
+                        {% else %}bg-rose-500/10 border-rose-500/25 text-rose-400{% endif %}"
+                         role="alert">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-lg">
+                                {% if isletme.is_premium %}
+                                    {% if message.tags == 'success' %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-emerald-400"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    {% elif message.tags == 'warning' %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-amber-400"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                                    {% else %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-rose-400"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.007v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    {% endif %}
+                                {% else %}
+                                    {% if message.tags == 'success' %}✅{% elif message.tags == 'warning' %}⚠️{% else %}🚨{% endif %}
+                                {% endif %}
+                            </span>
+                            <span>{{ message }}</span>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white font-bold ml-4">✕</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <script>
+                // Auto hide messages after 5 seconds
+                setTimeout(() => {
+                    const msgContainer = document.getElementById('django-messages-container');
+                    if (msgContainer) {
+                        msgContainer.style.transition = 'opacity 0.5s ease';
+                        msgContainer.style.opacity = '0';
+                        setTimeout(() => msgContainer.remove(), 500);
+                    }
+                }, 5000);
+            </script>
+        {% endif %}
+
+        <!-- TODAY'S PERFORMANCE CARD -->
+        <section class="glass-panel rounded-3xl p-5 md:p-6 shadow-2xl relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-sm font-extrabold text-slate-400 uppercase tracking-wider">Bugünün Randevu Özeti</h2>
+                    <p class="text-2xl font-black text-white mt-1">{{ completed_today }} <span class="text-zinc-600 font-bold text-lg">/ {{ total_today }} Tamamlandı</span></p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-amber-400/10 flex items-center justify-center text-amber-400 border border-amber-400/20 shadow-inner">
+                    {% if isletme.is_premium %}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21m-9-3a3 3 0 100 6 3 3 0 000-6z" /></svg>
+                    {% else %}
+                        🎯
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Custom Progress Bar -->
+            <div class="space-y-1.5">
+                <div class="w-full bg-zinc-950 rounded-full h-3 p-0.5 border border-zinc-800/80">
+                    <div class="bg-gradient-to-r from-amber-400 to-amber-500 h-full rounded-full transition-all duration-700 active-tab-glow" 
+                         style="width: {% if total_today > 0 %}{% widthratio completed_today total_today 100 %}{% else %}0{% endif %}%;">
+                    </div>
+                </div>
+                <div class="flex justify-between text-[11px] font-bold text-slate-500">
+                    <span>Tamamlama Oranı</span>
+                    <span class="text-amber-400">
+                        {% if total_today > 0 %}
+                            {% widthratio completed_today total_today 100 %}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- LIVE SEARCH BAR -->
+        <section class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.602 10.602z" />
+                </svg>
+            </div>
+            <input type="text" id="live-search-input" onkeyup="filterAppointments()" 
+                   placeholder="Müşteri adı veya hizmet ara..."
+                   class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-white outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 font-medium transition-all shadow-lg placeholder:text-zinc-600">
+        </section>
+
+        <!-- TAB NAVIGATION -->
+        <section class="grid grid-cols-3 gap-2 p-1 rounded-2xl bg-zinc-950/80 border border-zinc-800/60 shadow-lg">
+            <button onclick="switchTab('today')" id="tab-btn-today"
+                    class="py-3 px-2 rounded-xl text-xs font-black text-center transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 active:scale-[0.98]
+                    bg-amber-400 text-zinc-950 font-black active-tab-glow">
+                {% if not isletme.is_premium %}📅 {% endif %}Bugün
+                <span class="px-1.5 py-0.5 rounded-lg text-[9px] bg-zinc-950/20 text-zinc-950 font-black" id="badge-today">
+                    {{ today_appointments|length }}
+                </span>
+            </button>
+            
+            <button onclick="switchTab('upcoming')" id="tab-btn-upcoming"
+                    class="py-3 px-2 rounded-xl text-xs font-bold text-center transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 active:scale-[0.98]
+                    text-slate-400 hover:text-white">
+                {% if not isletme.is_premium %}🔮 {% endif %}Gelecek
+                <span class="px-1.5 py-0.5 rounded-lg text-[9px] bg-zinc-800 text-slate-300 font-bold" id="badge-upcoming">
+                    {{ upcoming_appointments|length }}
+                </span>
+            </button>
+            
+            <button onclick="switchTab('past')" id="tab-btn-past"
+                    class="py-3 px-2 rounded-xl text-xs font-bold text-center transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 active:scale-[0.98]
+                    text-slate-400 hover:text-white">
+                {% if not isletme.is_premium %}📜 {% endif %}Geçmiş
+                <span class="px-1.5 py-0.5 rounded-lg text-[9px] bg-zinc-800 text-slate-300 font-bold" id="badge-past">
+                    {{ past_appointments|length }}
+                </span>
+            </button>
+        </section>
+
+        <!-- APPOINTMENTS LIST CONTAINER -->
+        <section class="space-y-4">
+            
+            <!-- TODAY APPOINTMENTS -->
+            <div id="tab-content-today" class="tab-pane space-y-4">
+                <div class="appointments-list space-y-4">
+                {% for app in today_appointments %}
+                    {% include "businesses/staff_appointment_card.html" with app=app is_today=True %}
+                {% empty %}
+                    <div class="py-12 text-center border-2 border-dashed border-zinc-800 rounded-3xl bg-zinc-900/20">
+                        {% if isletme.is_premium %}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-3 text-slate-700">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
+                            </svg>
+                        {% else %}
+                            <span class="text-4xl block mb-3 opacity-60">🏖️</span>
+                        {% endif %}
+                        <h4 class="text-base font-bold text-slate-300 mb-1">Bugün Randevunuz Yok</h4>
+                        <p class="text-xs text-slate-500">Bugün için programınız tamamen boş görünüyor. Keyifli dinlenmeler!</p>
+                    </div>
+                {% endfor %}
+                </div>
+                <!-- Pagination Controls -->
+                <div id="pagination-today" class="pagination-controls flex items-center justify-between pt-4 hidden">
+                    <button onclick="prevPage('today')" id="btn-prev-today" class="px-4 py-2 text-xs font-bold bg-zinc-900 border border-zinc-800 text-slate-300 hover:text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all">Önceki</button>
+                    <span id="info-today" class="text-xs font-bold text-slate-500">Sayfa 1 / 1</span>
+                    <button onclick="nextPage('today')" id="btn-next-today" class="px-4 py-2 text-xs font-bold bg-zinc-900 border border-zinc-800 text-slate-300 hover:text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all">Sonraki</button>
+                </div>
+            </div>
+
+            <!-- UPCOMING APPOINTMENTS -->
+            <div id="tab-content-upcoming" class="tab-pane hidden space-y-4">
+                <div class="appointments-list space-y-4">
+                {% for app in upcoming_appointments %}
+                    {% include "businesses/staff_appointment_card.html" with app=app is_today=False %}
+                {% empty %}
+                    <div class="py-12 text-center border-2 border-dashed border-zinc-800 rounded-3xl bg-zinc-900/20">
+                        {% if isletme.is_premium %}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-3 text-slate-700">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        {% else %}
+                            <span class="text-4xl block mb-3 opacity-60">🔮</span>
+                        {% endif %}
+                        <h4 class="text-base font-bold text-slate-300 mb-1">Gelecek Randevu Yok</h4>
+                        <p class="text-xs text-slate-500">Önümüzdeki günlere ait planlanmış herhangi bir randevunuz bulunmuyor.</p>
+                    </div>
+                {% endfor %}
+                </div>
+                <!-- Pagination Controls -->
+                <div id="pagination-upcoming" class="pagination-controls flex items-center justify-between pt-4 hidden">
+                    <button onclick="prevPage('upcoming')" id="btn-prev-upcoming" class="px-4 py-2 text-xs font-bold bg-zinc-900 border border-zinc-800 text-slate-300 hover:text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all">Önceki</button>
+                    <span id="info-upcoming" class="text-xs font-bold text-slate-500">Sayfa 1 / 1</span>
+                    <button onclick="nextPage('upcoming')" id="btn-next-upcoming" class="px-4 py-2 text-xs font-bold bg-zinc-900 border border-zinc-800 text-slate-300 hover:text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all">Sonraki</button>
+                </div>
+            </div>
+
+            <!-- PAST APPOINTMENTS -->
+            <div id="tab-content-past" class="tab-pane hidden space-y-4">
+                <div class="appointments-list space-y-4">
+                {% for app in past_appointments %}
+                    {% include "businesses/staff_appointment_card.html" with app=app is_today=False %}
+                {% empty %}
+                    <div class="py-12 text-center border-2 border-dashed border-zinc-800 rounded-3xl bg-zinc-900/20">
+                        {% if isletme.is_premium %}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-3 text-slate-700">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                            </svg>
+                        {% else %}
+                            <span class="text-4xl block mb-3 opacity-60">📜</span>
+                        {% endif %}
+                        <h4 class="text-base font-bold text-slate-300 mb-1">Geçmiş Randevu Bulunamadı</h4>
+                        <p class="text-xs text-slate-500">Sistemde geçmiş döneme ait randevu kaydınız bulunmamaktadır.</p>
+                    </div>
+                {% endfor %}
+                </div>
+                <!-- Pagination Controls -->
+                <div id="pagination-past" class="pagination-controls flex items-center justify-between pt-4 hidden">
+                    <button onclick="prevPage('past')" id="btn-prev-past" class="px-4 py-2 text-xs font-bold bg-zinc-900 border border-zinc-800 text-slate-300 hover:text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all">Önceki</button>
+                    <span id="info-past" class="text-xs font-bold text-slate-500">Sayfa 1 / 1</span>
+                    <button onclick="nextPage('past')" id="btn-next-past" class="px-4 py-2 text-xs font-bold bg-zinc-900 border border-zinc-800 text-slate-300 hover:text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all">Sonraki</button>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER LOGO -->
+    <footer class="py-8 border-t border-zinc-900 text-center">
+        <div class="flex items-center justify-center gap-1.5 text-xs text-slate-600 font-semibold uppercase tracking-widest">
+            {% if not isletme.is_premium %}<span class="text-amber-500 text-base">⚡</span>{% endif %} KobiRandevu Ekip Portalı
+        </div>
+    </footer>
+
+    <!-- CANCEL CONFIRMATION MODAL -->
+    <div id="cancelModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-300 text-center" id="cancelModalContent">
+            <div class="w-14 h-14 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-rose-500/20">
+                {% if isletme.is_premium %}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                {% else %}
+                    🚨
+                {% endif %}
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Randevuyu İptal Et?</h3>
+            <p class="text-xs font-semibold text-slate-400 mb-6">
+                <span id="cancelCustomerName" class="text-rose-400 font-bold"></span> adlı müşterinin randevusunu iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz!
+            </p>
+            <div class="flex gap-3">
+                <button onclick="closeCancelModal()" 
+                        class="flex-1 py-3 rounded-xl font-bold border border-zinc-800 text-slate-300 hover:bg-zinc-800 transition-colors text-sm">
+                    Geri Git
+                </button>
+                <a id="confirmCancelBtn" href="#" 
+                   class="flex-1 py-3 rounded-xl font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-lg shadow-rose-500/20 flex items-center justify-center text-sm">
+                    Evet, İptal Et
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS ACTIONS -->
+    <script>
+        // PAGINATION STATE AND LOGIC
+        const paginationState = {
+            today: { currentPage: 1, itemsPerPage: 5 },
+            upcoming: { currentPage: 1, itemsPerPage: 5 },
+            past: { currentPage: 1, itemsPerPage: 5 }
+        };
+
+        function getVisibleCards(tabName) {
+            const pane = document.getElementById(`tab-content-${tabName}`);
+            const list = pane.querySelector('.appointments-list');
+            if (!list) return [];
+            
+            const allCards = Array.from(list.querySelectorAll('.appointment-card'));
+            const query = document.getElementById('live-search-input').value.toLowerCase().trim();
+            
+            return allCards.filter(card => {
+                const customer = card.getAttribute('data-customer').toLowerCase();
+                const service = card.getAttribute('data-service').toLowerCase();
+                return customer.includes(query) || service.includes(query);
+            });
+        }
+
+        function updatePagination(tabName) {
+            const visibleCards = getVisibleCards(tabName);
+            const state = paginationState[tabName];
+            const totalItems = visibleCards.length;
+            const totalPages = Math.ceil(totalItems / state.itemsPerPage) || 1;
+            
+            if (state.currentPage > totalPages) {
+                state.currentPage = totalPages;
+            }
+            if (state.currentPage < 1) {
+                state.currentPage = 1;
+            }
+
+            // Hide or show controls
+            const controls = document.getElementById(`pagination-${tabName}`);
+            const pane = document.getElementById(`tab-content-${tabName}`);
+            const list = pane.querySelector('.appointments-list');
+            
+            if (list) {
+                const allCards = Array.from(list.querySelectorAll('.appointment-card'));
+                allCards.forEach(card => card.style.display = 'none');
+            }
+
+            if (totalItems <= state.itemsPerPage) {
+                if (controls) controls.classList.add('hidden');
+                visibleCards.forEach(card => card.style.display = '');
+            } else {
+                if (controls) controls.classList.remove('hidden');
+                
+                const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+                const endIndex = startIndex + state.itemsPerPage;
+                
+                visibleCards.forEach((card, index) => {
+                    if (index >= startIndex && index < endIndex) {
+                        card.style.display = '';
+                    }
+                });
+            }
+
+            // Update buttons & info
+            const btnPrev = document.getElementById(`btn-prev-${tabName}`);
+            const btnNext = document.getElementById(`btn-next-${tabName}`);
+            const info = document.getElementById(`info-${tabName}`);
+
+            if (btnPrev) btnPrev.disabled = (state.currentPage === 1);
+            if (btnNext) btnNext.disabled = (state.currentPage === totalPages);
+            if (info) info.innerText = `Sayfa ${state.currentPage} / ${totalPages}`;
+        }
+
+        function prevPage(tabName) {
+            if (paginationState[tabName].currentPage > 1) {
+                paginationState[tabName].currentPage--;
+                updatePagination(tabName);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage(tabName) {
+            const visibleCards = getVisibleCards(tabName);
+            const totalPages = Math.ceil(visibleCards.length / paginationState[tabName].itemsPerPage);
+            if (paginationState[tabName].currentPage < totalPages) {
+                paginationState[tabName].currentPage++;
+                updatePagination(tabName);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Initialize Pagination on DOMContentLoaded
+        document.addEventListener("DOMContentLoaded", function() {
+            updatePagination('today');
+            updatePagination('upcoming');
+            updatePagination('past');
+        });
+
+        // TAB SWITCH LOGIC
+        function switchTab(tabName) {
+            // Hide all pane contents
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.add('hidden');
+            });
+            
+            // Remove active classes from all tab buttons
+            const tabs = ['today', 'upcoming', 'past'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const badge = document.getElementById(`badge-${t}`);
+                
+                btn.className = "py-3 px-2 rounded-xl text-xs font-bold text-center transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 active:scale-[0.98] text-slate-400 hover:text-white";
+                badge.className = "px-1.5 py-0.5 rounded-lg text-[9px] bg-zinc-800 text-slate-300 font-bold";
+            });
+
+            // Show active pane content
+            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+
+            // Apply active styles to the selected tab button
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            const activeBadge = document.getElementById(`badge-${tabName}`);
+            activeBtn.className = "py-3 px-2 rounded-xl text-xs font-black text-center transition-all duration-300 flex flex-col sm:flex-row items-center justify-center gap-1 active:scale-[0.98] bg-amber-400 text-zinc-950 font-black active-tab-glow";
+            activeBadge.className = "px-1.5 py-0.5 rounded-lg text-[9px] bg-zinc-950/20 text-zinc-950 font-black";
+            
+            // Re-apply live filtering for search if any input is written
+            filterAppointments();
+        }
+
+        // DYNAMIC SEARCH FILTERING
+        function filterAppointments() {
+            const query = document.getElementById('live-search-input').value.toLowerCase().trim();
+            
+            // Determine currently active tab pane
+            let activeTab = 'today';
+            if (!document.getElementById('tab-content-today').classList.contains('hidden')) {
+                activeTab = 'today';
+            } else if (!document.getElementById('tab-content-upcoming').classList.contains('hidden')) {
+                activeTab = 'upcoming';
+            } else if (!document.getElementById('tab-content-past').classList.contains('hidden')) {
+                activeTab = 'past';
+            }
+
+            // Reset to page 1 during a new search query
+            paginationState[activeTab].currentPage = 1;
+            updatePagination(activeTab);
+
+            // Show/Hide "No Results" message
+            const activePane = document.getElementById(`tab-content-${activeTab}`);
+            const visibleCards = getVisibleCards(activeTab);
+            let noResultDiv = activePane.querySelector('.search-no-results');
+            if (visibleCards.length === 0 && query !== '') {
+                if (!noResultDiv) {
+                    noResultDiv = document.createElement('div');
+                    noResultDiv.className = "search-no-results py-10 text-center border-2 border-dashed border-zinc-800 rounded-3xl bg-zinc-900/10 w-full";
+                    const isPremium = document.body.hasAttribute('data-premium');
+                    const searchIcon = isPremium 
+                        ? '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto mb-2 text-slate-700"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>'
+                        : '<span class="text-3xl block mb-2 opacity-50">🔍</span>';
+                    noResultDiv.innerHTML = `
+                        ${searchIcon}
+                        <h4 class="text-sm font-bold text-slate-400">Sonuç Bulunamadı</h4>
+                        <p class="text-[11px] text-slate-500">"${query}" arama kriterine uygun randevu kaydı eşleşmedi.</p>
+                    `;
+                    const list = activePane.querySelector('.appointments-list');
+                    if (list) {
+                        list.appendChild(noResultDiv);
+                    }
+                }
+            } else {
+                if (noResultDiv) {
+                    noResultDiv.remove();
+                }
+            }
+        }
+
+        // DETAIL DRAWER TOGGLE LOGIC
+        function toggleDetailDrawer(cardEl, event) {
+            // Don't toggle if user clicked on interactive elements
+            const target = event.target.closest('.interactive-btns, a[href], button');
+            if (target && !target.classList.contains('appointment-card')) {
+                return;
+            }
+
+            const drawer = cardEl.querySelector('.detail-drawer');
+            const chevron = cardEl.querySelector('.detail-chevron');
+            const compactNotes = cardEl.querySelector('.detail-compact-notes');
+
+            if (!drawer) return;
+
+            const isOpen = drawer.classList.contains('open');
+
+            if (isOpen) {
+                drawer.classList.remove('open');
+                if (chevron) chevron.classList.remove('rotated');
+                if (compactNotes) {
+                    setTimeout(() => compactNotes.classList.remove('hidden-notes'), 300);
+                }
+            } else {
+                drawer.classList.add('open');
+                if (chevron) chevron.classList.add('rotated');
+                if (compactNotes) compactNotes.classList.add('hidden-notes');
+            }
+        }
+
+        // CANCEL MODAL LOGIC
+        function openCancelModal(actionUrl, customerName) {
+            const modal = document.getElementById('cancelModal');
+            const content = document.getElementById('cancelModalContent');
+            
+            document.getElementById('cancelCustomerName').innerText = customerName;
+            document.getElementById('confirmCancelBtn').setAttribute('href', actionUrl);
+            
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeCancelModal() {
+            const modal = document.getElementById('cancelModal');
+            const content = document.getElementById('cancelModalContent');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }, 300);
+        }
+    </script>
+</body>
+</html>

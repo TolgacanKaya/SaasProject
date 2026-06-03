@@ -162,6 +162,13 @@ input[type="radio"]:checked { background-color: var(--gold-500) !important; bord
 .map-pulse-marker::after {
     border: 2px solid #ffffff !important;
 }
+.premium-about-text {
+    color: rgba(255, 255, 255, 0.98) !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.25), 0 0 20px rgba(250, 204, 21, 0.15) !important;
+    font-weight: 500 !important;
+    line-height: 1.725 !important;
+    letter-spacing: 0.01em !important;
+}
 </style>
 
 {% else %}
@@ -1510,10 +1517,10 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display) !important; }
 
                 {% if isletme.description|length > 200 %}
                 <div id="about-container" class="mb-5">
-                    <p id="about-short" class="{% if isletme.is_premium %}text-slate-400{% else %}text-slate-600{% endif %} leading-relaxed text-sm">
+                    <p id="about-short" class="{% if isletme.is_premium %}premium-about-text{% else %}text-slate-600{% endif %} leading-relaxed text-sm">
                         {{ isletme.description|slice:":200" }}...
                     </p>
-                    <p id="about-full" class="{% if isletme.is_premium %}text-slate-400{% else %}text-slate-600{% endif %} leading-relaxed text-sm hidden">
+                    <p id="about-full" class="{% if isletme.is_premium %}premium-about-text{% else %}text-slate-600{% endif %} leading-relaxed text-sm hidden">
                         {{ isletme.description|linebreaksbr }}
                     </p>
                     <button onclick="toggleAbout()" id="about-btn" class="mt-3 flex items-center gap-1.5 font-bold text-sm transition-colors group {% if isletme.is_premium %}text-amber-400 hover:text-amber-300{% else %}text-indigo-600 hover:text-indigo-800{% endif %}">
@@ -1522,7 +1529,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display) !important; }
                     </button>
                 </div>
                 {% else %}
-                <p class="{% if isletme.is_premium %}text-slate-400{% else %}text-slate-600{% endif %} leading-relaxed mb-5 text-sm">{{ isletme.description|default:"Bu işletme henüz bir açıklama eklememiş."|linebreaksbr }}</p>
+                <p class="{% if isletme.is_premium %}premium-about-text{% else %}text-slate-600{% endif %} leading-relaxed mb-5 text-sm">{{ isletme.description|default:"Bu işletme henüz bir açıklama eklememiş."|linebreaksbr }}</p>
                 {% endif %}
 
                 <div class="space-y-3">
@@ -2427,7 +2434,7 @@ function openWhatsApp() {
     phone = phone.replace(/\D/g,'');
     if (phone.startsWith('0')) phone = '90' + phone.substring(1);
     else if (!phone.startsWith('90')) phone = '90' + phone;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent("Merhaba, T-Randevu vitrininizi inceledim. Randevu ve hizmetleriniz hakkında bilgi almak istiyorum.")}`, '_blank');
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent("Merhaba, KobiRandevu vitrininizi inceledim. Randevu ve hizmetleriniz hakkında bilgi almak istiyorum.")}`, '_blank');
 }
 
 // ──────────────────────────────────────────
@@ -2442,6 +2449,7 @@ function copyCoupon(code) {
 // ──────────────────────────────────────────
 // SPOTIFY REAL-TIME POLLING & PARTICLE ANIMATION
 // ──────────────────────────────────────────
+{% if isletme.is_premium and isletme.spotify_access_token %}
 document.addEventListener("DOMContentLoaded", function() {
     const slug = "{{ isletme.slug }}";
     const widget = document.getElementById('spotify-live-widget');
@@ -2550,6 +2558,7 @@ document.addEventListener("DOMContentLoaded", function() {
     checkSpotify();
     pollInterval = setInterval(checkSpotify, 8000);
 });
+{% endif %}
     // --- LUXURY LIVE CLOCK SCRIPT ---
     function updateDetayClock() {
         const now = new Date();

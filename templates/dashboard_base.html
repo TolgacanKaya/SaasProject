@@ -55,8 +55,8 @@
                         {% endif %}
                     </div>
                     <div>
-                        <h1 class="font-extrabold text-lg leading-tight text-slate-900 tracking-tight">T-Randevu</h1>
-                        <p class="text-xs font-medium text-slate-500">İşletme Paneli</p>
+                        <h1 class="font-black text-xl leading-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 drop-shadow-[0_0_12px_rgba(99,102,241,0.6)] tracking-tighter">KobiRandevu</h1>
+                        <p class="text-xs font-bold text-indigo-500/80 uppercase tracking-widest mt-0.5">İşletme Paneli</p>
                     </div>
                 </div>
                 <button onclick="toggleMobileMenu()" class="md:hidden text-slate-400 hover:text-slate-600 focus:outline-none">
@@ -617,7 +617,7 @@
                             audio.play().catch(e => console.log("Tarayıcı sese izin vermedi."));
 
                             if (Notification.permission === "granted") {
-                                new Notification("T-Randevu: Yeni Bildirim!", {
+                                new Notification("KobiRandevu: Yeni Bildirim!", {
                                     body: "Hesabınızda yeni bir hareket var.",
                                     icon: "https://cdn-icons-png.flaticon.com/512/2875/2875394.png"
                                 });
