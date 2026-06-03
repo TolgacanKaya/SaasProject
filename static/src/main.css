@@ -1,3 +1,236 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ==========================================================
+   👑 PREMIUM BASE CUSTOM STYLES (FROM premium_base.html) 👑
+   ========================================================== */
+
+/* VIP Panel Özel Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #09090b; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; border: 2px solid #09090b; }
+::-webkit-scrollbar-thumb:hover { background: #eab308; }
+
+/* ── PREMIUM GLOW BUTTON ── */
+.premium-glow-btn {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    background: linear-gradient(135deg, #fbbf24, #d97706) !important;
+    color: #08080f !important;
+    box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.4), 0 0 0 0 rgba(251, 191, 36, 0) !important;
+    @apply font-black;
+}
+
+.premium-glow-btn:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 20px 35px -8px rgba(217, 119, 6, 0.5), 0 0 25px rgba(251, 191, 36, 0.4) !important;
+}
+
+.premium-glow-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: rotate(30deg);
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: -1;
+}
+
+.premium-glow-btn:hover::after {
+    left: 140%;
+}
+
+@keyframes gold-float-glow {
+    0%, 100% { box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.4), 0 0 15px rgba(251, 191, 36, 0.2); }
+    50% { box-shadow: 0 15px 40px -5px rgba(217, 119, 6, 0.6), 0 0 35px rgba(251, 191, 36, 0.5); }
+}
+
+.premium-glow-animate {
+    animation: gold-float-glow 3s ease-in-out infinite;
+}
+
+.premium-card {
+    @apply bg-card border border-border rounded-2xl transition-all duration-300;
+}
+.premium-card:hover {
+    @apply border-accent/30;
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.05);
+    transform: translateY(-2px);
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* ==========================================
+   🔥 DASHBOARD ÖZEL SIRALI ANİMASYONLAR 🔥
+   ========================================== */
+@keyframes slideFadeRight {
+    0% { opacity: 0; transform: translateX(-40px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideFadeDown {
+    0% { opacity: 0; transform: translateY(-40px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideFadeUpStagger {
+    0% { opacity: 0; transform: translateY(50px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.dash-anim-left { animation: slideFadeRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.dash-anim-top { animation: slideFadeDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+.dash-anim-1 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+.dash-anim-2 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+.dash-anim-3 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+.dash-anim-4 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
+.dash-anim-5 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both; }
+.dash-anim-6 { animation: slideFadeUpStagger 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both; }
+
+/* WhatsApp Butonu Dalga Efekti */
+@keyframes pulse-ring {
+    0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+    100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+.wa-pulse {
+    animation: pulse-ring 2s infinite;
+}
+
+/* 3 Kere Zıplama Efekti */
+@keyframes jump-three-times {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-25%); }
+}
+.animate-bounce-3 {
+    animation: jump-three-times 0.8s ease-in-out 3;
+}
+
+/* Scrollbar Gizleme */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ── RAW CSS PREMIUM OVERRIDES ── */
+select, .premium-select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23eab308' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1.25rem center !important;
+    background-size: 1rem !important;
+    background-color: #09090b !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+    padding: 0.875rem 3rem 0.875rem 1.25rem !important;
+    border-radius: 1rem !important;
+    font-weight: 700 !important;
+    font-size: 0.875rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    outline: none !important;
+}
+
+select:focus, .premium-select:focus {
+    border-color: #eab308 !important;
+    box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2) !important;
+    transform: translateY(-1px) !important;
+}
+
+input[type="number"], .premium-number {
+    background-color: #09090b !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+    padding: 0.875rem 1.25rem !important;
+    border-radius: 1rem !important;
+    font-weight: 800 !important;
+    outline: none !important;
+    transition: all 0.3s !important;
+}
+
+input[type="number"]:focus {
+    border-color: #eab308 !important;
+    box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2) !important;
+}
+
+/* Clickable Cards */
+.premium-clickable-card {
+    background: linear-gradient(145deg, #11111d, #0d0d1a) !important;
+    border: 1px solid #27272a !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+}
+.premium-clickable-card:hover {
+    border-color: #eab308 !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5) !important;
+}
+
+input[type="checkbox"].premium-checkbox {
+    appearance: none !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    border: 2px solid #27272a !important;
+    border-radius: 0.5rem !important;
+    background-color: #09090b !important;
+    cursor: pointer !important;
+    position: relative !important;
+}
+input[type="checkbox"].premium-checkbox:checked {
+    background-color: #eab308 !important;
+    border-color: #eab308 !important;
+}
+input[type="checkbox"].premium-checkbox:checked::after {
+    content: '✓' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #000 !important;
+    font-weight: 900 !important;
+}
+
+/* Spotify Çalıyor Ses Dalgaları */
+.playing-bar {
+    width: 3px;
+    background-color: #1DB954;
+    animation: sound-bounce 1s infinite alternate ease-in-out;
+}
+.playing-bar:nth-child(1) { animation-delay: 0.0s; }
+.playing-bar:nth-child(2) { animation-delay: 0.2s; height: 80%; }
+.playing-bar:nth-child(3) { animation-delay: 0.4s; height: 60%; }
+.playing-bar:nth-child(4) { animation-delay: 0.1s; height: 90%; }
+
+@keyframes sound-bounce {
+    0% { height: 20%; opacity: 0.6; }
+    100% { height: 100%; opacity: 1; }
+}
+
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
+.marquee-text {
+    display: inline-block;
+    animation: marquee 10s linear infinite;
+}
+@keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
