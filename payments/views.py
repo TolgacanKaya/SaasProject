@@ -20,6 +20,7 @@ from pos.models import Adisyon
 from appointments.models import Appointment
 from appointments.tasks import send_review_email_task
 from .models import SubscriptionPayment
+from core.utils import get_client_ip
 
 
 # ==========================================
@@ -84,7 +85,7 @@ def premium_satin_al(request):
         'email': request.user.email or 'info@trandevu.com',
         'identityNumber': '11111111111',
         'registrationAddress': isletme.address or 'Istanbul Merkez',
-        'ip': request.META.get('REMOTE_ADDR', '85.34.78.112'),
+        'ip': get_client_ip(request),
         'city': isletme.city or 'Istanbul',
         'country': 'Turkey',
         'zipCode': '34000'
@@ -252,7 +253,7 @@ def iyzico_ucret_iade_et(request, randevu):
             'locale': 'tr',
             'conversationId': str(randevu.id),
             'paymentId': randevu.iyzico_transaction_id,
-            'ip': request.META.get('REMOTE_ADDR', '85.34.78.112'),
+            'ip': get_client_ip(request),
         }
 
         cancel = iyzipay.Cancel().create(request_data, options)
@@ -362,7 +363,7 @@ def randevu_odeme_ozeti(request, token):
             'email': randevu.customer.email or 'musteri@trandevu.com',
             'identityNumber': '11111111111',
             'registrationAddress': randevu.customer_address or 'Adres Belirtilmedi',
-            'ip': request.META.get('REMOTE_ADDR', '85.34.78.112'),
+            'ip': get_client_ip(request),
             'city': randevu.business.city or 'Istanbul',
             'country': 'Turkey',
             'zipCode': '34000'
@@ -591,7 +592,7 @@ def boost_satin_al(request):
             'email': request.user.email or 'patron@trandevu.com',
             'identityNumber': '11111111111',
             'registrationAddress': isletme.address or 'Adres Belirtilmemiş',
-            'ip': request.META.get('REMOTE_ADDR', '85.34.78.112'),
+            'ip': get_client_ip(request),
             'city': isletme.city or 'Istanbul',
             'country': 'Turkey',
             'zipCode': '34732'

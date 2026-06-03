@@ -52,3 +52,22 @@ def generate_unique_slug(name, model_class=None):
 
     # Model verilmemişse UUID ile benzersizlik garantisi
     return f"{base_slug}-{uuid.uuid4().hex[:6]}"
+
+
+def get_client_ip(request):
+    """
+    İstemcinin IP adresini alır. Lokal geliştirme ortamında (127.0.0.1)
+    Iyzico gibi sistemlerin hata vermesini önlemek için 
+    varsayılan bir Türk IP'si (85.34.78.112) döndürür.
+    Nginx veya Cloudflare arkasında çalışırken de gerçek IP'yi alır.
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    
+    if not ip or ip in ['127.0.0.1', '::1']:
+        return '85.34.78.112'
+    return ip
+
