@@ -213,7 +213,7 @@ input[type="checkbox"].premium-checkbox:checked::after {
 /* Spotify Çalıyor Ses Dalgaları */
 .playing-bar {
     width: 3px;
-    background-color: #eab308;
+    background-color: #1DB954;
     animation: sound-bounce 1s infinite alternate ease-in-out;
 }
 .playing-bar:nth-child(1) { animation-delay: 0.0s; }
