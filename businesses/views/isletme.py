@@ -172,7 +172,8 @@ def isletme_ayarlar(request):
     if not isletme:
         return redirect("kayit")
 
-    kategoriler = Category.objects.all()
+    from django.core.cache import cache
+    kategoriler = cache.get_or_set('kategoriler_all', lambda: list(Category.objects.all()), 3600)
     time_choices = []
     for h in range(24):
         for m in (0, 15, 30, 45):

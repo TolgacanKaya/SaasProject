@@ -60,7 +60,8 @@ def isletme_kayit(request):
                 return redirect('isletme_sec')
             return redirect('dashboard')
 
-    kategoriler = Category.objects.all()
+    from django.core.cache import cache
+    kategoriler = cache.get_or_set('kategoriler_all', lambda: list(Category.objects.all()), 3600)
 
     # ==========================================
     # 🔥 EKLENEN KISIM: VİP İŞLETMELERİ ÇEKİYORUZ 🔥

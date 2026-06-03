@@ -36,18 +36,17 @@ class Business(models.Model):
     name = models.CharField(max_length=200, verbose_name="İşletme Adı")
     slug = models.SlugField(max_length=200, unique=True, blank=True, verbose_name="İşletme Linki")
     created_at = models.DateTimeField(default=timezone.now, null=True, blank=True, verbose_name="Kayıt Tarihi")
-
-    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Şehir")
-    district = models.CharField(max_length=100, blank=True, null=True, verbose_name="İlçe")
+    city = models.CharField(max_length=100, blank=True, null=True, db_index=True, verbose_name="Şehir")
+    district = models.CharField(max_length=100, blank=True, null=True, db_index=True, verbose_name="İlçe")
     description = models.TextField(blank=True, null=True, verbose_name="İşletme Açıklaması")
     logo = models.ImageField(upload_to='isletme_logolari/', blank=True, null=True, verbose_name="İşletme Logosu")
     cover_image = models.ImageField(upload_to='isletme_kapaklari/', blank=True, null=True, verbose_name="Kapak Fotoğrafı")
-
-    is_premium = models.BooleanField(default=False, verbose_name="Premium İşletme")
+ 
+    is_premium = models.BooleanField(default=False, db_index=True, verbose_name="Premium İşletme")
     is_verified = models.BooleanField(default=False, verbose_name="Doğrulanmış İşletme")
     premium_end_date = models.DateTimeField(null=True, blank=True, verbose_name="Premium Bitiş Tarihi")
     cancel_at_period_end = models.BooleanField(default=False, verbose_name="Dönem Sonunda İptal Edilecek")
-    is_active = models.BooleanField(default=True, verbose_name="Aktif mi (Vitrinde Görünür)")
+    is_active = models.BooleanField(default=True, db_index=True, verbose_name="Aktif mi (Vitrinde Görünür)")
 
     # ==========================================
     # 🔥 GOOGLE CALENDAR API ENTEGRASYON ALANLARI 🔥

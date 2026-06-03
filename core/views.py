@@ -21,7 +21,8 @@ def ana_sayfa(request):
 
 
 def kesfet(request):
-    kategoriler = Category.objects.all()
+    from django.core.cache import cache
+    kategoriler = cache.get_or_set('kategoriler_all', lambda: list(Category.objects.all()), 3600)
     isletmeler = Business.objects.filter(is_active=True).prefetch_related('services')
 
     # Formdan gelen verileri alıyoruz
