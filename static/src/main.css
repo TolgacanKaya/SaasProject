@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+.test-shadow-with-commas {
+    @apply shadow-[0_0_20px_rgba(245,158,11,0.35)];
+}
+
+
 /* ==========================================================
    👑 PREMIUM BASE CUSTOM STYLES (FROM premium_base.html) 👑
    ========================================================== */
