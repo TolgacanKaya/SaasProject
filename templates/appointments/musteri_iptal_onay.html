@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Randevu İptali | {{ randevu.business.name }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/dist.css' %}" rel="stylesheet">
     <style>
         /* Modal Animasyonları */
         .modal-enter { opacity: 1; transform: scale(1); }

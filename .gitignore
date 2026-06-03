@@ -42,3 +42,7 @@ celerybeat-schedule*
 *.sln
 *.swp
 *~
+
+# --- FRONTEND ---
+node_modules/
+package-lock.json

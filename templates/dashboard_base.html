@@ -8,10 +8,10 @@
     <title>{% block title %}Yönetim Paneli{% endblock %} | {{ isletme.name }}</title>
     <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/dist.css' %}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <style type="text/tailwindcss">
+    <style>
         body { font-family: 'Inter', sans-serif; }
 
         /* Freemium özel scrollbar */

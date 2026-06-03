@@ -1,0 +1,12 @@
+{
+  "name": "kobirandevu",
+  "version": "1.0.0",
+  "description": "KobiRandevu SaaS projesi Tailwind CSS derleme yapısı",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/src/main.css -o ./static/css/dist.css --minify",
+    "watch:css": "tailwindcss -i ./static/src/main.css -o ./static/css/dist.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

@@ -6,6 +6,15 @@ import socket
 import subprocess
 import sys
 
+# Windows konsolunda emojilerin düzgün görüntülenmesi için encoding ayarı
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
+
+
 
 def is_port_open(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -79,8 +88,28 @@ def brave_ile_ac():
         print(f"Brave bulunamadı veya açılamadı: {e}")
 
 
+def tailwind_css_derle():
+    print("🎨 Tailwind CSS derleniyor...")
+    try:
+        if not os.path.exists("node_modules"):
+            print("📦 node_modules bulunamadı, npm install çalıştırılıyor...")
+            subprocess.run(["npm", "install"], shell=True, check=True)
+        
+        result = subprocess.run(["npx", "tailwindcss", "-i", "./static/src/main.css", "-o", "./static/css/dist.css", "--minify"], 
+                                shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode == 0:
+            print("✅ Tailwind CSS başarıyla derlendi.")
+        else:
+            print(f"❌ Tailwind CSS derlenirken hata oluştu:\n{result.stderr.decode('utf-8')}")
+    except Exception as e:
+        print(f"❌ Tailwind CSS derlenirken beklenmedik bir hata oluştu: {e}")
+
+
 if __name__ == '__main__':
     print("\n🚀 KobiRandevu Sunucusu Hazırlanıyor...")
+    
+    # Tailwind CSS derle
+    tailwind_css_derle()
     
     # Veritabanı ve Redis'i kontrol et/başlat
     veritabani_kontrol_ve_baslat()
@@ -98,3 +127,4 @@ if __name__ == '__main__':
         os.system(f'"{sys.executable}" manage.py runserver')
     except KeyboardInterrupt:
         print("\n👋 Sunucu başarıyla kapatıldı.")
+

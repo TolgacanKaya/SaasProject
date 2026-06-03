@@ -6,31 +6,10 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:;">
     <title>{% block title %}VIP Panel{% endblock %} | {{ isletme.name }}</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        background: '#09090b',
-                        card: '#18181b',
-                        border: '#27272a',
-                        accent: '#eab308',
-                        'accent-hover': '#ca8a04',
-                        muted: '#a1a1aa',
-                        spotify: '#1DB954' /* Spotify Yeşili */
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="{% static 'css/dist.css' %}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style type="text/tailwindcss">
+    <style>
         /* VIP Panel Özel Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #09090b; }
