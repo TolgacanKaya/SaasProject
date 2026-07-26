@@ -1,4 +1,4 @@
-# KobiRandevu — SaaS Randevu, POS & İşletme Yönetim Platformu
+# 🚀 KobiRandevu — SaaS Randevu, POS & İşletme Yönetim Platformu
 
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/Django-6.0-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
@@ -14,7 +14,7 @@
 
 ---
 
-## ── Proje Hakkında
+## 📌 Proje Hakkında
 
 **KobiRandevu**, işletmelerin dijital dönüşümünü sağlayan tam kapsamlı bir **SaaS (Software as a Service)** platformudur. İşletmeler platform üzerinde hizmet kataloglarını, çalışma saatlerini, personel kadrolarını, adisyon ve kasa hareketlerini yönetebilir; müşteriler ise saniyeler içinde çevrim içi randevu alabilir.
 
@@ -22,42 +22,42 @@ Platform; **Spotify API** ile mekan içi müzik yönetimini, **Google Calendar A
 
 ---
 
-## ── Öne Çıkan Özellikler
+## ✨ Öne Çıkan Özellikler
 
-### 01 / İşletme & Hizmet Yönetimi
+### 🏢 1. İşletme & Hizmet Yönetimi
 - **Esnek Çalışma Saatleri**: İşletme ve personel özelinde tanımlanabilir çalışma saatleri ve mola periyotları.
 - **Hizmet & Personel Eşleşmesi**: Hizmet süreleri, fiyatlandırma ve hizmeti sunacak personellerin dinamik ataması.
 - **İşletme Profili & Görsel Galeri**: Detaylı marka tanıtım alanı, hizmet kataloğu ve müşteri değerlendirmeleri.
 
-### 02 / Akıllı Randevu & Takvim Senkronizasyonu
+### 📅 2. Akıllı Randevu & Takvim Senkronizasyonu
 - **Çakışmasız Randevu Altyapısı**: Personel ve saat çakışmalarını milisaniyeler içinde engelleyen dinamik takvim algoritması.
 - **Google Calendar Entegrasyonu**: Oluşturulan veya güncellenen randevuların hem işletme hem de müşteri Google Takvim'ine otomatik senkronizasyonu.
 - **Müşteri Portal Arayüzü**: Müşterilerin uygun zaman dilimlerini anlık görerek rezervasyon yapabileceği duyarlı arayüz.
 
-### 03 / Spotify Müzik & Mağaza İçi Atmosfer Yönetimi
+### 🎵 3. Spotify Müzik & Mağaza İçi Atmosfer Yönetimi
 - **Spotify API Entegrasyonu**: İşletme sahiplerinin dükkan içi müzik çalarlarını panel üzerinden bağlama imkanı.
 - **Canlı Çalma Listesi & Kontrol**: Panelden ortam müziklerini yönetme, çalma listelerini görüntüleme ve mağaza atmosferini dijitalleştirme.
 
-### 04 / Sanal POS & Ödeme Entegrasyonu
+### 💳 4. Sanal POS & Ödeme Entegrasyonu
 - **iyzico Sanal POS**: Randevularda kapora veya tam ücret tahsilatı için güvenli Ödeme Geçidi (Payment Gateway).
 - **Abonelik & Ödeme Yönetimi**: İşletmeler için SaaS abonelik planları ve geçmiş işlem kayıtları.
 
-### 05 / Adisyon & POS (Point of Sale) Sistemi
+### 🧾 5. Adisyon & POS (Point of Sale) Sistemi
 - **İşletme İçi Adisyon Takibi**: Anlık hizmet ve ürün satışlarını kayıt altına alan kasa/adisyon modülü.
 - **Hızlı Satış & Tahsilat**: Nakit, pos veya online ödeme tipleriyle anında adisyon kapatma.
 
-### 06 / Asenkron Görevler & Otomatik Bildirimler
+### ⚡ 6. Asenkron Görevler & Otomatik Bildirimler
 - **Celery & Redis Altyapısı**: Arka planda çalışan yüksek performanslı görev kuyruğu.
 - **Zamanlanmış Hatırlatıcılar**: Celery Beat ile otomatik randevu hatırlatmaları ve sistem bildirimleri.
 
-### 07 / Modern Arayüz & Güvenlik Altyapısı
+### 🎨 7. Modern Arayüz & Güvenlik Altyapısı
 - **Tailwind CSS**: Modern, ultra hızlı ve responsive kullanıcı arayüzü.
 - **Jazzmin Admin Paneli**: Özelleştirilmiş ve kullanıcı dostu yönetim paneli.
 - **Kurumsal Güvenlik**: CSRF koruması, HSTS, Secure Session & Cookie politikaları, XSS ve No-Sniff filtreleri.
 
 ---
 
-## ── Teknolojik Mimari
+## 🛠️ Teknolojik Mimari
 
 | Katman | Teknolojiler |
 | :--- | :--- |
@@ -71,7 +71,7 @@ Platform; **Spotify API** ile mekan içi müzik yönetimini, **Google Calendar A
 
 ---
 
-## ── Proje Dizin Yapısı
+## 📁 Proje Dizin Yapısı
 
 ```text
 KobiRandevu/
@@ -91,7 +91,7 @@ KobiRandevu/
 
 ---
 
-## ── Kurulum ve Çalıştırma
+## 🚀 Kurulum ve Çalıştırma
 
 ### 1. Depoyu Klonlayın
 ```bash
@@ -128,7 +128,7 @@ SPOTIFY_CLIENT_ID=your-spotify-client-id
 SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
 ```
 
-### 5. Otomatik Başlatma Betiğini Çalıştırın
+### 5. Otomatik Başlatma Betiğini Çalıştırın ⚡
 Projede PostgreSQL, Redis (Docker), Celery Worker, Celery Beat, Tailwind CSS derlemesi ve Django sunucusunu tek bir komutla başlatabilirsiniz:
 
 ```bash
@@ -138,6 +138,6 @@ python baslat.py
 
 ---
 
-## ── Lisans
+## 📜 Lisans
 
 Bu proje bir akademik **Dönem Tasarım Projesi** çalışması olup tüm hakları saklıdır.
