@@ -28,6 +28,7 @@ from businesses.views import get_aktif_isletme
 # AKILLI BİLDİRİM SİSTEMİ
 # ==========================================
 def arka_planda_mail_at(subject, message, from_email, recipient_list, html_message):
+    # sayfayı dondurmasın diye mailleri arka planda gönderiyorum
     try:
         send_mail(
             subject=subject,
@@ -43,8 +44,7 @@ def arka_planda_mail_at(subject, message, from_email, recipient_list, html_messa
 
 
 def bildirim_gonder(musteri, mesaj, html_mesaj=None):
-    temiz_telefon = musteri.phone.replace(" ", "").replace("-", "").replace("(", "").replace(")",
-                                                                                             "") if musteri.phone else "Bilinmiyor"
+    temiz_telefon = musteri.phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "") if musteri.phone else "Bilinmiyor"
     print(f"📨 [SMS SİMÜLASYONU] Kime: {temiz_telefon} | Mesaj: {mesaj}")
 
     if musteri.email:
@@ -67,6 +67,7 @@ def bildirim_gonder(musteri, mesaj, html_mesaj=None):
 # 🔥 GOOGLE TAKVİM BOTU 🔥
 # ==========================================
 def randevuyu_takvime_ekle(randevu):
+    # google calendar api'ye bağlanıp eventi oluşturan ana fonksiyon
     """ Sihirli anahtarı kullanarak Google Takvime randevuyu işler """
     isletme = randevu.business
 
@@ -102,10 +103,11 @@ def randevuyu_takvime_ekle(randevu):
         bitis_zamani = randevu.date_time + datetime.timedelta(minutes=sure_dk)
 
         # 4. Takvime eklenecek fiyakalı etiketi (Paketi) hazırla
+        tutar = randevu.total_online_charged if randevu.is_paid else randevu.final_service_price
         event = {
             'summary': f'💇‍♀️ KobiRandevu: {randevu.service.name}',
             'location': isletme.address or 'Belirtilmedi',
-            'description': f'👤 Müşteri: {randevu.customer.first_name} {randevu.customer.last_name}\n📞 Telefon: {randevu.customer.phone}\n📝 Not: {randevu.customer_note or "Yok"}\n💸 Tutar: {randevu.final_service_price} TL',
+            'description': f'👤 Müşteri: {randevu.customer.first_name} {randevu.customer.last_name}\n📞 Telefon: {randevu.customer.phone}\n📝 Not: {randevu.customer_note or "Yok"}\n💸 Tutar: {tutar} TL',
             'start': {
                 'dateTime': randevu.date_time.isoformat(),
                 'timeZone': 'Europe/Istanbul',
@@ -150,10 +152,12 @@ def randevuyu_takvime_ekle(randevu):
 
 @login_required(login_url="/hesap/giris/")
 def randevu_onayla(request, id):
+    # işlemi yapanın gerçekten o randevunun işletme sahibi olduğunu doğruluyorum
     isletme = get_aktif_isletme(request)
     randevu = get_object_or_404(Appointment, id=id, business=isletme)
 
     # GÜVENLİK DUVARI: Zaten onaylanmış, iptal edilmiş veya tarihi geçmişse engelle!
+    # url den parametre değiştirerek statü bozmasınlar diye önlem koydum
     if randevu.status != 'pending':
         messages.error(request, '❌ Sadece bekleyen randevular üzerinde işlem yapabilirsiniz.')
         return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
@@ -243,6 +247,7 @@ def isletme_randevular(request):
 
     now = timezone.now()
 
+    # randevu saati geçeli 1 saat olduysa statüyü otomatik tamamlandıya çekiyorum
     # HATA 1 ÇÖZÜMÜ: Sadece 'confirmed' olarak düzeltildi
     bir_saat_once = now - timedelta(hours=1)
     isletme.appointments.filter(
@@ -472,7 +477,7 @@ def get_available_times(request, slug):
     if toplam_yetkili_sayisi == 0:
         toplam_yetkili_sayisi = 1
 
-    # 🔥 HIZLANDIRMA 2: select_related ile randevunun içindeki hizmeti de tek seferde çekiyoruz!
+    # HIZLANDIRMA 2: select_related ile randevunun içindeki hizmeti de tek seferde çekiyoruz!
     gunluk_randevular = isletme.appointments.filter(
         date_time__date=secilen_tarih,
         status__in=['pending', 'approved', 'confirmed']
@@ -483,7 +488,7 @@ def get_available_times(request, slug):
     kapanis_zamani = datetime.datetime.combine(secilen_tarih, kapanis)
     now = timezone.now()
 
-    # 🔥 EKSTRA ZEKİ KONTROL: Eğer hizmet süresi dükkanın günlük toplam çalışma süresinden fazlaysa (Örn: 27 Saat),
+    # EKSTRA ZEKİ KONTROL: Eğer hizmet süresi dükkanın günlük toplam çalışma süresinden fazlaysa (Örn: 27 Saat),
     # Slotları bulurken süreyi 15 dakikaya sabitleyelim ki sistem kilitlenmesin ve patron randevuyu açabilsin.
     isletme_gunluk_sure_dk = (kapanis.hour * 60 + kapanis.minute) - (acilis.hour * 60 + acilis.minute)
     kontrol_suresi = sure_dk if sure_dk <= isletme_gunluk_sure_dk else 15
@@ -671,8 +676,9 @@ def google_takvim_kopar(request):
 
 
 # ==========================================
-# 🔥 YENİ: TÜM PERSONELLERİ ÇEKEN API (Aktarma Modalı İçin)
+#  YENİ: TÜM PERSONELLERİ ÇEKEN API (Aktarma Modalı İçin)
 # ==========================================
+# modal açılınca ajax ile bu rotaya gelip uzman listesini dolduruyorum
 def api_service_staffs(request, slug, service_id):
     isletme = get_object_or_404(Business, slug=slug)
 
@@ -684,7 +690,7 @@ def api_service_staffs(request, slug, service_id):
 
 
 # ==========================================
-# 🔥 YENİ: SADECE PERSONEL AKTARMA MOTORU (KRALIN ZEKASI)
+# YENİ: SADECE PERSONEL AKTARMA MOTORU
 # ==========================================
 @login_required(login_url="/hesap/giris/")
 def randevu_aktar(request):
@@ -730,14 +736,14 @@ def randevu_aktar(request):
         randevu.save()
 
         # ==========================================
-        # 🔥 MÜŞTERİYE HTML BİLDİRİM (ŞABLONDAN) 🔥
+        # MÜŞTERİYE HTML BİLDİRİM (ŞABLONDAN)
         # ==========================================
         from django.template.loader import render_to_string
 
         yeni_tarih_str = randevu.date_time.strftime("%d.%m.%Y")
         yeni_saat_str = randevu.date_time.strftime("%H:%M")
 
-        # 🔥 KRİTİK ÇÖZÜM: musteri_adi değişkeni eklendi! 🔥
+        #  KRİTİK ÇÖZÜM: musteri_adi değişkeni eklendi! 
         musteri_adi = f"{randevu.customer.first_name} {randevu.customer.last_name}"
         iptal_linki = request.build_absolute_uri(reverse('musteri_iptal_linki', args=[randevu.cancel_token]))
 
@@ -861,10 +867,10 @@ def takvim_gorunumu(request):
 
     return render(request, 'appointments/takvim.html', {'isletme': isletme})
 
-import threading  # 🔥 EKLENDİ: Sayfanın üst kısmına, diğer importların yanına koyun
+import threading  # EKLENDİ: Sayfanın üst kısmına, diğer importların yanına koyun
 
 # ==========================================
-# 🔥 YENİ: TAKVİMDEN HIZLI (MANUEL) RANDEVU OLUŞTURMA 🔥
+# YENİ: TAKVİMDEN HIZLI (MANUEL) RANDEVU OLUŞTURMA
 # ==========================================
 @login_required(login_url="/hesap/giris/")
 def manuel_randevu_olustur(request):
@@ -876,7 +882,7 @@ def manuel_randevu_olustur(request):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name', '')
         phone = request.POST.get('phone')
-        email = request.POST.get('email', '') # 🔥 YENİ: E-posta eklendi
+        email = request.POST.get('email', '') # YENİ: E-posta eklendi
         service_id = request.POST.get('service_id')
         staff_id = request.POST.get('staff_id')
         date_str = request.POST.get('date')
@@ -914,7 +920,7 @@ def manuel_randevu_olustur(request):
             randevu_status = 'confirmed'
             is_paid_status = True
         else:
-            # 🔥 PAZARYERİ GÜVENLİK KONTROLÜ 🔥
+            # PAZARYERİ GÜVENLİK KONTROLÜ
             # IBAN (subMerchantKey) olmayan işletmeler link gönderemez, böylece sistemin ana havuzu suistimal edilemez.
             if not isletme.iyzico_sub_merchant_key:
                 messages.error(request, "Online ödeme linki gönderebilmek için Ayarlar bölümünden IBAN ve Vergi bilgilerinizi eksiksiz doldurup Iyzico kaydınızı tamamlamanız gerekmektedir. Güvenlik sebebiyle şu an sadece nakit veya elden ödeme alabilirsiniz.")
@@ -944,7 +950,7 @@ def manuel_randevu_olustur(request):
             return redirect('takvim_gorunumu')
 
         # ==========================================
-        # 🔥 GOOGLE TAKVİM KAYDINI CELERY'E ATTIK 🔥
+        # GOOGLE TAKVİM KAYDINI CELERY'E ATMA
         # ==========================================
         try:
             from appointments.tasks import add_appointment_to_calendar_task
@@ -953,7 +959,7 @@ def manuel_randevu_olustur(request):
             print(f"Google Takvim asenkron işlemi başlatılamadı: {e}")
 
         if payment_type == 'link':
-            # 🔥 YENİ: DJANGO'NUN GERÇEK ÖDEME LİNKİNİ OLUŞTURUYORUZ 🔥
+            # YENİ: DJANGO'NUN GERÇEK ÖDEME LİNKİNİ OLUŞTURUYORUZ
             odeme_linki = request.build_absolute_uri(reverse('randevu_odeme_ozeti', kwargs={'token': randevu.cancel_token}))
 
             mesaj = f"Sayın {first_name}, {isletme.name} randevunuz oluşturuldu. Kesinleştirmek için ödemenizi şu linkten yapabilirsiniz: {odeme_linki}"

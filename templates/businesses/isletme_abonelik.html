@@ -483,6 +483,127 @@
         </div>
     </div>
 
+    <!-- 💎 💎 💎 KEŞFET REKLAM PANOSU & SPONSORLUK MODÜLÜ (EN PRESTİJLİ) 💎 💎 💎 -->
+    <div class="max-w-6xl mx-auto mt-16 bg-slate-900 rounded-[2rem] border-2 border-amber-400/40 overflow-hidden shadow-2xl shadow-amber-900/20 relative flex flex-col lg:flex-row">
+
+        <!-- Sol Bilgilendirme ve Durum Alanı -->
+        <div class="w-full lg:w-5/12 p-8 lg:p-10 relative overflow-hidden bg-gradient-to-br from-amber-950/40 via-slate-900 to-slate-900 flex flex-col justify-between">
+            <div class="absolute top-0 left-0 w-64 h-64 bg-amber-500/15 rounded-full blur-[80px] -translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 text-[10px] font-black uppercase tracking-widest mb-4 rounded-full border border-amber-400/40 shadow-sm">
+                    <svg class="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L9 7 3 5l2 9h14l2-9-6 2-3-5z"/></svg>
+                    En Prestijli Görünürlük
+                </span>
+                <h2 class="text-3xl lg:text-4xl font-black text-white mb-3 tracking-tight">Keşfet <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500">Reklam Panosu</span> & Sponsorluk</h2>
+                <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Masaüstünde Keşfet'in sağ ve sol yüzen sponsor kulelerinde, mobilde ise en tepedeki sponsor vitrininde yer alın. Günde binlerce potansiyel müşteriye doğrudan ulaşın!</p>
+
+                {% if isletme.is_ad_active_now %}
+                <div class="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex flex-col gap-3 mb-6 shadow-lg shadow-emerald-500/5">
+                    <div class="flex items-center gap-2.5">
+                        <div class="relative flex h-3 w-3 shrink-0">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                        </div>
+                        <div>
+                            <div class="text-emerald-400 text-xs font-black uppercase tracking-wider">Reklamınız Yayında!</div>
+                            <div class="text-white text-sm font-semibold">Bitiş: {{ isletme.ad_end_date|date:"d M Y - H:i" }}</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-emerald-500/20 text-center">
+                        <div class="bg-slate-900/60 p-2 rounded-xl">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">Tıklanma</div>
+                            <div class="text-emerald-300 font-black text-base">{{ isletme.ad_clicks }}</div>
+                        </div>
+                        <div class="bg-slate-900/60 p-2 rounded-xl">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase">Gösterim</div>
+                            <div class="text-amber-300 font-black text-base">{{ isletme.ad_impressions|default:"1.2K+" }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="p-4 bg-slate-800/60 border border-slate-700/80 rounded-2xl mb-6">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Pano Durumu</div>
+                    <div class="text-slate-300 text-sm font-medium">Şu an aktif bir Keşfet reklam panonuz bulunmuyor.</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Reklam Sloganı & Rozet Güncelleme Formu -->
+            <form action="{% url 'reklam_slogan_kaydet' %}" method="POST" class="relative z-10 bg-slate-950/60 border border-slate-800 p-4 rounded-2xl">
+                {% csrf_token %}
+                <label class="block text-[11px] font-black text-amber-300 uppercase tracking-widest mb-1.5">Özel Reklam Sloganınız</label>
+                <input type="text" name="ad_slogan" value="{{ isletme.ad_slogan|default:'' }}" placeholder="Örn: Bu haftaya özel tüm saç bakımlarında %25 indirim!" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs font-medium focus:border-amber-400 focus:outline-none mb-3">
+
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pano Rozeti</label>
+                        <input type="text" name="ad_badge_text" value="{{ isletme.ad_badge_text|default:'SPONSORLU' }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-white text-xs font-medium focus:border-amber-400 focus:outline-none">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black rounded-xl transition-all">
+                            Kaydet 💾
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sağ Paket Kartları Alanı -->
+        <div class="w-full lg:w-7/12 p-8 lg:p-10 bg-slate-900 border-l border-slate-800 relative z-10 flex flex-col justify-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <!-- 1 Günlük Paket -->
+                <a href="/odeme/reklam/?paket=ad_1d" class="group relative bg-slate-800/80 hover:bg-amber-500/10 border border-slate-700 hover:border-amber-400/60 rounded-2xl p-5 text-center transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col justify-center min-h-[135px]">
+                    <div class="text-slate-400 group-hover:text-amber-300 font-black text-sm uppercase tracking-widest mb-1 transition-colors">1 Günlük Pano</div>
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="text-slate-500 line-through text-sm font-bold">599 ₺</span>
+                        <span class="text-white font-extrabold text-2xl group-hover:text-amber-300 transition-colors">349 ₺</span>
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-semibold">24 Saat Boyunca Sağ/Sol Kule</div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-amber-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                </a>
+
+                <!-- 3 Günlük Paket -->
+                <a href="/odeme/reklam/?paket=ad_3d" class="group relative bg-slate-800/80 hover:bg-amber-500/10 border border-slate-700 hover:border-amber-400/60 rounded-2xl p-5 text-center transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col justify-center min-h-[135px]">
+                    <div class="absolute top-4 -right-12 w-40 bg-gradient-to-r from-amber-500 to-rose-500 text-white text-[9px] font-black py-1 text-center transform rotate-45 z-10 shadow-md">POPÜLER</div>
+                    <div class="text-slate-400 group-hover:text-amber-300 font-black text-sm uppercase tracking-widest mb-1 transition-colors">3 Günlük Pano</div>
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="text-slate-500 line-through text-sm font-bold">1.299 ₺</span>
+                        <span class="text-white font-extrabold text-2xl group-hover:text-amber-300 transition-colors">799 ₺</span>
+                    </div>
+                    <div class="text-[10px] text-emerald-400 font-bold">%35 Avantajlı</div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-amber-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                </a>
+
+                <!-- 1 Haftalık Paket (Yıldız Paket) -->
+                <a href="/odeme/reklam/?paket=ad_1w" class="group relative bg-gradient-to-b from-amber-500/15 to-slate-800 border-2 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.2)] rounded-2xl p-5 text-center transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col justify-center min-h-[135px] sm:scale-105 z-10">
+                    <div class="absolute top-4 -right-12 w-40 bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 text-[9px] font-black py-1 text-center transform rotate-45 z-10 shadow-md">EN İYİ FİYAT</div>
+                    <div class="text-amber-300 font-black text-sm uppercase tracking-widest mb-1">1 Haftalık Pano</div>
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="text-slate-500 line-through text-sm font-bold">2.799 ₺</span>
+                        <span class="text-white font-extrabold text-2xl">1.599 ₺</span>
+                    </div>
+                    <div class="text-[10px] text-amber-200/90 font-bold uppercase">7 Gün Kesintisiz Sponsorluk</div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-amber-400"></div>
+                </a>
+
+                <!-- 1 Aylık Paket -->
+                <a href="/odeme/reklam/?paket=ad_1m" class="group relative bg-slate-800/80 hover:bg-amber-500/10 border border-slate-700 hover:border-amber-400/60 rounded-2xl p-5 text-center transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col justify-center min-h-[135px]">
+                    <div class="text-slate-400 group-hover:text-amber-300 font-black text-sm uppercase tracking-widest mb-1 transition-colors">1 Aylık Sponsor</div>
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="text-slate-500 line-through text-sm font-bold">7.490 ₺</span>
+                        <span class="text-white font-extrabold text-2xl group-hover:text-amber-300 transition-colors">4.490 ₺</span>
+                    </div>
+                    <div class="text-[10px] text-emerald-400 font-bold">30 Gün Sabit Vitrin</div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-amber-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                </a>
+
+            </div>
+            <p class="text-center text-slate-500 text-xs mt-6 font-medium">* Satın alım sonrası reklam süreniz ve Keşfet panosu yayınınız anında başlar. İşlemler İyzico güvencesiyle gerçekleşmektedir.</p>
+        </div>
+    </div>
+
     <!-- 🗑️ ABONELİK İPTAL MODALI (Gelişmiş Sabitleme) -->
     <div id="cancelModal" class="fixed inset-0 !z-[9999] flex items-center justify-center hidden bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0" style="width: 100vw; height: 100vh; top: 0; left: 0;">
         <div class="bg-slate-900 border border-slate-700 rounded-[2rem] p-8 w-full max-w-md shadow-2xl transform scale-95 opacity-0 transition-all duration-300 relative overflow-hidden" id="cancelModalContent">
@@ -519,6 +640,7 @@
         </div>
     </div>
 
+    <!-- 🚀 VİTRİN BOOST BAŞARI MODALI -->
     {% if request.session.show_boost_success_modal %}
     <div id="boostSuccessModal" class="fixed inset-0 !z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300" style="width: 100vw; height: 100vh; top: 0; left: 0;">
         <div class="bg-slate-900 border border-violet-500/50 rounded-3xl p-8 w-full max-w-md shadow-[0_0_40px_rgba(139,92,246,0.3)] transform transition-all duration-300 text-center relative overflow-hidden">
@@ -538,6 +660,30 @@
             </p>
 
             <button type="button" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-500 text-slate-900 text-lg font-black rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:-translate-y-1 relative z-10" onclick="closeBoostModal()">
+                Harika, Panelime Dön
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 💎 REKLAM PANOSU BAŞARI MODALI -->
+    {% if request.session.show_ad_success_modal %}
+    <div id="adSuccessModal" class="fixed inset-0 !z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300" style="width: 100vw; height: 100vh; top: 0; left: 0;">
+        <div class="bg-slate-900 border border-amber-400/50 rounded-3xl p-8 w-full max-w-md shadow-[0_0_40px_rgba(245,158,11,0.3)] transform transition-all duration-300 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+
+            <div class="mb-6 relative z-10">
+                <div class="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto border border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                    <span class="text-4xl">💎</span>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-black text-white mb-3 tracking-tight relative z-10">Reklam Panonuz Aktif!</h3>
+            <p class="text-slate-400 text-sm mb-8 leading-relaxed relative z-10">
+                Tebrikler! <strong class="text-amber-400 font-bold">{{ request.session.ad_paket_adi }}</strong> paketiniz başarıyla tanımlandı. İşletmeniz Keşfet sayfasında sağ ve sol sponsor kulelerinde ve mobil vitrinde 10.000+ kullanıcıya sergileniyor.
+            </p>
+
+            <button type="button" class="w-full py-4 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 text-lg font-black rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:-translate-y-1 relative z-10" onclick="closeAdModal()">
                 Harika, Panelime Dön
             </button>
         </div>
@@ -664,6 +810,28 @@
         // Sayfa yenilendiğinde tekrar açılmaması için session'ı temizle
         fetch("{% url 'clear_boost_session' %}")
             .catch(error => console.error('Session temizlenemedi:', error));
+    }
+    {% endif %}
+
+    // 💎 REKLAM PANOSU BAŞARI MODALİ KAPATMA KODU
+    {% if request.session.show_ad_success_modal %}
+    document.addEventListener("DOMContentLoaded", function() {
+        const adModal = document.getElementById('adSuccessModal');
+        if (adModal) {
+            document.body.appendChild(adModal);
+        }
+    });
+
+    function closeAdModal() {
+        const modal = document.getElementById('adSuccessModal');
+        modal.classList.add('opacity-0');
+
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+
+        fetch("{% url 'clear_ad_session' %}")
+            .catch(error => console.error('Reklam session temizlenemedi:', error));
     }
     {% endif %}
 </script>

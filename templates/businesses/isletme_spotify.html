@@ -70,6 +70,14 @@ h1, h2, h3, h4, h5 {
     pointer-events: none;
 }
 
+@keyframes beatGlow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.25); filter: blur(40px); }
+}
+.animate-beat-glow {
+    animation: beatGlow 0.85s infinite alternate ease-in-out;
+}
+
 /* Custom Scrollbar */
 .custom-scroll::-webkit-scrollbar {
     width: 6px;
@@ -96,10 +104,10 @@ h1, h2, h3, h4, h5 {
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
             {{ isletme.name }} Vitrinine Geri Dön
         </a>
-        <h1 class="text-3xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400 mt-2">
+        <h1 class="text-3xl md:text-5xl font-black tracking-tight text-[#1DB954] drop-shadow-[0_0_20px_rgba(29,185,84,0.3)] mt-2 transition-all duration-500 hover:drop-shadow-[0_0_35px_rgba(29,185,84,0.5)]">
             Müşteri DJ Kabini
         </h1>
-        <p class="text-sm md:text-base text-slate-400 max-w-lg mx-auto mt-2.5 font-medium leading-relaxed">
+        <p class="text-sm md:text-base text-slate-400 max-w-lg mx-auto mt-3 font-medium leading-relaxed">
             Salonda o an çalan şarkıyı görün, sıraya en sevdiğiniz şarkıyı ekleyin veya salon çalma listelerini keşfedin!
         </p>
     </div>
@@ -124,7 +132,8 @@ h1, h2, h3, h4, h5 {
         <div class="lg:col-span-5 space-y-6">
             <!-- CANLI ÇALAN ŞARKI KARTI -->
             <div id="spotify-jukebox-player" class="spotify-glass rounded-[2rem] p-6 md:p-8 border border-white/[0.05] shadow-2xl relative overflow-hidden transition-all duration-500">
-                <div class="absolute -right-16 -top-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div id="jukebox-glow-orb-1" class="absolute -right-16 -top-16 w-64 h-64 bg-[#1DB954]/15 rounded-full blur-3xl pointer-events-none transition-all duration-500"></div>
+                <div id="jukebox-glow-orb-2" class="absolute -left-16 -bottom-16 w-56 h-56 bg-[#1DB954]/10 rounded-full blur-3xl pointer-events-none transition-all duration-500"></div>
                 
                 <div class="flex flex-col sm:flex-row lg:flex-col items-center gap-6 relative z-10">
                     <!-- Dönen Plak Görseli -->
@@ -142,7 +151,7 @@ h1, h2, h3, h4, h5 {
                             
                             <!-- Spindle Center Hole -->
                             <div class="absolute w-4 h-4 bg-neutral-900 border border-neutral-800 rounded-full z-20 flex items-center justify-center">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                                <div class="w-1.5 h-1.5 bg-[#1DB954] rounded-full"></div>
                             </div>
                         </div>
                         <!-- Floating notes container -->
@@ -151,20 +160,20 @@ h1, h2, h3, h4, h5 {
 
                     <!-- Şarkı & Çalma Detayları -->
                     <div class="flex-1 text-center sm:text-left lg:text-center min-w-0 w-full">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/35 uppercase tracking-widest mb-3">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-black bg-[#1DB954]/20 text-[#1DB954] border border-[#1DB954]/40 uppercase tracking-widest mb-3 shadow-[0_0_15px_rgba(29,185,84,0.3)]">
                             <span class="flex gap-0.5 items-end h-2.5">
-                                <span class="w-0.5 h-2 bg-emerald-400 rounded-full inline-block origin-bottom animate-wave-1"></span>
-                                <span class="w-0.5 h-3 bg-emerald-400 rounded-full inline-block origin-bottom animate-wave-2"></span>
-                                <span class="w-0.5 h-1.5 bg-emerald-400 rounded-full inline-block origin-bottom animate-wave-3"></span>
+                                <span class="w-0.5 h-2 bg-[#1DB954] rounded-full inline-block origin-bottom animate-wave-1"></span>
+                                <span class="w-0.5 h-3 bg-[#1DB954] rounded-full inline-block origin-bottom animate-wave-2"></span>
+                                <span class="w-0.5 h-1.5 bg-[#1DB954] rounded-full inline-block origin-bottom animate-wave-3"></span>
                             </span>
                             Salonda Şu An Çalıyor
                         </div>
-                        <h2 id="jukebox-track-name" class="text-lg md:text-xl font-black truncate tracking-tight text-white">Şarkı Yükleniyor...</h2>
+                        <h2 id="jukebox-track-name" class="text-lg md:text-xl font-black truncate tracking-tight text-white drop-shadow-md">Şarkı Yükleniyor...</h2>
                         <p id="jukebox-artist-name" class="text-xs md:text-sm text-slate-400 mt-1 truncate font-semibold">Sanatçı</p>
                         
                         <!-- Playback Progress Bar -->
                         <div class="w-full h-1.5 bg-white/10 rounded-full mt-6 overflow-hidden">
-                            <div id="jukebox-progress" class="h-full bg-emerald-500 rounded-full transition-all duration-1000" style="width: 35%"></div>
+                            <div id="jukebox-progress" class="h-full bg-[#1DB954] rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(29,185,84,0.5)]" style="width: 35%"></div>
                         </div>
                     </div>
                 </div>
@@ -363,6 +372,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     
                     vinyl.classList.add('animate-vinyl-spin');
                     startNoteAnimation();
+                    document.getElementById('jukebox-glow-orb-1').classList.add('animate-beat-glow');
+                    document.getElementById('jukebox-glow-orb-2').classList.add('animate-beat-glow');
                     
                     if (!fakeProgressInterval) {
                         fakeProgressInterval = setInterval(() => {
@@ -385,6 +396,9 @@ document.addEventListener("DOMContentLoaded", function() {
                         vinyl.classList.remove('animate-vinyl-spin');
                         stopNoteAnimation();
                     }
+                    document.getElementById('jukebox-glow-orb-1').classList.remove('animate-beat-glow');
+                    document.getElementById('jukebox-glow-orb-2').classList.remove('animate-beat-glow');
+                    
                     if (fakeProgressInterval) {
                         clearInterval(fakeProgressInterval);
                         fakeProgressInterval = null;

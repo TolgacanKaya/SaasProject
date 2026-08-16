@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('', views.ana_sayfa, name='ana_sayfa'),
     path('kesfet/', views.kesfet, name='kesfet'),
+    path('reklam/tikla/<int:business_id>/', views.reklam_tikla, name='reklam_tikla'),
     # YENİ STATİK SAYFALAR
     path('hakkimizda/', views.hakkimizda, name='hakkimizda'),
     path('nasil-calisir/rozetler/', views.rozetler, name='rozetler'),

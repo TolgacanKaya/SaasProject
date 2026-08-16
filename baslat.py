@@ -23,30 +23,37 @@ def is_port_open(port):
 
 def veritabani_kontrol_ve_baslat():
     # --- POSTGRESQL KONTROL ---
+    pg_path = r"C:\Program Files\PostgreSQL\17\bin\pg_ctl.exe"
+    data_dir = r"D:\PostgreSQL-Proje\data"
+    log_file = r"D:\PostgreSQL-Proje\server.log"
+    pid_file = os.path.join(data_dir, "postmaster.pid")
+
     if not is_port_open(5432):
-        print("🐘 PostgreSQL kapalı, başlatılıyor...")
-        pg_path = r"C:\Program Files\PostgreSQL\17\bin\pg_ctl.exe"
-        data_dir = r"D:\PostgreSQL-Proje\data"
-        log_file = r"D:\PostgreSQL-Proje\server.log"
-        
+        print("PostgreSQL kapalı, başlatılıyor...")
+        # Yetim kalmış postmaster.pid dosyası varsa temizle
+        if os.path.exists(pid_file):
+            try:
+                os.remove(pid_file)
+            except Exception:
+                pass
+
         try:
-            subprocess.Popen([pg_path, "start", "-D", data_dir, "-l", log_file], 
-                             shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print("✅ PostgreSQL başlatma komutu gönderildi.")
+            subprocess.run([pg_path, "start", "-D", data_dir, "-l", log_file], shell=True)
+            print("✅ PostgreSQL başlatıldı.")
         except Exception as e:
-            print(f"❌ PostgreSQL başlatılamadı: {e}")
+            print(f"PostgreSQL başlatılamadı: {e}")
     else:
-        print("✅ PostgreSQL zaten çalışıyor.")
+        print("PostgreSQL zaten çalışıyor.")
 
     # --- REDIS KONTROL (DOCKER) ---
     if not is_port_open(6379):
-        print("🔴 Redis kapalı, Docker üzerinden başlatılıyor...")
+        print("Redis kapalı, Docker üzerinden başlatılıyor...")
         try:
             subprocess.run(["docker", "start", "saas-redis"], 
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print("✅ Redis (saas-redis) başlatıldı.")
         except Exception as e:
-            print(f"❌ Redis başlatılamadı (Docker açık mı?): {e}")
+            print(f"Redis başlatılamadı (Docker açık mı?): {e}")
     else:
         print("✅ Redis zaten çalışıyor.")
 
@@ -55,7 +62,7 @@ def veritabani_kontrol_ve_baslat():
 
 
 def celery_ve_beat_baslat():
-    print("⏳ Celery Worker ve Beat başlatılıyor...")
+    print("Celery Worker ve Beat başlatılıyor...")
     try:
         venv_python = sys.executable
         # Windows'ta Celery worker'ı -P solo ile başlatmalıyız.
@@ -68,9 +75,9 @@ def celery_ve_beat_baslat():
         
         subprocess.Popen(worker_cmd, stdout=worker_log, stderr=worker_log, shell=True)
         subprocess.Popen(beat_cmd, stdout=beat_log, stderr=beat_log, shell=True)
-        print("✅ Celery Worker ve Beat arka planda başlatıldı (Loglar: logs/celery_worker.log ve logs/celery_beat.log).")
+        print("Celery Worker ve Beat arka planda başlatıldı (Loglar: logs/celery_worker.log ve logs/celery_beat.log).")
     except Exception as e:
-        print(f"❌ Celery veya Beat başlatılamadı: {e}")
+        print(f"Celery veya Beat başlatılamadı: {e}")
 
 
 def brave_ile_ac():
@@ -89,24 +96,24 @@ def brave_ile_ac():
 
 
 def tailwind_css_derle():
-    print("🎨 Tailwind CSS derleniyor...")
+    print("Tailwind CSS derleniyor...")
     try:
         if not os.path.exists("node_modules"):
-            print("📦 node_modules bulunamadı, npm install çalıştırılıyor...")
+            print("node_modules bulunamadı, npm install çalıştırılıyor...")
             subprocess.run(["npm", "install"], shell=True, check=True)
         
         result = subprocess.run(["npx", "tailwindcss", "-i", "./static/src/main.css", "-o", "./static/css/dist.css", "--minify"], 
                                 shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode == 0:
-            print("✅ Tailwind CSS başarıyla derlendi.")
+            print("Tailwind CSS başarıyla derlendi.")
         else:
-            print(f"❌ Tailwind CSS derlenirken hata oluştu:\n{result.stderr.decode('utf-8')}")
+            print(f"Tailwind CSS derlenirken hata oluştu:\n{result.stderr.decode('utf-8')}")
     except Exception as e:
-        print(f"❌ Tailwind CSS derlenirken beklenmedik bir hata oluştu: {e}")
+        print(f"Tailwind CSS derlenirken beklenmedik bir hata oluştu: {e}")
 
 
 if __name__ == '__main__':
-    print("\n🚀 KobiRandevu Sunucusu Hazırlanıyor...")
+    print("\nKobiRandevu Sunucusu Hazırlanıyor...")
     
     # Tailwind CSS derle
     tailwind_css_derle()
@@ -117,8 +124,8 @@ if __name__ == '__main__':
     # Celery ve Beat'i başlat
     celery_ve_beat_baslat()
     
-    print("🌐 Django Sunucusu Başlatılıyor ve Brave Açılıyor...")
-    print("🛑 Kapatmak için CTRL+C tuşlarına basabilirsiniz.\n")
+    print("Django Sunucusu Başlatılıyor ve Brave Açılıyor...")
+    print("Kapatmak için CTRL+C tuşlarına basabilirsiniz.\n")
 
     threading.Thread(target=brave_ile_ac, daemon=True).start()
 

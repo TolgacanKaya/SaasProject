@@ -22,13 +22,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # admin panelini gizledim ki dışarıdan kolayca bulunmasın
     path('patron-gizli-giris-404/', admin.site.urls),
     path('hesap/', include('accounts.urls')),
 
 
+    # adisyon ve pos işlemleri için rotalar
     path('pos/', include('pos.urls')),
 
-    # DİKKAT: path('businesses/', include('businesses.urls')) satırını sildik! Çiftleme yapıyordu.
 
     path('randevu-yonetimi/', include('appointments.urls')),
     path('odeme/', include('payments.urls')),
@@ -39,6 +40,7 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # lokalde çalışırken medya dosyaları yüklenebilsin diye ekledim
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     import debug_toolbar
     urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns

@@ -128,7 +128,7 @@
 }
 
 /* ── RAW CSS PREMIUM OVERRIDES ── */
-select, .premium-select {
+.dark select, .premium-select {
     appearance: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -150,13 +150,13 @@ select, .premium-select {
     outline: none !important;
 }
 
-select:focus, .premium-select:focus {
+.dark select:focus, .premium-select:focus {
     border-color: #eab308 !important;
     box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2) !important;
     transform: translateY(-1px) !important;
 }
 
-input[type="number"], .premium-number {
+.dark input[type="number"], .premium-number {
     background-color: #09090b !important;
     border: 1px solid #27272a !important;
     color: #ffffff !important;
@@ -167,7 +167,7 @@ input[type="number"], .premium-number {
     transition: all 0.3s !important;
 }
 
-input[type="number"]:focus {
+.dark input[type="number"]:focus {
     border-color: #eab308 !important;
     box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2) !important;
 }

@@ -11,7 +11,7 @@ from django.core.cache import cache
 from core.decorators import ratelimit
 
 
-@ratelimit(key='ip', rate='5/m')
+@ratelimit(key='ip', rate='500/m')
 @never_cache
 def isletme_giris(request):
     # SENARYO 1: Zaten giriş yapmış biri bu sayfaya gelirse
@@ -50,7 +50,7 @@ def isletme_cikis(request):
     return redirect('ana_sayfa')
 
 
-@ratelimit(key='ip', rate='3/h')
+@ratelimit(key='ip', rate='300/h')
 def isletme_kayit(request):
     if request.user.is_authenticated:
         isletme_kontrol = Business.objects.filter(owner=request.user).exists()

@@ -17,6 +17,7 @@ ENV/
 .env.local
 .env.*
 !.env.example
+proje_secret_keys.txt
 
 # --- VERİTABANLARI (DATABASES) ---
 db.sqlite3

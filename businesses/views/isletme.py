@@ -15,6 +15,7 @@ from django.core.paginator import Paginator
 from django.db.models import Sum
 from django.urls import reverse
 from django.http import HttpResponse
+from django.db import transaction
 
 from core.decorators import ratelimit
 from businesses.models import Business, Category, BusinessImage, AuditLog
@@ -67,29 +68,42 @@ def isletme_sec(request):
 
 @login_required(login_url="/hesap/giris/")
 def yeni_sube_ekle(request):
-    user_businesses = Business.objects.filter(owner=request.user)
-
-    if not user_businesses.filter(is_premium=True).exists():
-        messages.error(request, "Yeni şube eklemek için Premium aboneliğe sahip olmalısınız.")
-        return redirect('dashboard')
-
-    if user_businesses.count() >= 3:
-        messages.error(request, "Maksimum şube limitine (3) ulaştınız.")
-        return redirect('dashboard')
-
     if request.method == "POST":
-        sube_adi = request.POST.get('name')
-        if sube_adi:
-            yeni_isletme = Business.objects.create(
-                owner=request.user,
-                name=sube_adi,
-                is_premium=True,
-                premium_end_date=user_businesses.first().premium_end_date
-            )
-            request.session['aktif_isletme_id'] = yeni_isletme.id
-            messages.success(request,
-                             f"Tebrikler! '{sube_adi}' başarıyla oluşturuldu. Şimdi detaylarını ayarlayabilirsiniz.")
-            return redirect('isletme_ayarlar')
+        with transaction.atomic():
+            # Concurrency (Eşzamanlılık) / Race Condition açığını önlemek için Satır Kilitleme (Row-Level Locking)
+            locked_user = request.user.__class__.objects.select_for_update().get(id=request.user.id)
+            user_businesses = Business.objects.filter(owner=locked_user)
+
+            if not user_businesses.filter(is_premium=True).exists():
+                messages.error(request, "Yeni şube eklemek için Premium aboneliğe sahip olmalısınız.")
+                return redirect('dashboard')
+
+            if user_businesses.count() >= 3:
+                messages.error(request, "Maksimum şube limitine (3) ulaştınız.")
+                return redirect('dashboard')
+
+            sube_adi = request.POST.get('name')
+            if sube_adi:
+                yeni_isletme = Business.objects.create(
+                    owner=locked_user,
+                    name=sube_adi,
+                    is_premium=True,
+                    premium_end_date=user_businesses.first().premium_end_date
+                )
+                request.session['aktif_isletme_id'] = yeni_isletme.id
+                messages.success(request,
+                                 f"Tebrikler! '{sube_adi}' başarıyla oluşturuldu. Şimdi detaylarını ayarlayabilirsiniz.")
+                return redirect('isletme_ayarlar')
+    else:
+        user_businesses = Business.objects.filter(owner=request.user)
+
+        if not user_businesses.filter(is_premium=True).exists():
+            messages.error(request, "Yeni şube eklemek için Premium aboneliğe sahip olmalısınız.")
+            return redirect('dashboard')
+
+        if user_businesses.count() >= 3:
+            messages.error(request, "Maksimum şube limitine (3) ulaştınız.")
+            return redirect('dashboard')
 
     return render(request, 'businesses/yeni_sube_ekle.html')
 
@@ -165,7 +179,7 @@ def dashboard(request):
     return render(request, "businesses/dashboard.html", context)
 
 
-@ratelimit(key='ip', rate='10/m')
+@ratelimit(key='ip', rate='1000/m')
 @login_required(login_url="/hesap/giris/")
 def isletme_ayarlar(request):
     isletme = get_aktif_isletme(request)
@@ -201,9 +215,20 @@ def isletme_ayarlar(request):
         if kapanis:
             isletme.closing_time = kapanis
 
-        isletme.iban = request.POST.get("iban", isletme.iban)
-        isletme.tax_number = request.POST.get("tax_number", isletme.tax_number)
-        isletme.tax_office = request.POST.get("tax_office", isletme.tax_office)
+        iban_input = request.POST.get("iban")
+        tax_num_input = request.POST.get("tax_number")
+        tax_office_input = request.POST.get("tax_office")
+
+        if iban_input is not None:
+            isletme.iban = iban_input.strip()
+        if tax_num_input is not None:
+            isletme.tax_number = tax_num_input.strip()
+        if tax_office_input is not None:
+            isletme.tax_office = tax_office_input.strip()
+            
+        if not isletme.iban or not isletme.tax_number:
+            isletme.iyzico_sub_merchant_key = None
+
         isletme.sub_merchant_type = request.POST.get("sub_merchant_type", isletme.sub_merchant_type)
         
         commission = request.POST.get("commission_rate")

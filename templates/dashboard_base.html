@@ -75,7 +75,7 @@
     <div id="mobileSidebarBackdrop" onclick="toggleMobileMenu()" class="fixed inset-0 bg-slate-900/60 z-40 hidden backdrop-blur-sm transition-opacity opacity-0 md:hidden"></div>
 
     <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col justify-between shadow-2xl md:shadow-sm transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-        <div class="p-6 overflow-y-auto hide-scrollbar">
+        <div id="sidebarScrollContainer" class="p-6 overflow-y-auto hide-scrollbar">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl overflow-hidden bg-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-600/20 shrink-0">
@@ -296,6 +296,18 @@
             </div>
         </div>
     </aside>
+    <!-- 🔥 SIDEBAR SCROLL POZİSYONU ANINDA GERİ YÜKLEME (Flicker / FOUC Önleme) 🔥 -->
+    <script>
+        (function() {
+            const sidebarScroll = document.getElementById('sidebarScrollContainer');
+            if (sidebarScroll) {
+                const savedScrollPos = sessionStorage.getItem('sidebarScrollPos');
+                if (savedScrollPos !== null) {
+                    sidebarScroll.scrollTop = parseInt(savedScrollPos, 10);
+                }
+            }
+        })();
+    </script>
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
 
@@ -342,25 +354,25 @@
                             </div>
 
                             {% for randevu in isletme.recent_appointments_for_notif %}
-                            <a href="{% url 'isletme_randevular' %}" data-notif-id="randevu_{{ randevu.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 mt-0.5">📅</div>
+                            <a href="{% url 'isletme_randevular' %}" data-notif-id="randevu_{{ randevu.id }}" class="notif-item flex gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 mt-0.5 shadow-sm">📅</div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-white mb-0.5">Yeni Randevu Talebi!</h4>
-                                    <p class="text-[11px] text-slate-300 leading-relaxed">
-                                        <strong class="text-indigo-400">{{ randevu.customer.first_name|default:"Müşteri" }} {{ randevu.customer.last_name|default:"" }}</strong> adlı kişi randevu oluşturdu.
+                                    <h4 class="text-sm font-bold text-slate-800 mb-0.5">Yeni Randevu Talebi!</h4>
+                                    <p class="text-[11px] text-slate-600 leading-relaxed">
+                                        <strong class="text-indigo-600">{{ randevu.customer.first_name|default:"Müşteri" }} {{ randevu.customer.last_name|default:"" }}</strong> adlı kişi randevu oluşturdu.
                                     </p>
-                                    <span class="text-[10px] text-slate-500 mt-1 block">Tarih: {{ randevu.date_time|date:"d M Y - H:i" }}</span>
+                                    <span class="text-[10px] text-slate-400 mt-1 block font-medium">Tarih: {{ randevu.date_time|date:"d M Y - H:i" }}</span>
                                 </div>
                             </a>
                             {% endfor %}
 
                             {% for personel in isletme.recent_staff_for_notif %}
-                            <a href="{% url 'isletme_personeller' %}" data-notif-id="personel_{{ personel.id }}" class="notif-item flex gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl hover:bg-slate-700/50 transition-colors cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">✅</div>
+                            <a href="{% url 'isletme_personeller' %}" data-notif-id="personel_{{ personel.id }}" class="notif-item flex gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 mt-0.5 shadow-sm">✅</div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-white mb-0.5">Personel Onaylandı</h4>
-                                    <p class="text-[11px] text-slate-300 leading-relaxed">
-                                        <strong class="text-emerald-400">{{ personel.name }}</strong> adlı uzmanınız sistem tarafından onaylandı.
+                                    <h4 class="text-sm font-bold text-slate-800 mb-0.5">Personel Onaylandı</h4>
+                                    <p class="text-[11px] text-slate-600 leading-relaxed">
+                                        <strong class="text-emerald-600">{{ personel.name }}</strong> adlı uzmanınız sistem tarafından onaylandı.
                                     </p>
                                 </div>
                             </a>
@@ -464,7 +476,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const toastMessages = [
             {% for message in messages %}
-            { text: "{{ message|escapejs }}", type: "{{ message.tags }}" },
+            { text: "{{ message|escapejs }}".replace(/^[^\wÇĞİÖŞÜçğıöşüA-Za-z0-9]+/g, '').trim(), type: "{{ message.tags }}" },
             {% endfor %}
         ];
         toastMessages.forEach((msg, index) => {
@@ -643,6 +655,34 @@
                 }
             {% endif %}
 
+            // 💎 KEŞFET REKLAM PANOSU BİLDİRİMİ 💎
+            {% if isletme.ad_end_date %}
+                const adEndStr = "{{ isletme.ad_end_date|date:'c' }}";
+                if (adEndStr) {
+                    const adEndDate = new Date(adEndStr);
+                    const adNow = new Date();
+                    const adDiffHours = Math.ceil((adEndDate - adNow) / (1000 * 60 * 60));
+
+                    if (adDiffHours > 0 && !readNotifs.includes('ad_active_notif')) {
+                        if (!listElement.querySelector('.ad-active-notif')) {
+                            listElement.insertAdjacentHTML('afterbegin', `
+                                <a href="{% url 'isletme_abonelik' %}" class="notif-item ad-active-notif flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100/60 transition-colors cursor-pointer group" data-notif-id="ad_active_notif">
+                                    <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
+                                        💎
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-amber-900 mb-0.5 group-hover:text-amber-700 transition-colors">Keşfet Reklam Panonuz Yayında!</h4>
+                                        <p class="text-[11px] text-amber-800 leading-relaxed">
+                                            İşletmeniz Keşfet kulelerinde binlerce müşteriye sergileniyor.
+                                        </p>
+                                    </div>
+                                </a>
+                            `);
+                        }
+                    }
+                }
+            {% endif %}
+
             return listElement;
         }
 
@@ -710,6 +750,26 @@
             }
 
             setInterval(checkRealTimeNotifications, 60000);
+
+            // 🔥 SIDEBAR SCROLL POZİSYONU KORUMA 🔥
+            const sidebarScroll = document.getElementById('sidebarScrollContainer');
+            if (sidebarScroll) {
+                // Scroll pozisyonunu sürekli kaydet (debounced)
+                let scrollTimer;
+                sidebarScroll.addEventListener('scroll', function() {
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => {
+                        sessionStorage.setItem('sidebarScrollPos', sidebarScroll.scrollTop);
+                    }, 100);
+                });
+
+                // Sidebar nav linklerine tıklanmadan hemen önce pozisyonu kaydet
+                sidebarScroll.querySelectorAll('a[href]').forEach(link => {
+                    link.addEventListener('click', function() {
+                        sessionStorage.setItem('sidebarScrollPos', sidebarScroll.scrollTop);
+                    });
+                });
+            }
         });
     </script>
 </body>

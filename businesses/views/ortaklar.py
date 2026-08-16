@@ -17,6 +17,9 @@ def get_aktif_isletme(request):
 
     if aktif_id:
         isletme = kullanici_isletmeleri.filter(id=aktif_id).first()
+        
+        if isletme:
+            isletme.check_premium_status()
 
         # =========================================================
         # 🔥 YENİ: OTO-TAMİR ZEKASI (AUTO-HEAL) 🔥

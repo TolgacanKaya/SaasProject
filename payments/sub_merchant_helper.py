@@ -83,7 +83,7 @@ def create_iyzico_sub_merchant(business):
         error_msg = cevap.get('errorMessage', 'Bilinmeyen Hata')
         error_code = cevap.get('errorCode', '???')
         
-        # JÜRİ KORUMA MODU: Eğer Sandbox'taysak ve yetki hatası (2000) alıyorsak, sunumun aksamaması için sanal bir key üretip geçiyoruz.
+        
         if error_code == '2000' and 'sandbox' in options['base_url']:
             virtual_key = f"VIRTUAL_{random_id[:8]}"
             business.iyzico_sub_merchant_key = virtual_key

@@ -49,12 +49,14 @@ def get_iyzico_options():
 # ==========================================
 @login_required(login_url='/hesap/giris/')
 def premium_satin_al(request):
+    # önce kullanıcının işletmesi var mı diye bakıyorum, yoksa kayıt sayfasına atıyorum
     isletme = Business.objects.filter(owner=request.user).first()
     if not isletme:
         return redirect('kayit')
 
     secilen_plan = request.GET.get('plan', 'monthly')
 
+    # fiyatı ve paket adını requestten gelen tipe göre dinamik ayarlıyorum
     if secilen_plan == 'yearly':
         fiyat = Decimal("9990.00")
         paket_adi = "KobiRandevu Premium Plan (Yıllık)"
@@ -169,6 +171,7 @@ def odeme_sonuc(request):
             odeme_kaydi = SubscriptionPayment.objects.filter(status='pending').order_by('-created_at').first()
 
         if result_data.get('paymentStatus') == 'SUCCESS':
+            # ödeme başarılı döndüyse db'deki kaydı güncelliyorum
             if odeme_kaydi:
                 odeme_kaydi.status = 'success'
                 odeme_kaydi.iyzico_payment_id = result_data.get('paymentId')
@@ -277,6 +280,7 @@ def iyzico_ucret_iade_et(request, randevu):
 # ==========================================
 @xframe_options_exempt
 def randevu_odeme_ozeti(request, token):
+    # url'deki token ile randevuyu buluyorum, direkt id kullanmadım ki başkası göremesin
     randevu = get_object_or_404(Appointment, cancel_token=token)
     is_embed = request.GET.get('embed') == 'true'
 
@@ -301,7 +305,7 @@ def randevu_odeme_ozeti(request, token):
         if is_embed: url += "?embed=true"
         return redirect(url)
 
-    # 🔥 PAZARYERİ (MARKETPLACE) MANTIĞI: Komisyonu işletmeden düşüyoruz
+    #  PAZARYERİ (MARKETPLACE) MANTIĞI: Komisyonu işletmeden düşüyoruz
     fiyat = randevu.service.discounted_price
     
     # Kupon varsa fiyattan düş
@@ -315,6 +319,7 @@ def randevu_odeme_ozeti(request, token):
         fiyat = fiyat - indirim_tutari
         if fiyat < 0: fiyat = Decimal('0.00')
 
+    # burada platform komisyonunu hesaplayıp parayı ikiye bölüyorum
     komisyon_orani = randevu.business.commission_rate / Decimal('100.00')
     platform_bedeli = (fiyat * komisyon_orani).quantize(Decimal('0.01'))
     
@@ -385,14 +390,15 @@ def randevu_odeme_ozeti(request, token):
         'basketItems': [basket_item]
     }
 
-    # 🛠️ IYZICO FORM OLUŞTURMA (PAZARYERİ MODU)
+    # IYZICO FORM OLUŞTURMA (PAZARYERİ MODU)
     checkout_form_initialize = iyzipay.CheckoutFormInitialize().create(req, options)
     raw_cevap = checkout_form_initialize.read()
     if isinstance(raw_cevap, bytes):
         raw_cevap = raw_cevap.decode('utf-8')
     form_data = json.loads(raw_cevap)
 
-    # 🔄 Eğer hata aldıysak ve alt üye işyeri / pazaryeri kullanımı kaynaklı bir sorun varsa, standard checkout'a geri dönüyoruz
+    # alt üye işyeri patlarsa diye standart ödemeye geri düşme fallback'i yazdım
+    # Eğer hata aldıysak ve alt üye işyeri / pazaryeri kullanımı kaynaklı bir sorun varsa, standard checkout'a geri dönüyoruz
     has_submerchant_params = False
     if req.get('basketItems'):
         has_submerchant_params = any('subMerchantKey' in item for item in req['basketItems'])
@@ -416,7 +422,7 @@ def randevu_odeme_ozeti(request, token):
             raw_cevap = raw_cevap.decode('utf-8')
         form_data = json.loads(raw_cevap)
 
-    # 🚨 EĞER PAZARYERİ HATASI VARSA VEYA API ANAHTARI YOKSA DİREKT HATA MESAJI (SUİSTİMAL ENGELLEME)
+    # EĞER PAZARYERİ HATASI VARSA VEYA API ANAHTARI YOKSA DİREKT HATA MESAJI (SUİSTİMAL ENGELLEME)
     iyzico_html = form_data.get('checkoutFormContent')
 
 
@@ -681,12 +687,173 @@ def clear_boost_session(request):
     return JsonResponse({'status': 'cleared'})
 
 
+# ==========================================
+# 5. 💎 KEŞFET REKLAM PANOSU & SPONSORLUK MODÜLÜ
+# ==========================================
+AD_PACKAGES = {
+    'ad_1d': {'name': '1 Günlük Keşfet Reklam Panosu', 'price': '349.00', 'days': 1},
+    'ad_3d': {'name': '3 Günlük Keşfet Reklam Panosu', 'price': '799.00', 'days': 3},
+    'ad_1w': {'name': '1 Haftalık Keşfet Reklam Panosu', 'price': '1599.00', 'days': 7},
+    'ad_1m': {'name': '1 Aylık Keşfet Reklam Panosu', 'price': '4490.00', 'days': 30},
+}
+
+
+@login_required(login_url="/hesap/giris/")
+def reklam_satin_al(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect('kayit')
+
+    paket_kodu = request.GET.get('paket')
+    if paket_kodu not in AD_PACKAGES:
+        messages.error(request, "Geçersiz bir reklam paketi seçtiniz.")
+        return redirect('isletme_abonelik')
+
+    paket = AD_PACKAGES[paket_kodu]
+    options = get_iyzico_options()
+
+    req = {
+        'locale': 'tr',
+        'conversationId': f"AD-{isletme.id}-{paket_kodu}",
+        'price': paket['price'],
+        'paidPrice': paket['price'],
+        'currency': 'TRY',
+        'basketId': f"AD-B-{isletme.id}",
+        'paymentGroup': 'PRODUCT',
+        'callbackUrl': request.build_absolute_uri(reverse('reklam_callback')),
+        'enabledInstallments': ['1'],
+        'buyer': {
+            'id': str(request.user.id),
+            'name': request.user.first_name or 'Patron',
+            'surname': request.user.last_name or 'Patron',
+            'gsmNumber': isletme.phone or '+905555555555',
+            'email': request.user.email or 'patron@trandevu.com',
+            'identityNumber': '11111111111',
+            'registrationAddress': isletme.address or 'Adres Belirtilmemiş',
+            'ip': get_client_ip(request),
+            'city': isletme.city or 'Istanbul',
+            'country': 'Turkey',
+            'zipCode': '34732'
+        },
+        'shippingAddress': {
+            'contactName': isletme.name,
+            'city': isletme.city or 'Istanbul',
+            'country': 'Turkey',
+            'address': isletme.address or 'Adres Belirtilmemiş',
+            'zipCode': '34732'
+        },
+        'billingAddress': {
+            'contactName': isletme.name,
+            'city': isletme.city or 'Istanbul',
+            'country': 'Turkey',
+            'address': isletme.address or 'Adres Belirtilmemiş',
+            'zipCode': '34732'
+        },
+        'basketItems': [
+            {
+                'id': paket_kodu,
+                'name': paket['name'],
+                'category1': 'SponsorAd',
+                'itemType': 'VIRTUAL',
+                'price': paket['price']
+            }
+        ]
+    }
+
+    checkout_form_initialize = iyzipay.CheckoutFormInitialize().create(req, options)
+    cevap = json.loads(checkout_form_initialize.read().decode('utf-8'))
+
+    if cevap.get('status') == 'success':
+        return render(request, 'payments/odeme.html', {
+            'form_content': cevap.get('checkoutFormContent'),
+            'paket_adi': paket['name'],
+            'fiyat': paket['price'],
+            'sayfa_basligi': 'Keşfet Reklam Panosu Ödemesi',
+            'is_ad': True,
+            'isletme': isletme
+        })
+    else:
+        messages.error(request, f"Ödeme ekranı şu an açılamıyor, lütfen az sonra tekrar deneyin. ({cevap.get('errorMessage')})")
+        return redirect('isletme_abonelik')
+
+
+@csrf_exempt
+@login_required(login_url="/hesap/giris/")
+def reklam_callback(request):
+    isletme = get_aktif_isletme(request)
+    token = request.POST.get('token')
+    if not token:
+        return redirect('isletme_abonelik')
+
+    options = get_iyzico_options()
+    req = {'locale': 'tr', 'token': token}
+    checkout_form_result = iyzipay.CheckoutForm().retrieve(req, options)
+    result_data = json.loads(checkout_form_result.read().decode('utf-8'))
+
+    if result_data.get('status') == 'success' and result_data.get('paymentStatus') == 'SUCCESS':
+        try:
+            paket_kodu = result_data.get('itemTransactions')[0].get('itemId')
+        except:
+            paket_kodu = 'ad_1d'
+
+        paket = AD_PACKAGES.get(paket_kodu)
+        sure_gun = paket['days'] if paket else 1
+        suan = timezone.now()
+
+        if isletme.ad_end_date and isletme.ad_end_date > suan:
+            isletme.ad_end_date += timedelta(days=sure_gun)
+        else:
+            isletme.ad_end_date = suan + timedelta(days=sure_gun)
+
+        isletme.save()
+        request.session['show_ad_success_modal'] = True
+        request.session['ad_paket_adi'] = paket['name']
+        return redirect('isletme_abonelik')
+
+    messages.error(request, "❌ Reklam ödemesi tamamlanamadı veya iptal edildi.")
+    return redirect('isletme_abonelik')
+
+
+def clear_ad_session(request):
+    if 'show_ad_success_modal' in request.session:
+        del request.session['show_ad_success_modal']
+    if 'ad_paket_adi' in request.session:
+        del request.session['ad_paket_adi']
+    return JsonResponse({'status': 'cleared'})
+
+
+@login_required(login_url="/hesap/giris/")
+def reklam_slogan_kaydet(request):
+    """Esnafın reklam panosundaki özel sloganını ve rozetini güncellemesini sağlar."""
+    if request.method == "POST":
+        isletme = get_aktif_isletme(request)
+        if not isletme:
+            return redirect('kayit')
+
+        slogan = request.POST.get('ad_slogan', '').strip()
+        badge_text = request.POST.get('ad_badge_text', '').strip()
+
+        isletme.ad_slogan = slogan[:150]
+        if badge_text:
+            isletme.ad_badge_text = badge_text[:50]
+        isletme.save()
+
+        messages.success(request, "✨ Reklam sloganınız ve rozetiniz başarıyla güncellendi!")
+        return redirect('isletme_abonelik')
+
+    return redirect('isletme_abonelik')
+
+
 @login_required(login_url="/hesap/giris/")
 def isletme_iyzico_kayit(request):
     """İşletmeyi Iyzico Sandbox sistemine 'Alt Üye İşyeri' olarak kaydeder."""
     isletme = get_aktif_isletme(request)
     if not isletme:
         return redirect('kayit')
+
+    if not isletme.iban or not isletme.tax_number:
+        messages.error(request, "❌ Lütfen önce IBAN ve Vergi Numaranızı doldurup 'Kaydet' butonuna basınız.")
+        return redirect('isletme_ayarlar')
 
     from .sub_merchant_helper import create_iyzico_sub_merchant
     basarili, sonuc = create_iyzico_sub_merchant(isletme)
@@ -715,3 +882,18 @@ def isletme_iyzico_kayit(request):
 
     return redirect('isletme_ayarlar')
 
+
+@login_required(login_url="/hesap/giris/")
+def isletme_iyzico_kopar(request):
+    isletme = get_aktif_isletme(request)
+    if not isletme:
+        return redirect('kayit')
+        
+    isletme.iban = ""
+    isletme.tax_number = ""
+    isletme.tax_office = ""
+    isletme.iyzico_sub_merchant_key = None
+    isletme.save()
+    
+    messages.success(request, "Iyzico Pazaryeri bağlantısı başarıyla koparıldı ve finansal bilgileriniz temizlendi.")
+    return redirect('isletme_ayarlar')

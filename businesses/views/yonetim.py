@@ -372,8 +372,16 @@ def staff_magic_panel(request, token):
         if personel.id not in allowed_staff_ids:
             return render(request, 'businesses/staff_restricted.html', {
                 'personel': personel,
-                'isletme': isletme
+                'isletme': isletme,
+                'reason': 'limit_exceeded'
             })
+
+    if not personel.is_active:
+        return render(request, 'businesses/staff_restricted.html', {
+            'personel': personel,
+            'isletme': isletme,
+            'reason': 'inactive'
+        })
 
     request.session['staff_token'] = str(token)
     
@@ -386,6 +394,8 @@ def staff_magic_panel(request, token):
     past_appointments = []
     
     completed_today = 0
+    today_revenue = 0
+    total_revenue = 0
     
     for app in all_appointments:
         app_date = timezone.localtime(app.date_time).date()
@@ -393,14 +403,19 @@ def staff_magic_panel(request, token):
             today_appointments.append(app)
             if app.status == 'completed':
                 completed_today += 1
+                today_revenue += app.final_service_price
         elif app_date > today:
             upcoming_appointments.append(app)
         else:
             past_appointments.append(app)
             
+        if app.status == 'completed':
+            total_revenue += app.final_service_price
+            
     past_appointments.reverse()
 
-    return render(request, 'businesses/staff_dashboard.html', {
+    template_name = 'businesses/staff_dashboard.html' if isletme.is_premium else 'businesses/staff_dashboard_free.html'
+    return render(request, template_name, {
         'personel': personel,
         'isletme': isletme,
         'today_appointments': today_appointments,
@@ -408,6 +423,8 @@ def staff_magic_panel(request, token):
         'past_appointments': past_appointments,
         'completed_today': completed_today,
         'total_today': len(today_appointments),
+        'today_revenue': today_revenue,
+        'total_revenue': total_revenue,
     })
 
 

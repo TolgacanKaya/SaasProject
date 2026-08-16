@@ -327,8 +327,9 @@ def public_spotify_verify_customer(request, slug):
     from django.utils import timezone
     from datetime import datetime, time
 
-    today_start = timezone.make_aware(datetime.combine(timezone.now().date(), time.min))
-    today_end = timezone.make_aware(datetime.combine(timezone.now().date(), time.max))
+    local_now = timezone.localtime(timezone.now())
+    today_start = timezone.make_aware(datetime.combine(local_now.date(), time.min))
+    today_end = timezone.make_aware(datetime.combine(local_now.date(), time.max))
 
     # Bugün bu dükkanda aktif olan randevuları getir
     appointments = Appointment.objects.filter(

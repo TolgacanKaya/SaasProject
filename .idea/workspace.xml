@@ -6,18 +6,41 @@
   <component name="ChangeListManager">
     <list default="true" id="b8d7e1a1-0524-493f-a306-4793c7ea7bd6" name="Changes" comment="Proje iskeleti ve core app oluşturuldu">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appointments/templates/appointments/degerlendirme_yap.html" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/templates/appointments/degerlendirme_yap.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/appointments/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/appointments/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baslat.py" beforeDir="false" afterPath="$PROJECT_DIR$/baslat.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/businesses/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/booking_wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/booking_wizard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_analiz.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_analiz.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_detay.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_detay.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_giderler.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_giderler.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_personeller.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_personeller.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/isletme_spotify.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/isletme_spotify.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/templates/businesses/yorumlar.html" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/templates/businesses/yorumlar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/businesses/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/views/isletme.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/views/isletme.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/views/ortaklar.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/views/ortaklar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/views/rezervasyon.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/views/rezervasyon.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/views/spotify.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/views/spotify.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/businesses/views/yonetim.py" beforeDir="false" afterPath="$PROJECT_DIR$/businesses/views/yonetim.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/payments/sub_merchant_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/payments/sub_merchant_helper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/payments/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/payments/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/payments/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/payments/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/css/dist.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/dist.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/src/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/src/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/booking_wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/booking_wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_analiz.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_analiz.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_ayarlar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_ayarlar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_degerlendirmeler.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_degerlendirmeler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_detay.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_detay.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_giderler.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_giderler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_hizmetler.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_hizmetler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_kuponlar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_kuponlar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_musteriler.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_musteriler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_personeller.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_personeller.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/isletme_spotify.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/isletme_spotify.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/staff_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/staff_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/businesses/staff_restricted.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/businesses/staff_restricted.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/core/kesfet.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/core/kesfet.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/pos/adisyon_listesi.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/pos/adisyon_listesi.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/pos/urunler.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/pos/urunler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/premium_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/premium_base.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

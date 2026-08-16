@@ -935,18 +935,18 @@ body {
         if (currentStep === 5) {
             const isPaymentReady = {% if isletme.iyzico_sub_merchant_key %}true{% else %}false{% endif %};
             if (!isPaymentReady) {
-                btn.innerText = "Ödeme Altyapısı Hazır Değil";
-                btn.classList.add('!bg-rose-500', '!text-white', 'opacity-80');
+                btn.innerText = "Sistem Kapalı";
+                btn.classList.add('!bg-slate-200', '!text-slate-500', '!shadow-none', 'cursor-not-allowed');
                 btn.disabled = true;
                 
                 // Küçük bir açıklama metni ekleyelim
                 const existingWarning = document.getElementById('paymentWarningNote');
                 if(!existingWarning) {
-                    const warning = document.createElement('p');
+                    const warning = document.createElement('div');
                     warning.id = 'paymentWarningNote';
-                    warning.className = "text-[10px] text-rose-500 font-bold mt-2 text-center animate-pulse";
-                    warning.innerText = "İşletme şu an online ödeme kabul edemiyor.";
-                    btn.parentNode.appendChild(warning);
+                    warning.className = "bg-rose-50 border border-rose-200 rounded-xl p-3 mb-3 text-center w-full";
+                    warning.innerHTML = "<p class='text-xs text-rose-600 font-bold'>İşletme şu an online ödeme kabul edemiyor.</p>";
+                    btn.parentNode.insertBefore(warning, btn);
                 }
             } else {
                 btn.innerText = "Randevuyu Onayla ve Öde";

@@ -292,6 +292,11 @@ def isletme_yorumlar(request, slug):
 def booking_wizard(request, slug):
     """Fresha tarzı rezervasyon sihirbazı ekranı"""
     isletme = get_object_or_404(Business, slug=slug)
+
+    # İşletme sahibi kendi dükkanından müşteri gibi randevu alamaz
+    if request.user.is_authenticated and hasattr(request.user, 'business') and request.user.business == isletme:
+        messages.warning(request, "Kendi işletmeniz üzerinden müşteri olarak randevu alamazsınız. Müşteri deneyimini test etmek istiyorsanız sistemden çıkış yapın veya gizli sekme (incognito) kullanın.")
+        return redirect('dashboard')
     hizmetler = isletme.services.all()
     personeller = isletme.staff_members.all()
     aktif_personeller = personeller.filter(is_active=True, is_approved=True)

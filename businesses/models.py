@@ -31,6 +31,16 @@ class Business(models.Model):
         # Tüm hizmetlerin indirimli (discounted_price) değerlerini tarar ve en düşüğünü alır
         return min(hizmet.discounted_price for hizmet in hizmetler)
 
+    @property
+    def starting_price_is_discounted(self):
+        """Bu işletmenin EN DÜŞÜK fiyatlı hizmetinin kampanyalı olup olmadığını bulur."""
+        hizmetler = self.services.all()
+        if not hizmetler:
+            return False
+        # En ucuz fiyatlı hizmeti bulma
+        en_ucuz_hizmet = min(hizmetler, key=lambda h: h.discounted_price)
+        return en_ucuz_hizmet.has_campaign
+
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='businesses')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Sektör/Kategori")
     name = models.CharField(max_length=200, verbose_name="İşletme Adı")
@@ -88,10 +98,22 @@ class Business(models.Model):
     # 🔥 BOOST (ÖNE ÇIKARMA) SİSTEMİ 🔥
     boost_end_date = models.DateTimeField(null=True, blank=True, verbose_name="Boost Bitiş Tarihi")
 
+    # 💎 KEŞFET REKLAM PANOSU & SPONSORLUK SİSTEMİ 💎
+    ad_end_date = models.DateTimeField(null=True, blank=True, verbose_name="Reklam Panosu Bitiş Tarihi")
+    ad_slogan = models.CharField(max_length=150, blank=True, null=True, verbose_name="Reklam Sloganı")
+    ad_badge_text = models.CharField(max_length=50, blank=True, null=True, default="SPONSORLU", verbose_name="Reklam Rozeti")
+    ad_clicks = models.PositiveIntegerField(default=0, verbose_name="Reklam Tıklanma Sayısı")
+    ad_impressions = models.PositiveIntegerField(default=0, verbose_name="Reklam Gösterim Sayısı")
+
     @property
     def is_boosted_now(self):
         from django.utils import timezone
         return self.boost_end_date and self.boost_end_date > timezone.now()
+
+    @property
+    def is_ad_active_now(self):
+        from django.utils import timezone
+        return self.ad_end_date and self.ad_end_date > timezone.now()
 
     @property
     def recent_appointments_for_notif(self):

@@ -4,19 +4,22 @@
 {% block page_title %}İşletme Analizi{% endblock %}
 
 {% block content %}
-<div class="relative min-h-[600px]">
+<div class="relative {% if is_premium_teaser %}h-[800px] overflow-hidden{% else %}min-h-[600px]{% endif %}">
     {% if is_premium_teaser %}
     <!-- Premium Teaser Glassmorphism Lock Card -->
-    <div class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md rounded-3xl">
+    <div class="absolute inset-0 z-50 flex items-start pt-24 md:pt-32 justify-center p-4 bg-slate-950/80 backdrop-blur-md rounded-3xl">
         <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/30 rounded-3xl p-8 max-w-2xl w-full text-center shadow-[0_0_50px_rgba(251,191,36,0.15)] relative overflow-hidden group">
             <div class="absolute -right-20 -top-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl"></div>
             <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
             
             <div class="w-16 h-16 bg-gradient-to-tr from-amber-400 to-amber-500 text-slate-950 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg shadow-amber-500/20 border-2 border-amber-300 animate-bounce">
-                👑
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
             </div>
             
-            <h3 class="text-2xl font-black text-white mb-2 tracking-tight">👑 KobiRandevu Premium İşletme Analizi</h3>
+            <h3 class="text-2xl font-black text-white mb-2 tracking-tight flex items-center justify-center gap-2">
+                <svg class="w-7 h-7 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                KobiRandevu Premium İşletme Analizi
+            </h3>
             <p class="text-sm text-slate-400 max-w-lg mx-auto mb-8 font-semibold leading-relaxed">
                 İşletmenizin finansal gücünü elinize alın. Detaylı analiz paneliyle dükkanınızın geleceğini verilere dayanarak yönetin.
             </p>
@@ -24,7 +27,7 @@
             <!-- Features list instead of slider -->
             <div class="bg-slate-950/85 border border-slate-800 rounded-2xl p-6 mb-8 text-left max-w-md mx-auto shadow-inner relative z-10">
                 <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-                    ⚡ Premium Modülle Neler Kazanacaksınız?
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> Premium Modülle Neler Kazanacaksınız?
                 </h4>
                 <ul class="space-y-3.5 text-xs text-slate-300 font-bold">
                     <li class="flex items-start gap-2.5">
@@ -48,7 +51,7 @@
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <a href="{% url 'isletme_abonelik' %}" class="px-8 py-3.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-amber-500/20 hover:-translate-y-0.5 transition-all w-full sm:w-auto">
-                    ⭐ Premium Plana Yükselt ve Başla
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg> Premium Plana Yükselt ve Başla
                 </a>
                 <a href="{% url 'dashboard' %}" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl transition-colors w-full sm:w-auto">
                     Geri Dön
@@ -113,7 +116,10 @@
         </div>
 
         <!-- Aylık Gelir, Gider ve Net Kâr Karşılaştırması -->
-        <div class="bg-slate-900 border border-slate-800 shadow-xl rounded-[2.25rem] p-6 md:p-8 mb-8 relative overflow-hidden transition-all duration-300 group hover:border-indigo-500/25">
+        <div class="relative bg-slate-900/40 backdrop-blur-3xl border border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.3)] rounded-[2.5rem] p-6 md:p-8 mb-8 overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(99,102,241,0.15)] hover:border-indigo-500/40 group">
+            <!-- Decorative Glow Backgrounds -->
+            <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none translate-x-1/3 -translate-y-1/3"></div>
+            <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none -translate-x-1/3 translate-y-1/3"></div>
             <h4 class="text-lg font-bold text-white mb-1 flex items-center justify-between relative z-10">
                 <div class="flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-indigo-400">
@@ -129,7 +135,9 @@
         </div>
 
         <!-- Detaylı Dönem Karşılaştırma Analizi -->
-        <div class="bg-slate-900 border border-slate-800 shadow-xl rounded-[2.25rem] p-6 md:p-8 mb-8 relative overflow-hidden transition-all duration-300">
+        <div class="relative bg-slate-900/40 backdrop-blur-3xl border border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.3)] rounded-[2.5rem] p-6 md:p-8 mb-8 overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(168,85,247,0.15)] hover:border-purple-500/40 group">
+            <!-- Decorative Glow Backgrounds -->
+            <div class="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-800/80 pb-4">
                 <div>
                     <h4 class="text-lg font-bold text-white flex items-center gap-2">
@@ -155,7 +163,7 @@
             <!-- 3'lü Kart Karşılaştırma Grubu -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <!-- Toplam Gelir Karşılaştırma -->
-                <div class="bg-slate-950/40 border border-slate-850 p-6 rounded-2xl">
+                <div class="relative bg-slate-950/60 backdrop-blur-xl border border-slate-700/40 p-6 rounded-[2rem] shadow-inner transition-all duration-300 hover:bg-slate-800/80 hover:border-slate-500 hover:-translate-y-1">
                     <div class="flex justify-between items-start mb-2">
                         <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">TOPLAM GELİR</span>
                         <span id="incomeChangeBadge" class="text-xs font-black px-2 py-0.5 rounded-full"></span>
@@ -178,7 +186,7 @@
                 </div>
 
                 <!-- Toplam Gider Karşılaştırma -->
-                <div class="bg-slate-950/40 border border-slate-850 p-6 rounded-2xl">
+                <div class="relative bg-slate-950/60 backdrop-blur-xl border border-slate-700/40 p-6 rounded-[2rem] shadow-inner transition-all duration-300 hover:bg-slate-800/80 hover:border-slate-500 hover:-translate-y-1">
                     <div class="flex justify-between items-start mb-2">
                         <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">TOPLAM GİDER</span>
                         <span id="expenseChangeBadge" class="text-xs font-black px-2 py-0.5 rounded-full"></span>
@@ -201,7 +209,7 @@
                 </div>
                 
                 <!-- Net Kar Karşılaştırma -->
-                <div class="bg-slate-950/40 border border-slate-850 p-6 rounded-2xl">
+                <div class="relative bg-slate-950/60 backdrop-blur-xl border border-slate-700/40 p-6 rounded-[2rem] shadow-inner transition-all duration-300 hover:bg-slate-800/80 hover:border-slate-500 hover:-translate-y-1">
                     <div class="flex justify-between items-start mb-2">
                         <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">NET KÂR / ZARAR</span>
                         <span id="profitChangeBadge" class="text-xs font-black px-2 py-0.5 rounded-full"></span>
@@ -270,9 +278,9 @@
                 <div class="relative h-[250px] w-full flex items-center justify-center z-10">
                     <canvas id="popularityChart"></canvas>
                     {% if isletme.is_premium %}
-                    <div class="absolute flex flex-col items-center justify-center pointer-events-none">
-                        <span class="text-[9px] uppercase tracking-widest text-slate-500 font-extrabold">Hacim</span>
-                        <span class="text-3xl font-black text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.3)] select-none">VIP</span>
+                    <div id="vipHacimBadge" class="absolute flex flex-col items-center justify-center pointer-events-none transition-opacity duration-300">
+                        <span class="text-[10px] uppercase tracking-widest text-amber-500/80 font-extrabold mb-[-4px]">Hacim</span>
+                        <span class="text-4xl font-black text-amber-400 drop-shadow-[0_0_20px_rgba(245,158,11,0.6)] select-none tracking-tighter">VIP</span>
                     </div>
                     {% endif %}
                 </div>
@@ -438,6 +446,20 @@
         const karsilastirmaKar = JSON.parse('{{ karsilastirma_kar_json|safe }}');
 
         const plCtx = document.getElementById('plComparisonChart').getContext('2d');
+
+        // Premium Canvas Gradient Tanımlamaları
+        const gradientGelir = plCtx.createLinearGradient(0, 0, 0, 300);
+        gradientGelir.addColorStop(0, '#10b981'); // Parlak zümrüt
+        gradientGelir.addColorStop(1, '#047857'); // Derin yeşil
+
+        const gradientGider = plCtx.createLinearGradient(0, 0, 0, 300);
+        gradientGider.addColorStop(0, '#f43f5e'); // Parlak gül
+        gradientGider.addColorStop(1, '#be123c'); // Derin kırmızı
+
+        const gradientKar = plCtx.createLinearGradient(0, 0, 0, 300);
+        gradientKar.addColorStop(0, 'rgba(168, 85, 247, 0.6)'); // Yoğun mor dalga
+        gradientKar.addColorStop(1, 'rgba(168, 85, 247, 0.05)');
+
         new Chart(plCtx, {
             type: 'bar',
             data: {
@@ -446,42 +468,40 @@
                     {
                         label: 'Toplam Gelir (₺)',
                         data: karsilastirmaGelir,
-                        backgroundColor: '#10b981', // Emerald
-                        borderColor: '#10b981',
-                        borderWidth: 1.5,
-                        borderRadius: 6,
-                        barThickness: 22,
-                        maxBarThickness: 26,
-                        grouped: false, // Prevents side-by-side shifting, centers bar on label
-                        order: 2 // Render behind Gider
+                        backgroundColor: gradientGelir,
+                        borderWidth: 0,
+                        borderRadius: 6, // Tatlı yuvarlaklık
+                        barThickness: 20, // Tok ve dengeli görünüm
+                        maxBarThickness: 24,
+                        hoverBackgroundColor: '#34d399'
                     },
                     {
                         label: 'Toplam Gider (₺)',
                         data: karsilastirmaGider,
-                        backgroundColor: '#f43f5e', // Rose
-                        borderColor: '#f43f5e',
-                        borderWidth: 1.5,
+                        backgroundColor: gradientGider,
+                        borderWidth: 0,
                         borderRadius: 6,
-                        barThickness: 11,
-                        maxBarThickness: 15,
-                        grouped: false, // Prevents side-by-side shifting, centers bar on label
-                        order: 1 // Render in front of Gelir
+                        barThickness: 20,
+                        maxBarThickness: 24,
+                        hoverBackgroundColor: '#fb7185'
                     },
                     {
                         label: 'Net Kâr (₺)',
                         data: karsilastirmaKar,
                         type: 'line',
-                        borderColor: '#6366f1', // Indigo
-                        backgroundColor: 'rgba(99, 102, 241, 0.05)',
-                        borderWidth: 3.5,
-                        pointBackgroundColor: '#6366f1',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        tension: 0.35,
+                        borderColor: '#c084fc', // Neon mor çizgi
+                        backgroundColor: gradientKar,
+                        borderWidth: 4,
+                        pointBackgroundColor: '#0f172a',
+                        pointBorderColor: '#c084fc',
+                        pointBorderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 9,
+                        pointHoverBackgroundColor: '#c084fc',
+                        pointHoverBorderColor: '#ffffff',
+                        tension: 0.45, // Pürüzsüz akıcı dalga
                         fill: true,
-                        order: 0 // Render on top of everything
+                        order: -1
                     }
                 ]
             },
@@ -496,8 +516,11 @@
                     legend: {
                         position: 'top',
                         labels: {
-                            color: '#94a3b8',
-                            font: { family: 'Inter', size: 11, weight: 'bold' }
+                            usePointStyle: true, // Renk kutuları yerine şık yuvarlaklar
+                            boxWidth: 8,
+                            padding: 20,
+                            color: '#e2e8f0',
+                            font: { family: 'Inter', size: 12, weight: '600' }
                         }
                     },
                     tooltip: premiumTooltipConfig
@@ -505,19 +528,22 @@
                 scales: {
                     y: {
                         ticks: {
-                            color: '#64748b',
-                            font: { family: 'Inter', size: 10 },
-                            callback: function(value) { return value.toLocaleString('tr-TR') + ' ₺'; }
+                            color: '#94a3b8',
+                            font: { family: 'Inter', size: 11 },
+                            callback: function(value) { return value.toLocaleString('tr-TR') + ' ₺'; },
+                            padding: 12
                         },
                         grid: {
-                            color: 'rgba(51, 65, 85, 0.12)'
+                            color: 'rgba(51, 65, 85, 0.3)',
+                            borderDash: [5, 5] // Kesik çizgili modern grid
                         },
                         border: { display: false }
                     },
                     x: {
                         ticks: {
-                            color: '#94a3b8',
-                            font: { family: 'Inter', size: 10, weight: '600' }
+                            color: '#cbd5e1',
+                            font: { family: 'Inter', size: 11, weight: '600' },
+                            padding: 12
                         },
                         grid: { display: false },
                         border: { display: false }
@@ -539,17 +565,22 @@
                     datasets: [{
                         data: hizmetSayilari,
                         backgroundColor: [
-                            '#fbbf24', '#f43f5e', '#3b82f6', '#10b981', '#a855f7'
+                            'rgba(251, 191, 36, 0.95)', 
+                            'rgba(244, 63, 94, 0.95)', 
+                            'rgba(59, 130, 246, 0.95)', 
+                            'rgba(16, 185, 129, 0.95)', 
+                            'rgba(168, 85, 247, 0.95)'
                         ],
-                        borderWidth: 2,
-                        borderColor: '#0f172a',
-                        hoverOffset: 12
+                        borderWidth: 0,
+                        hoverOffset: 15,
+                        borderRadius: 10, // Premium modern yuvarlak köşeler
+                        spacing: 6 // Dilimler arası estetik boşluk
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '75%',
+                    cutout: '82%', // Çok daha ince ve zarif bir halka
                     animation: {
                         animateScale: true,
                         animateRotate: true,
@@ -607,6 +638,9 @@
         } else {
             // Boş Doughnut Görünümü
             document.getElementById('popularityChart').style.display = 'none';
+            if (document.getElementById('vipHacimBadge')) {
+                document.getElementById('vipHacimBadge').style.display = 'none'; // Veri yoksa VIP yazısını gizle
+            }
             const parent = document.getElementById('popularityChart').parentElement;
             if(parent) {
                 parent.innerHTML += `

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div id="staffWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl transform scale-95 transition-transform duration-300" id="staffModalContent">
+    <div class="{% if isletme.is_premium %}bg-slate-900/60 backdrop-blur-md border border-amber-500/10 shadow-[0_20px_50px_rgba(245,158,11,0.15)]{% else %}bg-white{% endif %} rounded-3xl max-w-md w-full p-8 shadow-2xl transform scale-95 transition-transform duration-300" id="staffModalContent">
         <div class="w-16 h-16 {% if isletme.is_premium %}bg-amber-500/10 text-amber-400 border border-amber-400/20{% else %}bg-amber-100 text-amber-500 border border-amber-200{% endif %} rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-inner">
             {% if isletme.is_premium %}
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
@@ -12,13 +12,13 @@
                 🛡️
             {% endif %}
         </div>
-        <h3 class="text-2xl font-extrabold text-slate-900 text-center mb-4">Güvenlik Kontrolü</h3>
-        <p class="text-slate-600 text-center leading-relaxed font-medium mb-6">
+        <h3 class="text-2xl font-extrabold {% if isletme.is_premium %}text-white{% else %}text-slate-900{% endif %} text-center mb-4">Güvenlik Kontrolü</h3>
+        <p class="{% if isletme.is_premium %}text-slate-400{% else %}text-slate-600{% endif %} text-center leading-relaxed font-medium mb-6">
             Platform kalitemizi korumak adına, eklediğiniz yeni personeller sistem yöneticilerimiz tarafından onaylanana dek <strong class="text-amber-500">müşterileriniz tarafından seçilemez.</strong>
             <br><br>
-            Onay süreci genellikle <strong class="text-slate-800">12 - 48 saat</strong> sürmektedir. Onaylanan personellerinizin isminin yanında <span class="text-blue-500 inline-flex items-center gap-1 font-bold">Mavi Tık <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span> belirecektir.
+            Onay süreci genellikle <strong class="{% if isletme.is_premium %}text-slate-200{% else %}text-slate-800{% endif %}">12 - 48 saat</strong> sürmektedir. Onaylanan personellerinizin isminin yanında <span class="text-blue-500 inline-flex items-center gap-1 font-bold">Mavi Tık <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span> belirecektir.
         </p>
-        <button onclick="closeStaffModal()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-xl shadow-lg transition-transform hover:-translate-y-0.5">
+        <button onclick="closeStaffModal()" class="w-full py-3.5 {% if isletme.is_premium %}bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-[0_0_15px_rgba(245,158,11,0.2)]{% else %}bg-slate-900 hover:bg-slate-800 text-white shadow-lg{% endif %} font-extrabold rounded-xl transition-transform hover:-translate-y-0.5">
             Anladım, Teşekkürler
         </button>
     </div>
@@ -90,7 +90,13 @@
     </div>
 
     <div class="lg:col-span-2 space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="max-h-[calc(100vh-10rem)] overflow-y-auto pr-2 pb-8" style="scrollbar-width: thin; scrollbar-color: rgba(251, 191, 36, 0.3) transparent;">
+            <style>
+                .max-h-\[calc\(100vh-10rem\)\]::-webkit-scrollbar { width: 6px; }
+                .max-h-\[calc\(100vh-10rem\)\]::-webkit-scrollbar-track { background: transparent; }
+                .max-h-\[calc\(100vh-10rem\)\]::-webkit-scrollbar-thumb { background-color: rgba(251, 191, 36, 0.3); border-radius: 20px; }
+            </style>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {% for personel in personeller %}
             <div class="{% if isletme.is_premium %}bg-slate-900/60 backdrop-blur-md border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:border-amber-500/30 hover:shadow-[0_20px_40px_rgba(245,158,11,0.08)] hover:-translate-y-2{% else %}bg-white border-slate-200 shadow-sm hover:-translate-y-1 hover:shadow-xl{% endif %} rounded-3xl p-6 border flex flex-col gap-4 relative transition-all duration-300 {% if not personel.is_active %}opacity-70 grayscale-[30%]{% endif %} group overflow-hidden">
                 

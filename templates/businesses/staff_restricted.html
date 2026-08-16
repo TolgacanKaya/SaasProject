@@ -46,16 +46,29 @@
                 </h1>
             </div>
 
-            <p class="text-sm font-medium text-slate-400 leading-relaxed text-justify sm:text-center">
-                Bağlı bulunduğunuz <strong class="text-slate-200">{{ isletme.name }}</strong> işletmesinin <strong>Premium Plan</strong> abonelik süresi sona ermiş ve sistem otomatik olarak ücretsiz plana geçiş yapmıştır.
-                <br><br>
-                Ücretsiz plan kapsamında en fazla <strong class="text-white">2 personel</strong> çalışma paneline erişebilmektedir. Sınır aşımı nedeniyle bu bağlantının erişimi geçici olarak askıya alınmıştır.
-            </p>
+            {% if reason == 'inactive' %}
+                <p class="text-sm font-medium text-slate-400 leading-relaxed text-justify sm:text-center">
+                    Çalışma profiliniz şu anda <strong class="text-slate-200">pasif (izinde veya onaysız)</strong> durumdadır.
+                    <br><br>
+                    Müşteri kabulüne tekrar başlayabilmek için işletme yöneticiniz tarafından profilinizin <strong class="text-white">Aktif</strong> duruma getirilmesi gerekmektedir. Bu süre zarfında çalışma paneline erişiminiz askıya alınmıştır.
+                </p>
 
-            <!-- INFORMATIONAL DIV -->
-            <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 text-xs font-semibold text-slate-500 text-center leading-relaxed">
-                İşletme yöneticinizin <strong>KobiRandevu Premium Plan</strong> üyeliğini yenilemesi durumunda bu bağlantı üzerinden paneliniz anında otomatik olarak tekrar aktif olacaktır.
-            </div>
+                <!-- INFORMATIONAL DIV -->
+                <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 text-xs font-semibold text-slate-500 text-center leading-relaxed">
+                    Yöneticiniz profilinizi aktifleştirdiğinde bu bağlantı üzerinden panelinize anında tekrar erişebilirsiniz.
+                </div>
+            {% else %}
+                <p class="text-sm font-medium text-slate-400 leading-relaxed text-justify sm:text-center">
+                    Bağlı bulunduğunuz <strong class="text-slate-200">{{ isletme.name }}</strong> işletmesinin <strong>Premium Plan</strong> abonelik süresi sona ermiş ve sistem otomatik olarak ücretsiz plana geçiş yapmıştır.
+                    <br><br>
+                    Ücretsiz plan kapsamında en fazla <strong class="text-white">2 personel</strong> çalışma paneline erişebilmektedir. Sınır aşımı nedeniyle bu bağlantının erişimi geçici olarak askıya alınmıştır.
+                </p>
+
+                <!-- INFORMATIONAL DIV -->
+                <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 text-xs font-semibold text-slate-500 text-center leading-relaxed">
+                    İşletme yöneticinizin <strong>KobiRandevu Premium Plan</strong> üyeliğini yenilemesi durumunda bu bağlantı üzerinden paneliniz anında otomatik olarak tekrar aktif olacaktır.
+                </div>
+            {% endif %}
         </div>
 
         <!-- INFO / FOOTER -->
