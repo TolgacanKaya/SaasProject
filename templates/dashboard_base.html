@@ -655,7 +655,7 @@
                 }
             {% endif %}
 
-            // 💎 KEŞFET REKLAM PANOSU BİLDİRİMİ 💎
+            // KEŞFET REKLAM PANOSU BİLDİRİMİ
             {% if isletme.ad_end_date %}
                 const adEndStr = "{{ isletme.ad_end_date|date:'c' }}";
                 if (adEndStr) {
@@ -668,12 +668,12 @@
                             listElement.insertAdjacentHTML('afterbegin', `
                                 <a href="{% url 'isletme_abonelik' %}" class="notif-item ad-active-notif flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100/60 transition-colors cursor-pointer group" data-notif-id="ad_active_notif">
                                     <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
-                                        💎
+                                        <svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                                     </div>
                                     <div>
-                                        <h4 class="text-sm font-bold text-amber-900 mb-0.5 group-hover:text-amber-700 transition-colors">Keşfet Reklam Panonuz Yayında!</h4>
+                                        <h4 class="text-sm font-bold text-amber-900 mb-0.5 group-hover:text-amber-700 transition-colors">Keşfet Reklam Panonuz Yayında</h4>
                                         <p class="text-[11px] text-amber-800 leading-relaxed">
-                                            İşletmeniz Keşfet kulelerinde binlerce müşteriye sergileniyor.
+                                            İşletmeniz Keşfet Spotlight vitrininde binlerce müşteriye sergileniyor.
                                         </p>
                                     </div>
                                 </a>

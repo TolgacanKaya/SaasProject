@@ -483,7 +483,7 @@
         </div>
     </div>
 
-    <!-- 💎 💎 💎 KEŞFET REKLAM PANOSU & SPONSORLUK MODÜLÜ (EN PRESTİJLİ) 💎 💎 💎 -->
+    <!-- KEŞFET REKLAM PANOSU & SPONSORLUK MODÜLÜ -->
     <div class="max-w-6xl mx-auto mt-16 bg-slate-900 rounded-[2rem] border-2 border-amber-400/40 overflow-hidden shadow-2xl shadow-amber-900/20 relative flex flex-col lg:flex-row">
 
         <!-- Sol Bilgilendirme ve Durum Alanı -->
@@ -496,7 +496,7 @@
                     En Prestijli Görünürlük
                 </span>
                 <h2 class="text-3xl lg:text-4xl font-black text-white mb-3 tracking-tight">Keşfet <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500">Reklam Panosu</span> & Sponsorluk</h2>
-                <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Masaüstünde Keşfet'in sağ ve sol yüzen sponsor kulelerinde, mobilde ise en tepedeki sponsor vitrininde yer alın. Günde binlerce potansiyel müşteriye doğrudan ulaşın!</p>
+                <p class="text-slate-400 text-sm font-medium leading-relaxed mb-6">Keşfet sayfasının en tepesindeki Spotlight Vitrininde yer alarak binlerce potansiyel müşteriye doğrudan ulaşın ve işletmenizin randevu trafiğini katlayın.</p>
 
                 {% if isletme.is_ad_active_now %}
                 <div class="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex flex-col gap-3 mb-6 shadow-lg shadow-emerald-500/5">
@@ -506,7 +506,7 @@
                             <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                         </div>
                         <div>
-                            <div class="text-emerald-400 text-xs font-black uppercase tracking-wider">Reklamınız Yayında!</div>
+                            <div class="text-emerald-400 text-xs font-black uppercase tracking-wider">Reklamınız Yayında</div>
                             <div class="text-white text-sm font-semibold">Bitiş: {{ isletme.ad_end_date|date:"d M Y - H:i" }}</div>
                         </div>
                     </div>
@@ -533,7 +533,7 @@
             <form action="{% url 'reklam_slogan_kaydet' %}" method="POST" class="relative z-10 bg-slate-950/60 border border-slate-800 p-4 rounded-2xl">
                 {% csrf_token %}
                 <label class="block text-[11px] font-black text-amber-300 uppercase tracking-widest mb-1.5">Özel Reklam Sloganınız</label>
-                <input type="text" name="ad_slogan" value="{{ isletme.ad_slogan|default:'' }}" placeholder="Örn: Bu haftaya özel tüm saç bakımlarında %25 indirim!" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs font-medium focus:border-amber-400 focus:outline-none mb-3">
+                <input type="text" name="ad_slogan" value="{{ isletme.ad_slogan|default:'' }}" placeholder="Örn: Bu haftaya özel tüm saç bakımlarında indirim fırsatı!" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs font-medium focus:border-amber-400 focus:outline-none mb-3">
 
                 <div class="flex gap-2">
                     <div class="flex-1">
@@ -541,8 +541,9 @@
                         <input type="text" name="ad_badge_text" value="{{ isletme.ad_badge_text|default:'SPONSORLU' }}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-white text-xs font-medium focus:border-amber-400 focus:outline-none">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black rounded-xl transition-all">
-                            Kaydet 💾
+                        <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-black rounded-xl transition-all flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            Kaydet
                         </button>
                     </div>
                 </div>
@@ -560,7 +561,7 @@
                         <span class="text-slate-500 line-through text-sm font-bold">599 ₺</span>
                         <span class="text-white font-extrabold text-2xl group-hover:text-amber-300 transition-colors">349 ₺</span>
                     </div>
-                    <div class="text-[10px] text-slate-400 font-semibold">24 Saat Boyunca Sağ/Sol Kule</div>
+                    <div class="text-[10px] text-slate-400 font-semibold">24 Saat Boyunca Kesintisiz Vitrin</div>
                     <div class="absolute bottom-0 left-0 w-full h-1 bg-amber-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
                 </a>
 
@@ -604,10 +605,9 @@
         </div>
     </div>
 
-    <!-- 🗑️ ABONELİK İPTAL MODALI (Gelişmiş Sabitleme) -->
+    <!-- ABONELİK İPTAL MODALI -->
     <div id="cancelModal" class="fixed inset-0 !z-[9999] flex items-center justify-center hidden bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0" style="width: 100vw; height: 100vh; top: 0; left: 0;">
         <div class="bg-slate-900 border border-slate-700 rounded-[2rem] p-8 w-full max-w-md shadow-2xl transform scale-95 opacity-0 transition-all duration-300 relative overflow-hidden" id="cancelModalContent">
-            <!-- Arkaplan Süslemesi -->
             <div class="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
             <div class="flex justify-between items-center mb-6 relative z-10">
@@ -640,7 +640,7 @@
         </div>
     </div>
 
-    <!-- 🚀 VİTRİN BOOST BAŞARI MODALI -->
+    <!-- VİTRİN BOOST BAŞARI MODALI -->
     {% if request.session.show_boost_success_modal %}
     <div id="boostSuccessModal" class="fixed inset-0 !z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300" style="width: 100vw; height: 100vh; top: 0; left: 0;">
         <div class="bg-slate-900 border border-violet-500/50 rounded-3xl p-8 w-full max-w-md shadow-[0_0_40px_rgba(139,92,246,0.3)] transform transition-all duration-300 text-center relative overflow-hidden">
@@ -666,21 +666,21 @@
     </div>
     {% endif %}
 
-    <!-- 💎 REKLAM PANOSU BAŞARI MODALI -->
+    <!-- REKLAM PANOSU BAŞARI MODALI -->
     {% if request.session.show_ad_success_modal %}
     <div id="adSuccessModal" class="fixed inset-0 !z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300" style="width: 100vw; height: 100vh; top: 0; left: 0;">
         <div class="bg-slate-900 border border-amber-400/50 rounded-3xl p-8 w-full max-w-md shadow-[0_0_40px_rgba(245,158,11,0.3)] transform transition-all duration-300 text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
 
             <div class="mb-6 relative z-10">
-                <div class="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto border border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.4)]">
-                    <span class="text-4xl">💎</span>
+                <div class="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto border border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.4)] text-amber-400">
+                    <svg class="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 </div>
             </div>
 
             <h3 class="text-2xl font-black text-white mb-3 tracking-tight relative z-10">Reklam Panonuz Aktif!</h3>
             <p class="text-slate-400 text-sm mb-8 leading-relaxed relative z-10">
-                Tebrikler! <strong class="text-amber-400 font-bold">{{ request.session.ad_paket_adi }}</strong> paketiniz başarıyla tanımlandı. İşletmeniz Keşfet sayfasında sağ ve sol sponsor kulelerinde ve mobil vitrinde 10.000+ kullanıcıya sergileniyor.
+                Tebrikler! <strong class="text-amber-400 font-bold">{{ request.session.ad_paket_adi }}</strong> paketiniz başarıyla tanımlandı. İşletmeniz Keşfet sayfasında Spotlight Sponsor Vitrininde sergilenmektedir.
             </p>
 
             <button type="button" class="w-full py-4 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 text-lg font-black rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:-translate-y-1 relative z-10" onclick="closeAdModal()">
